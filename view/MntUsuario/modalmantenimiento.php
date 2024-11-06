@@ -36,6 +36,18 @@
                         <select class="select2" id="rol_id" name="rol_id">
                             <option value="1">Usuario</option>
                             <option value="2">Soporte</option>
+                            <option value="3">Operador</option>
+                        </select>
+                    </div>
+
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="empresa_id">Empresa</label>
+                        <select class="select2" id="empresa_id" name="empresa_id">
+                            <option value="1">Claro</option>
+                            <option value="2">CNEL</option>
+                            <option value="3">Administrativo</option>
+                        
                         </select>
                     </div>
 

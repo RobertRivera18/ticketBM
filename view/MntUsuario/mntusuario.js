@@ -96,6 +96,7 @@ function editar(usu_id){
         $('#usu_correo').val(data.usu_correo);
         $('#usu_pass').val(data.usu_pass);
         $('#rol_id').val(data.rol_id).trigger('change');
+        $('#empresa_id').val(data.empresa_id).trigger('change');
     }); 
 
     $('#modalmantenimiento').modal('show');

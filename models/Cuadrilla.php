@@ -33,15 +33,24 @@
         }
 
          // Método para eliminar una cuadrilla
-    public function delete_cuadrilla($cua_id) {
-        $conectar = parent::conexion();
-        parent::set_names();
-        $sql = "DELETE FROM tm_cuadrilla WHERE cua_id = ?";
-        $stmt = $conectar->prepare($sql);
-        $stmt->bindValue(1, $cua_id);
-        $stmt->execute();
-        return $resultado = $stmt->fetchAll();
-    }
+         public function delete_cuadrilla($cua_id) {
+            $conectar = parent::conexion();
+            parent::set_names();
+            
+            // Preparamos la sentencia DELETE
+            $sql = "DELETE FROM tm_cuadrilla WHERE cua_id = ?";
+            $stmt = $conectar->prepare($sql);
+            // Enlazamos el valor del parámetro
+            $stmt->bindValue(1, $cua_id);
+            // Ejecutamos la consulta
+            $result = $stmt->execute();
+            // Retornamos un valor booleano que indica si la eliminación fue exitosa
+            if ($result) {
+                return true;  // Eliminación exitosa
+            } else {
+                return false;  // Hubo un error al intentar eliminar
+            }
+        }
 
     public function get_cuadrilla_x_id($cua_id){
         $conectar= parent::conexion();
