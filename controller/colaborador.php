@@ -1,65 +1,50 @@
 <?php
     require_once("../config/conexion.php");
-    require_once("../models/Cuadrilla.php");
-    $cuadrilla = new Cuadrilla();
+    require_once("../models/Colaborador.php");
+    $colaborador = new Colaborador();
 
     switch($_GET["op"]){
         case "guardaryeditar":
             if(empty($_POST["cua_id"])){       
-                $cuadrilla->insert_cuadrilla($_POST["cua_nombre"]);     
+                $colaborador->insert_colaborador($_POST["col_nombre"],$_POST["col_apellido"]);     
             }
             else {
-                $cuadrilla->update_cuadrilla($_POST["cua_id"],$_POST["cua_nombre"]);
+                $colaborador->update_colaborador($_POST["col_id"],$_POST["col_nombre"],$_POST["col_apellido"]);
             }
             break;
 
-         case "listar":
-        // Obtener todas las cuadrillas
-        $datos = $cuadrilla->get_cuadrilla();
-        $data = Array();
-        foreach ($datos as $row) {
-            $sub_array = array();
-            $sub_array[] = $row["cua_nombre"];
-            
-            // Obtener los colaboradores de esta cuadrilla
-            $colaboradores = $cuadrilla->get_colaboradores_por_cuadrilla($row["cua_id"]);
-            $colaboradores_array = array();
-            if (is_array($colaboradores) && count($colaboradores) > 0) {
-                foreach ($colaboradores as $colaborador) {
-                    $colaboradores_array[] = $colaborador["col_nombre"] . ' ' . $colaborador["col_apellido"];
-                }
-                $sub_array[] = implode(", ", $colaboradores_array); // Mostrar colaboradores como lista separada por comas
-            } else {
-                $sub_array[] = "No hay colaboradores Asigandos"; // Si no tiene colaboradores
+        case "listar":
+            $datos=$colaborador->get_colaborador();
+            $data= Array();
+            foreach($datos as $row){
+                $sub_array = array();
+                $sub_array[] = $row["col_nombre"] . " " . $row["col_apellido"];
+
+                $sub_array[] = '<button type="button" onClick="editar('.$row["col_id"].');"  id="'.$row["col_id"].'" class="btn btn-inline btn-warning btn-sm ladda-button"><i class="fa fa-edit"></i></button>';
+                $sub_array[] = '<button type="button" onClick="eliminar('.$row["col_id"].');"  id="'.$row["col_id"].'" class="btn btn-inline btn-danger btn-sm ladda-button"><i class="fa fa-trash"></i></button>';
+                $data[] = $sub_array;
             }
 
-            // Botones para editar y eliminar
-            $sub_array[] = '<button type="button" onClick="editar(' . $row["cua_id"] . ');"  id="' . $row["cua_id"] . '" class="btn btn-inline btn-warning btn-sm ladda-button"><i class="fa fa-edit"></i></button>';
-            $sub_array[] = '<button type="button" onClick="eliminar(' . $row["cua_id"] . ');"  id="' . $row["cua_id"] . '" class="btn btn-inline btn-danger btn-sm ladda-button"><i class="fa fa-trash"></i></button>';
-            $data[] = $sub_array;
-        }
-
-        // Respuesta en formato JSON
-        $results = array(
-            "sEcho" => 1,
-            "iTotalRecords" => count($data),
-            "iTotalDisplayRecords" => count($data),
-            "aaData" => $data
-        );
-        echo json_encode($results);
-        break;
+            $results = array(
+                "sEcho"=>1,
+                "iTotalRecords"=>count($data),
+                "iTotalDisplayRecords"=>count($data),
+                "aaData"=>$data);
+            echo json_encode($results);
+            break;
 
         case "eliminar":
-            $cuadrilla->delete_cuadrilla($_POST["cua_id"]);
+            $colaborador->delete_colaborador($_POST["col_id"]);
             break;
 
         case "mostrar";
-            $datos=$cuadrilla->get_cuadrilla_x_id($_POST["cua_id"]);  
+            $datos=$colaborador->get_colaborador_x_id($_POST["col_id"]);  
             if(is_array($datos)==true and count($datos)>0){
                 foreach($datos as $row)
                 {
-                    $output["cua_id"] = $row["cua_id"];
-                    $output["cua_nombre"] = $row["cua_nombre"];
+                    $output["col_id"] = $row["col_id"];
+                    $output["col_nombre"] = $row["col_nombre"];
+                    $output["col_apellido"] = $row["col_apellido"];
                 }
                 echo json_encode($output);
             }   

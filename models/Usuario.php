@@ -34,20 +34,38 @@
             }
         }
 
-        public function insert_usuario($usu_nom,$usu_ape,$usu_correo,$usu_pass,$rol_id,$empresa_id){
-            $conectar= parent::conexion();
+        public function insert_usuario($usu_nom, $usu_ape, $usu_correo, $usu_pass, $rol_id, $empresa_id) {
+            // Conexión a la base de datos
+            $conectar = parent::conexion();
             parent::set_names();
-            $sql="INSERT INTO tm_usuario (usu_id, usu_nom, usu_ape, usu_correo, usu_pass, rol_id,empresa_id, fech_crea, fech_modi, fech_elim, est) VALUES (NULL,?,?,?,MD5(?),?,now(), NULL, NULL, '1');";
-            $sql=$conectar->prepare($sql);
+            $hashed_pass = MD5($usu_pass);
+            $sql = "INSERT INTO tm_usuario (usu_id, usu_nom, usu_ape, usu_correo, usu_pass, rol_id, empresa_id, fech_crea, fech_modi, fech_elim, est) 
+                    VALUES (NULL, ?, ?, ?, ?, ?, ?, NOW(), NULL, NULL, '1')";
+        
+            // Preparación de la sentencia
+            $sql = $conectar->prepare($sql);
+        
+            // Enlace de los parámetros
             $sql->bindValue(1, $usu_nom);
             $sql->bindValue(2, $usu_ape);
             $sql->bindValue(3, $usu_correo);
-            $sql->bindValue(4, $usu_pass);
+            $sql->bindValue(4, $hashed_pass); // O usa la variable de password_hash si es necesario
             $sql->bindValue(5, $rol_id);
             $sql->bindValue(6, $empresa_id);
+        
+            // Ejecución de la consulta
             $sql->execute();
-            return $resultado=$sql->fetchAll();
+        
+            // Verificar si la inserción fue exitosa
+            if ($sql->rowCount() > 0) {
+                // Si se insertó correctamente, podemos retornar el ID del nuevo usuario
+                return $conectar->lastInsertId();
+            } else {
+                // Si hubo un error en la inserción
+                return false;
+            }
         }
+        
 
         public function update_usuario($usu_id,$usu_nom,$usu_ape,$usu_correo,$usu_pass,$rol_id,$empresa_id){
             $conectar= parent::conexion();
@@ -95,7 +113,7 @@
         public function get_usuario_x_rol(){
             $conectar= parent::conexion();
             parent::set_names();
-            $sql="SELECT * FROM tm_usuario where est=1 and rol_id=2 and rol_id=3" ;
+            $sql="SELECT * FROM tm_usuario where est=1 and rol_id=2";
             $sql=$conectar->prepare($sql);
             $sql->execute();
             return $resultado=$sql->fetchAll();
