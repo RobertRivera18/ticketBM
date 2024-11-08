@@ -9,10 +9,16 @@ class Cuadrilla extends Conectar
         $sql = "INSERT INTO tm_cuadrilla (cua_nombre) VALUES (?)";
         $stmt = $conectar->prepare($sql);
         $stmt->bindValue(1, $cua_nombre);
-        $stmt->execute();
-        return $conectar->lastInsertId();
+    
+        if ($stmt->execute()) {
+            $lastInsertId = $conectar->lastInsertId(); // Obtener el último ID insertado
+            error_log("ID insertado: " . $lastInsertId); // Log para depuración
+            return $lastInsertId;
+        } else {
+            error_log("Error en la inserción: " . implode(" ", $stmt->errorInfo())); // Mostrar errores de la consulta
+            return false; // Retorna false si no se pudo insertar
+        }
     }
-
 
     // Método para actualizar el nombre de una cuadrilla
     public function update_cuadrilla($cua_id, $cua_nombre)
@@ -79,49 +85,55 @@ class Cuadrilla extends Conectar
         return $resultado = $sql->fetchAll();
     }
 
-    public function update_cuadrilla_asignacion($cua_id, $col_id) {
-        // $conectar = parent::conexion();
-        // parent::set_names();
-        // try {
-        //     // Iniciar la transacción para asegurar que las operaciones sean atómicas
-        //     $conectar->beginTransaction();
-        //     // Primero, eliminamos todos los colaboradores anteriores asignados a la cuadrilla
-        //     $sql = "DELETE FROM tm_cuadrilla_colaborador WHERE cua_id = ?";
-        //     $stmt = $conectar->prepare($sql);
-        //     $stmt->bindValue(1, $cua_id);
-        //     $stmt->execute();
-        //     // Ahora, insertamos los nuevos colaboradores asignados a esta cuadrilla
-        //     foreach ($colaboradores as $colaborador_id) {
-        //         $sql = "INSERT INTO tm_cuadrilla_colaborador (cua_id, col_id) VALUES (?, ?)";
-        //         $stmt = $conectar->prepare($sql);
-        //         $stmt->bindValue(1, $cua_id);
-        //         $stmt->bindValue(2, $colaborador_id);
-        //         $stmt->execute();
-        //     }
-        //     // Confirmamos la transacción
-        //     $conectar->commit();
-        //     return true; // Si todo fue bien
-        // } catch (PDOException $e) {
-        //     // En caso de error, revertimos la transacción
-        //     $conectar->rollBack();
-        //     echo "Error: " . $e->getMessage();
-        //     return false; // Si algo falló
-        // }
+    public function update_cuadrilla_asignacion($cua_id, $col_id) {        
+        $conectar = parent::conexion();
+        parent::set_names();
+        $sql = "UPDATE tm_cuadrilla_colaborador 
+                SET col_id = ? 
+                WHERE cua_id = ?";
         
-            $conectar= parent::conexion();
-            parent::set_names();
-            $sql="update tm_cuadrilla_colaborador 
-                set	
-                    col_id = ?
-                where
-                    cua_id = ?";
-            $sql=$conectar->prepare($sql);
-            $sql->bindValue(1, $col_id);
-            $sql->bindValue(2, $cua_id);
-            $sql->execute();
-            return $resultado=$sql->fetchAll();
+        $sql = $conectar->prepare($sql);
+        $sql->bindValue(1, $col_id);
+        $sql->bindValue(2, $cua_id);
+        
+        // Verificar si la ejecución fue exitosa
+        if ($sql->execute()) {
+            return true;
+        } else {
+            return false;
         }
+    }
     
+
+
+        //     $conectar = parent::conexion();
+        //     parent::set_names();
+        
+        //     // Primero verificamos si ya existe una asignación para esa cuadrilla
+        //     $sql = "SELECT * FROM tm_cuadrilla_colaborador WHERE cua_id = ? AND col_id = ?";
+        //     $sql = $conectar->prepare($sql);
+        //     $sql->bindValue(1, $cua_id);
+        //     $sql->bindValue(2, $col_id);
+        //     $sql->execute();
+        
+        //     // Si no existe una asignación, realizamos un INSERT
+        //     if ($sql->rowCount() == 0) {
+        //         $sql = "INSERT INTO tm_cuadrilla_colaborador (cua_id, col_id) VALUES (?, ?)";
+        //         $sql = $conectar->prepare($sql);
+        //         $sql->bindValue(1, $cua_id);
+        //         $sql->bindValue(2, $col_id);
+        //         $sql->execute();
+        //     } else {
+        //         // Si ya existe, simplemente actualizamos el registro
+        //         $sql = "UPDATE tm_cuadrilla_colaborador SET col_id = ? WHERE cua_id = ?";
+        //         $sql = $conectar->prepare($sql);
+        //         $sql->bindValue(1, $col_id);
+        //         $sql->bindValue(2, $cua_id);
+        //         $sql->execute();
+        //     }
+        
+        //     return true;
+        
     
 
     // public function get_colaboradores(){
@@ -136,8 +148,7 @@ class Cuadrilla extends Conectar
 
 
     //Metodo usado para mostar los colaboradores por cuadrilla en el DataTable
-    public function get_colaboradores_por_cuadrilla($cua_id)
-    {
+    public function get_colaboradores_por_cuadrilla($cua_id){
         $conectar = parent::conexion();
         parent::set_names();
 

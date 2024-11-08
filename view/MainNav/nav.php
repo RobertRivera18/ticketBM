@@ -70,6 +70,13 @@
                             <span class="lbl">Mantenimiento Colaboradores</span>
                         </a>
                     </li>
+
+                    <li class="blue-dirty">
+                        <a href="..\MntGrupos\">
+                            <span class="glyphicon glyphicon-th"></span>
+                            <span class="lbl">Mantenimiento Grupos</span>
+                        </a>
+                    </li>
                     
                 </ul>
             </nav>

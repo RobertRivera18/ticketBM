@@ -5,13 +5,32 @@
 
     switch($_GET["op"]){
         case "guardaryeditar":
-            if(empty($_POST["cua_id"])){       
-                $cuadrilla->insert_cuadrilla($_POST["cua_nombre"]);     
-            }
-            else {
-                $cuadrilla->update_cuadrilla($_POST["cua_id"],$_POST["cua_nombre"]);
+            // Verificar que los datos estén siendo enviados correctamente
+            error_log("cua_nombre: " . $_POST["cua_nombre"]);
+            error_log("cua_id: " . $_POST["cua_id"]);
+        
+            if(empty($_POST["cua_id"])){
+                // Insertar nueva cuadrilla
+                $cua_id = $cuadrilla->insert_cuadrilla($_POST["cua_nombre"]);
+                
+                if ($cua_id) {
+                    error_log("ID de cuadrilla insertada: " . $cua_id); // Verificar ID insertado
+                    echo json_encode(['status' => 'success', 'cua_id' => $cua_id]); // Respuesta exitosa
+                } else {
+                    error_log("Error al insertar cuadrilla.");
+                    echo json_encode(['status' => 'error', 'message' => 'No se pudo insertar la cuadrilla']);
+                }
+            } else {
+                // Actualizar cuadrilla
+                $resultado = $cuadrilla->update_cuadrilla($_POST["cua_id"], $_POST["cua_nombre"]);
+                if ($resultado) {
+                    echo json_encode(['status' => 'success']);
+                } else {
+                    echo json_encode(['status' => 'error', 'message' => 'No se pudo actualizar la cuadrilla']);
+                }
             }
             break;
+        
 
          case "listar":
         // Obtener todas las cuadrillas
@@ -30,7 +49,6 @@
                 }
                 $sub_array[] = implode(", ", $colaboradores_array); // Mostrar colaboradores como lista separada por comas
             } else {
-                $sub_array[] = '<span class="label label-pill label-warning">No tiene colaboradores asignados</span>'; // Si no tiene colaboradores
                     $sub_array[] = '<a onClick="asignar('.$row["cua_id"].');"><span class="label label-pill label-warning">Sin Asignar</span></a>';
             }
 
@@ -65,64 +83,20 @@
                 echo json_encode($output);
             }   
             break;
-       
+
+
             case "asignar":
-                $cuadrilla->update_cuadrilla_asignacion($_POST["cua_id"],$_POST["col_id"]);
-            break;
-/* 
-        case "total";
-            $datos=$usuario->get_usuario_total_x_id($_POST["usu_id"]);  
-            if(is_array($datos)==true and count($datos)>0){
-                foreach($datos as $row)
-                {
-                    $output["TOTAL"] = $row["TOTAL"];
+                if (isset($_POST["cua_id"]) && isset($_POST["col_id"])) {
+                    // Verificar los valores recibidos
+                    error_log("cua_id: " . $_POST["cua_id"]);
+                    error_log("col_id: " . $_POST["col_id"]);
+                    
+                    // Llamar al método de asignación
+                    $cuadrilla->update_cuadrilla_asignacion($_POST["cua_id"], $_POST["col_id"]);
+                    echo json_encode(['status' => 'success']);
+                } else {
+                    echo json_encode(['status' => 'error', 'message' => 'Faltan parámetros']);
                 }
-                echo json_encode($output);
-            }
-            break;
-
-        case "totalabierto";
-            $datos=$usuario->get_usuario_totalabierto_x_id($_POST["usu_id"]);  
-            if(is_array($datos)==true and count($datos)>0){
-                foreach($datos as $row)
-                {
-                    $output["TOTAL"] = $row["TOTAL"];
-                }
-                echo json_encode($output);
-            }
-            break;
-
-        case "totalcerrado";
-            $datos=$usuario->get_usuario_totalcerrado_x_id($_POST["usu_id"]);  
-            if(is_array($datos)==true and count($datos)>0){
-                foreach($datos as $row)
-                {
-                    $output["TOTAL"] = $row["TOTAL"];
-                }
-                echo json_encode($output);
-            }
-            break;
-
-        case "grafico";
-            $datos=$usuario->get_usuario_grafico($_POST["usu_id"]);  
-            echo json_encode($datos);
-            break;
-*/
-        // case "combo";
-        //     $datos = $cuadrilla->get_colaboradores();
-        //     if(is_array($datos)==true and count($datos)>0){
-        //         $html.= "<option label='Seleccionar'></option>";
-        //         foreach($datos as $row)
-        //         {
-        //             $html.= "<option value='".$row['col_id']."'>".$row['col_nombre']."</option>";
-        //         }
-        //         echo $html;
-        //     }
-        //     break;
-        /* Controller para actualizar contraseña */
-        /* case "password":
-            $usuario->update_usuario_pass($_POST["usu_id"],$_POST["usu_pass"]);
-            break; */
-
+                break;
     }
 ?>
