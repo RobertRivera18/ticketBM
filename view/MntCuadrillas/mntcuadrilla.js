@@ -159,6 +159,9 @@ function guardaryeditar(e) {
 }
 
 $(document).ready(function () {
+    $.post("../../controller/colaborador.php?op=combo", function (data) {
+        $('#col_id').html(data);
+    });
     // Inicialización de DataTable
     tabla = $('#cuadrilla_data').DataTable({
         "aProcessing": true,
@@ -216,12 +219,11 @@ function editar(cua_id) {
     $('#modalmantenimiento').modal('show');
 }
 
-function asignar(tick_id){
-    $.post("../../controller/ticket.php?op=mostrar", {tick_id : tick_id}, function (data) {
+function asignar(cua_id){
+    $.post("../../controller/cuadrilla.php?op=mostrar", {cua_id : cua_id}, function (data) {
         data = JSON.parse(data);
-        $('#tick_id').val(data.tick_id);
-
-        $('#mdltitulo').html('Asignar Agente');
+        $('#cua_id').val(data.cua_id);
+        $('#mdltitulo').html('Asignar Colaboradores');
         $("#modalasignar").modal('show');
     });
  

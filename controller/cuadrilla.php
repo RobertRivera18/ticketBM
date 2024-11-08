@@ -30,7 +30,8 @@
                 }
                 $sub_array[] = implode(", ", $colaboradores_array); // Mostrar colaboradores como lista separada por comas
             } else {
-                $sub_array[] = "No hay colaboradores Asigandos"; // Si no tiene colaboradores
+                $sub_array[] = '<span class="label label-pill label-warning">No tiene colaboradores asignados</span>'; // Si no tiene colaboradores
+                    $sub_array[] = '<a onClick="asignar('.$row["cua_id"].');"><span class="label label-pill label-warning">Sin Asignar</span></a>';
             }
 
             // Botones para editar y eliminar
@@ -63,6 +64,10 @@
                 }
                 echo json_encode($output);
             }   
+            break;
+       
+            case "asignar":
+                $cuadrilla->update_cuadrilla_asignacion($_POST["cua_id"],$_POST["col_id"]);
             break;
 /* 
         case "total";

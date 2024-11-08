@@ -22,6 +22,11 @@
                         <input type="text" class="form-control" id="col_apellido" name="col_apellido" placeholder="Ingrese Apellido del Colaborador" required>
                         
                     </div>
+                    <div class="form-group">
+                        <label class="form-label" for="col_cedula">Cedula del Colaborador</label>
+                        <input type="text" class="form-control" id="col_cedula" name="col_cedula" placeholder="Ingrese Cedula del Colaborador" required>
+                        
+                    </div>
 
                     
                 </div>

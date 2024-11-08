@@ -79,6 +79,51 @@ class Cuadrilla extends Conectar
         return $resultado = $sql->fetchAll();
     }
 
+    public function update_cuadrilla_asignacion($cua_id, $col_id) {
+        // $conectar = parent::conexion();
+        // parent::set_names();
+        // try {
+        //     // Iniciar la transacción para asegurar que las operaciones sean atómicas
+        //     $conectar->beginTransaction();
+        //     // Primero, eliminamos todos los colaboradores anteriores asignados a la cuadrilla
+        //     $sql = "DELETE FROM tm_cuadrilla_colaborador WHERE cua_id = ?";
+        //     $stmt = $conectar->prepare($sql);
+        //     $stmt->bindValue(1, $cua_id);
+        //     $stmt->execute();
+        //     // Ahora, insertamos los nuevos colaboradores asignados a esta cuadrilla
+        //     foreach ($colaboradores as $colaborador_id) {
+        //         $sql = "INSERT INTO tm_cuadrilla_colaborador (cua_id, col_id) VALUES (?, ?)";
+        //         $stmt = $conectar->prepare($sql);
+        //         $stmt->bindValue(1, $cua_id);
+        //         $stmt->bindValue(2, $colaborador_id);
+        //         $stmt->execute();
+        //     }
+        //     // Confirmamos la transacción
+        //     $conectar->commit();
+        //     return true; // Si todo fue bien
+        // } catch (PDOException $e) {
+        //     // En caso de error, revertimos la transacción
+        //     $conectar->rollBack();
+        //     echo "Error: " . $e->getMessage();
+        //     return false; // Si algo falló
+        // }
+        
+            $conectar= parent::conexion();
+            parent::set_names();
+            $sql="update tm_cuadrilla_colaborador 
+                set	
+                    col_id = ?
+                where
+                    cua_id = ?";
+            $sql=$conectar->prepare($sql);
+            $sql->bindValue(1, $col_id);
+            $sql->bindValue(2, $cua_id);
+            $sql->execute();
+            return $resultado=$sql->fetchAll();
+        }
+    
+    
+
     // public function get_colaboradores(){
     //     $conectar= parent::conexion();
     //     parent::set_names();
@@ -88,6 +133,9 @@ class Cuadrilla extends Conectar
     //     return $resultado=$sql->fetchAll();
     // }
 
+
+
+    //Metodo usado para mostar los colaboradores por cuadrilla en el DataTable
     public function get_colaboradores_por_cuadrilla($cua_id)
     {
         $conectar = parent::conexion();
@@ -111,3 +159,4 @@ class Cuadrilla extends Conectar
         return $stmt->fetchAll();
     }
 }
+?>

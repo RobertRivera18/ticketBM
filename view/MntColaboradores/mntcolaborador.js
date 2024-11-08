@@ -84,6 +84,7 @@ function editar(col_id) {
         $('#col_id').val(data.col_id);
         $('#col_nombre').val(data.col_nombre);
         $('#col_apellido').val(data.col_apellido);
+        $('#col_cedula').val(data.col_cedula);
     });
     $('#modalmantenimiento').modal('show');
 }

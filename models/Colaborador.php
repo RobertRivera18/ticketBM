@@ -1,27 +1,29 @@
 <?php
     class Colaborador extends Conectar{
 
-        public function insert_colaborador($col_nombre,$col_apellido) {
+        public function insert_colaborador($col_nombre,$col_apellido,$col_cedula) {
             $conectar = parent::conexion();
             parent::set_names();
-            $sql = "INSERT INTO tm_colaborador (col_nombre,col_apellido) VALUES (?,?)";
+            $sql = "INSERT INTO tm_colaborador (col_nombre,col_apellido,col_cedula) VALUES (?,?,?)";
             $stmt = $conectar->prepare($sql);
             $stmt->bindValue(1, $col_nombre);
             $stmt->bindValue(2, $col_apellido);
+            $stmt->bindValue(3, $col_cedula);
             $stmt->execute();
             return $conectar->lastInsertId();
         }
         
     
         // Método para actualizar el nombre de una cuadrilla
-        public function update_colaborador($col_id, $col_nombre,$col_apellido) {
+        public function update_colaborador($col_id, $col_nombre,$col_apellido,$col_cedula) {
             $conectar = parent::conexion();
             parent::set_names();
-            $sql = "UPDATE tm_colaborador SET col_nombre = ?,col_apellido = ? WHERE col_id = ?";
+            $sql = "UPDATE tm_colaborador SET col_nombre = ?,col_apellido = ?,col_cedula = ? WHERE col_id = ?";
             $stmt = $conectar->prepare($sql);
             $stmt->bindValue(1, $col_nombre);
             $stmt->bindValue(2, $col_apellido);
-            $stmt->bindValue(3, $col_id);
+            $stmt->bindValue(3, $col_cedula);
+            $stmt->bindValue(4, $col_id);
             $stmt->execute();
             return $resultado = $stmt->fetchAll();
         }
@@ -74,14 +76,14 @@
         return $resultado=$sql->fetchAll();
     }
 
-    // public function get_colaboradores(){
-    //     $conectar= parent::conexion();
-    //     parent::set_names();
-    //     $sql="SELECT * FROM tm_colaborador";
-    //     $sql=$conectar->prepare($sql);
-    //     $sql->execute();
-    //     return $resultado=$sql->fetchAll();
-    // }
+    public function get_colaboradores(){
+        $conectar= parent::conexion();
+        parent::set_names();
+        $sql="SELECT * FROM tm_colaborador";
+        $sql=$conectar->prepare($sql);
+        $sql->execute();
+        return $resultado=$sql->fetchAll();
+    }
 
     }
 ?>

@@ -9,11 +9,11 @@
             </div>
             <form method="post" id="ticket_form">
                 <div class="modal-body">
-                    <input type="hidden" id="tick_id" name="tick_id">
+                    <input type="hidden" id="cua_id" name="cua_id">
 
                     <div class="form-group">
-                        <label class="form-label" for="usu_asig">Soporte</label>
-                        <select class="select2" id="usu_asig" name="usu_asig" data-placeholder="Seleccionar" required>
+                        <label class="form-label" for="col_id">Colabordores</label>
+                        <select class="select2" id="col_id" name="col_id" data-placeholder="Seleccionar" required>
 
                         </select>
                     </div>
