@@ -74,6 +74,41 @@ class Grupo extends Conectar
     }
 
 
+    //Metodo anterior
+    // public function update_grupo_asignacion($grupo_id,$col_id){
+    //     $conectar= parent::conexion();
+    //     parent::set_names();
+    //     $sql="update tm_grupo 
+    //         set	
+    //             col_id = ?
+    //         where
+    //             grupo_id = ?";
+    //     $sql=$conectar->prepare($sql);
+    //     $sql->bindValue(1, $col_id);
+    //     $sql->bindValue(2, $grupo_id);
+    //     $sql->execute();
+    //     return $resultado=$sql->fetchAll();
+    // }
+
+    public function update_grupo_asignacion($cua_id, $col_id) {        
+        $conectar = parent::conexion();
+        parent::set_names();
+        $sql = "UPDATE tm_cuadrilla_colaborador 
+                SET col_id = ? 
+                WHERE cua_id = ?";
+        
+        $sql = $conectar->prepare($sql);
+        $sql->bindValue(1, $col_id);
+        $sql->bindValue(2, $cua_id);
+        
+        // Verificar si la ejecución fue exitosa
+        if ($sql->execute()) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     // //Muestra los colaboradores que no tienen asignado una cuadrilla 
     // public function get_colaboradores()
     // {
@@ -87,4 +122,28 @@ class Grupo extends Conectar
     //     $sql->execute();
     //     return $resultado = $sql->fetchAll();
     // }
+
+
+
+    //Metodo usado para mostar los colaboradores por cuadrilla en el DataTable
+    public function get_colaboradores_por_grupo($grupo_id){
+        $conectar = parent::conexion();
+        parent::set_names();
+
+        // Consulta para obtener los colaboradores de una cuadrilla
+        $sql = "SELECT 
+                    col.col_nombre
+                FROM 
+                    tm_cuadrilla_colaborador c_cuadrilla_colaborador
+                INNER JOIN 
+                    tm_colaborador col ON c_cuadrilla_colaborador.col_id = col.col_id
+                WHERE 
+                    c_cuadrilla_colaborador.cua_id = ?";
+
+        $stmt = $conectar->prepare($sql);
+        $stmt->bindValue(1, $grupo_id);
+        $stmt->execute();
+
+        return $stmt->fetchAll();
+    }
 }

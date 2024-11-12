@@ -33,12 +33,16 @@ function guardaryeditar(e) {
 $(document).ready(function () {
     // Inicialización de DataTable
     tabla = $('#colaborador_data').DataTable({
-        "aProcessing": true,
-        "aServerSide": true,
-        dom: 'Bfrtip',
-        "searching": true,
-        lengthChange: false,
-        colReorder: true,
+        "lengthMenu": [5, 10, 25, 75, 100],//mostramos el menú de registros a revisar
+        "aProcessing": true,//Activamos el procesamiento del datatables
+        "aServerSide": true,//Paginación y filtrado realizados por el servidor
+        dom: '<Bl<f>rtip>',//Definimos los elementos del control de tabla
+        buttons: [
+            'copyHtml5',
+            'excelHtml5',
+            'csvHtml5',
+            'pdf'
+        ],
         buttons: [
             'copyHtml5',
             'excelHtml5',
@@ -56,7 +60,7 @@ $(document).ready(function () {
         "bDestroy": true,
         "responsive": true,
         "bInfo": true,
-        "iDisplayLength": 10,
+        "iDisplayLength": 100,
         "autoWidth": false,
         "language": {
             "sProcessing": "Procesando...",
@@ -83,8 +87,8 @@ function editar(col_id) {
         data = JSON.parse(data);
         $('#col_id').val(data.col_id);
         $('#col_nombre').val(data.col_nombre);
-        $('#col_apellido').val(data.col_apellido);
         $('#col_cedula').val(data.col_cedula);
+        $('#col_empresa_id').val(data.col_empresa_id);
     });
     $('#modalmantenimiento').modal('show');
 }

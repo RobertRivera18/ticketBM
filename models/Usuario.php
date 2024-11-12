@@ -35,33 +35,22 @@
         }
 
         public function insert_usuario($usu_nom, $usu_ape, $usu_correo, $usu_pass, $rol_id, $empresa_id) {
-            // Conexión a la base de datos
             $conectar = parent::conexion();
             parent::set_names();
             $hashed_pass = MD5($usu_pass);
             $sql = "INSERT INTO tm_usuario (usu_id, usu_nom, usu_ape, usu_correo, usu_pass, rol_id, empresa_id, fech_crea, fech_modi, fech_elim, est) 
                     VALUES (NULL, ?, ?, ?, ?, ?, ?, NOW(), NULL, NULL, '1')";
-        
-            // Preparación de la sentencia
             $sql = $conectar->prepare($sql);
-        
-            // Enlace de los parámetros
             $sql->bindValue(1, $usu_nom);
             $sql->bindValue(2, $usu_ape);
             $sql->bindValue(3, $usu_correo);
-            $sql->bindValue(4, $hashed_pass); // O usa la variable de password_hash si es necesario
+            $sql->bindValue(4, $hashed_pass);
             $sql->bindValue(5, $rol_id);
             $sql->bindValue(6, $empresa_id);
-        
-            // Ejecución de la consulta
             $sql->execute();
-        
-            // Verificar si la inserción fue exitosa
             if ($sql->rowCount() > 0) {
-                // Si se insertó correctamente, podemos retornar el ID del nuevo usuario
                 return $conectar->lastInsertId();
             } else {
-                // Si hubo un error en la inserción
                 return false;
             }
         }

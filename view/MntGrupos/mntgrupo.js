@@ -31,6 +31,10 @@ function guardaryeditar(e) {
 }
 
 $(document).ready(function () {
+    $.post("../../controller/colaborador.php?op=combo", function (data) {
+        $('#col_id').html(data);
+    });
+
     // Inicialización de DataTable
     tabla = $('#grupo_data').DataTable({
         "aProcessing": true,
@@ -76,6 +80,18 @@ $(document).ready(function () {
         }
     });
 });
+
+
+function asignar(grupo_id){
+    $.post("../../controller/grupo.php?op=mostrar", {grupo_id : grupo_id}, function (data) {
+        data = JSON.parse(data);
+        $('#grupo_id').val(data.grupo_id);
+
+        $('#mdltitulo').html('Asignar Colaborador');
+        $("#modalasignar").modal('show');
+    });
+ 
+}
 
 function editar(grupo_id) {
     $('#mdltitulo').html('Editar Registro');

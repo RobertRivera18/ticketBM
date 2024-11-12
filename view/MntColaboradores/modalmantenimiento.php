@@ -18,14 +18,17 @@
                     </div>
 
                     <div class="form-group">
-                        <label class="form-label" for="col_apellido">Apellidos del Colaborador</label>
-                        <input type="text" class="form-control" id="col_apellido" name="col_apellido" placeholder="Ingrese Apellido del Colaborador" required>
-                        
-                    </div>
-                    <div class="form-group">
                         <label class="form-label" for="col_cedula">Cedula del Colaborador</label>
                         <input type="text" class="form-control" id="col_cedula" name="col_cedula" placeholder="Ingrese Cedula del Colaborador" required>
                         
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="empresa_id">Empresa</label>
+                        <select class="select2" id="empresa_id" name="empresa_id">
+                            <option value="1">CNEL</option>
+                            <option value="2">Claro</option>
+                            
+                        </select>
                     </div>
 
                     

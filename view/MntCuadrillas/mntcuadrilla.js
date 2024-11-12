@@ -1,4 +1,4 @@
-var tabla;
+/* var tabla;
 function init() {
     // Evento submit del formulario
     $("#cuadrilla_form").on("submit", function (e) {
@@ -145,10 +145,10 @@ $(document).on("click", "#btnnuevo", function () {
     $('#modalmantenimiento').modal('show');
 });
 
-init();
+init(); */
 
 
-/* var tabla;
+ var tabla;
 
 function init() {
     // Evento submit del formulario
@@ -325,4 +325,3 @@ $(document).on("click", "#btnnuevo", function () {
 });
 
 init();
- */

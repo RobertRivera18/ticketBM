@@ -58,8 +58,6 @@ class Cuadrilla extends Conectar
     {
         $conectar = parent::conexion();
         parent::set_names();
-
-        // Preparamos la sentencia DELETE
         $sql = "DELETE FROM tm_cuadrilla WHERE cua_id = ?";
         $stmt = $conectar->prepare($sql);
         // Enlazamos el valor del parámetro
@@ -72,6 +70,7 @@ class Cuadrilla extends Conectar
         } else {
             return false;  // Hubo un error al intentar eliminar
         }
+
     }
 
     public function get_cuadrilla_x_id($cua_id)
@@ -155,7 +154,6 @@ class Cuadrilla extends Conectar
         // Consulta para obtener los colaboradores de una cuadrilla
         $sql = "SELECT 
                     col.col_nombre, 
-                    col.col_apellido 
                 FROM 
                     tm_cuadrilla_colaborador c_cuadrilla_colaborador
                 INNER JOIN 

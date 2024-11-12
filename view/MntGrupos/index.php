@@ -37,7 +37,8 @@
 				<table id="grupo_data" class="table table-bordered table-striped table-vcenter js-dataTable-full">
 					<thead>
 						<tr>
-							<th style="width: 10%;">Nombre del Grupo</th>
+						<th style="width: 10%;">Nombre Grupo</th>
+							<th class="d-none d-sm-table-cell" style="width: 10%;">Colaborador Integrantes</th>
 							<th class="text-center" style="width: 5%;"></th>
 							<th class="text-center" style="width: 5%;"></th>
 						</tr>
@@ -51,7 +52,7 @@
 		</div>
 	</div>
 	<!-- Contenido -->
-
+	<?php require_once("modalasignar.php");?>
 	<?php require_once("modalmantenimiento.php");?>
 
 	<?php require_once("../MainJs/js.php");?>

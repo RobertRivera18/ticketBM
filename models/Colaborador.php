@@ -2,30 +2,34 @@
 class Colaborador extends Conectar
 {
 
-    public function insert_colaborador($col_nombre, $col_apellido, $col_cedula)
+    public function insert_colaborador($col_nombre, $col_cedula, $empresa_id)
     {
         $conectar = parent::conexion();
         parent::set_names();
-        $sql = "INSERT INTO tm_colaborador (col_nombre,col_apellido,col_cedula) VALUES (?,?,?)";
+        $sql = "INSERT INTO tm_colaborador (col_nombre,col_cedula,empresa_id)) VALUES (?,?,?)";
         $stmt = $conectar->prepare($sql);
         $stmt->bindValue(1, $col_nombre);
-        $stmt->bindValue(2, $col_apellido);
-        $stmt->bindValue(3, $col_cedula);
+        $stmt->bindValue(2, $col_cedula);
+        $stmt->bindValue(3, $empresa_id);
         $stmt->execute();
-        return $conectar->lastInsertId();
+        if ($stmt->rowCount() > 0) {
+            return $conectar->lastInsertId();
+        } else {
+            return false;
+        }
     }
 
 
     // Método para actualizar el nombre de una cuadrilla
-    public function update_colaborador($col_id, $col_nombre, $col_apellido, $col_cedula)
+    public function update_colaborador($col_id, $col_nombre, $col_cedula, $empresa_id)
     {
         $conectar = parent::conexion();
         parent::set_names();
-        $sql = "UPDATE tm_colaborador SET col_nombre = ?,col_apellido = ?,col_cedula = ? WHERE col_id = ?";
+        $sql = "UPDATE tm_colaborador SET col_nombre = ?,col_cedula = ?, empresa_id = ? WHERE col_id = ?";
         $stmt = $conectar->prepare($sql);
         $stmt->bindValue(1, $col_nombre);
-        $stmt->bindValue(2, $col_apellido);
-        $stmt->bindValue(3, $col_cedula);
+        $stmt->bindValue(2, $col_cedula);
+        $stmt->bindValue(3, $empresa_id);
         $stmt->bindValue(4, $col_id);
         $stmt->execute();
         return $resultado = $stmt->fetchAll();
@@ -82,6 +86,18 @@ class Colaborador extends Conectar
         return $resultado = $sql->fetchAll();
     }
 
+    public function get_colaboradores_x_id()
+    {
+        $conectar = parent::conexion();
+        parent::set_names();
+        $sql = "SELECT c.*
+             FROM tm_colaborador c
+             LEFT JOIN tm_cuadrilla_colaborador cc ON c.col_id = cc.col_id
+             WHERE cc.col_id IS NULL";
+        $sql = $conectar->prepare($sql);
+        $sql->execute();
+        return $resultado = $sql->fetchAll();
+    }
 
     //Muestra los colaboradores que no tienen asignado una cuadrilla 
     public function get_colaboradores()
@@ -91,7 +107,7 @@ class Colaborador extends Conectar
         $sql = "SELECT c.*
              FROM tm_colaborador c
              LEFT JOIN tm_cuadrilla_colaborador cc ON c.col_id = cc.col_id
-             WHERE cc.col_id IS NULL;";
+             WHERE cc.col_id IS NULL";
         $sql = $conectar->prepare($sql);
         $sql->execute();
         return $resultado = $sql->fetchAll();

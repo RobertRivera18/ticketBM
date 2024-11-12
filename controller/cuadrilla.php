@@ -45,7 +45,7 @@
             $colaboradores_array = array();
             if (is_array($colaboradores) && count($colaboradores) > 0) {
                 foreach ($colaboradores as $colaborador) {
-                    $colaboradores_array[] = $colaborador["col_nombre"] . ' ' . $colaborador["col_apellido"];
+                    $colaboradores_array[] = $colaborador["col_nombre"];
                 }
                 $sub_array[] = implode(", ", $colaboradores_array); // Mostrar colaboradores como lista separada por comas
             } else {
