@@ -26,7 +26,7 @@
                         <label class="form-label" for="empresa_id">Empresa</label>
                         <select class="select2" id="empresa_id" name="empresa_id">
                             <option value="1">CNEL</option>
-                            <option value="2">Claro</option>
+                            <option value="2">CLARO</option>
                             
                         </select>
                     </div>

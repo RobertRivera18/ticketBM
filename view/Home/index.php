@@ -6,7 +6,7 @@
 <html>
     <?php require_once("../MainHead/head.php");?>
 	<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/morris.js/0.5.1/morris.css">
-	<title>Sistena Tickets Soporte Tecnico</>::Home</title>
+	<title>Sistema Ticket Soporte Tecnico-Home</title>
 </head>
 <body class="with-side-menu">
 

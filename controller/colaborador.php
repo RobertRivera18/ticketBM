@@ -64,14 +64,35 @@ switch ($_GET["op"]) {
         break;
 
 
-    case "combo";
+    // case "combo";
+    //     $datos = $colaborador->get_colaboradores();
+    //     if (is_array($datos) == true and count($datos) > 0) {
+    //         $html .= "<option label='Seleccionar'></option>";
+    //         foreach ($datos as $row) {
+    //             $html .= "<option value='" . $row['col_id'] . "'>" . $row['col_nombre'] . " - " . $row['col_cedula'] . "</option>";
+    //         }
+    //         echo $html;
+    //     }
+    //     break;
+    
+    case "combo":
         $datos = $colaborador->get_colaboradores();
-        if (is_array($datos) == true and count($datos) > 0) {
-            $html .= "<option label='Seleccionar'></option>";
+        $data = array();
+        if (is_array($datos) && count($datos) > 0) {
             foreach ($datos as $row) {
-                $html .= "<option value='" . $row['col_id'] . "'>" . $row['col_nombre'] . " - " . $row['col_cedula'] . "</option>";
+                $data[] = array(
+                    "0" => $row['col_nombre'],
+                    "1" => $row['col_cedula'],
+                );
             }
-            echo $html;
         }
+        $results = array(
+            "sEcho"=>1, //Información para el datatables
+            "iTotalRecords"=>count($data), //enviamos el total registros al datatable
+            "iTotalDisplayRecords"=>count($data), //enviamos el total registros a visualizar
+            "aaData"=>$data);
+            echo json_encode($results);
         break;
+    
+    
 }

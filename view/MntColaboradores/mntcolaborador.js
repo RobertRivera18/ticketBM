@@ -88,7 +88,8 @@ function editar(col_id) {
         $('#col_id').val(data.col_id);
         $('#col_nombre').val(data.col_nombre);
         $('#col_cedula').val(data.col_cedula);
-        $('#col_empresa_id').val(data.col_empresa_id);
+        $('#empresa_id').val(data.empresa_id).trigger('change');
+      
     });
     $('#modalmantenimiento').modal('show');
 }
