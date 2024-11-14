@@ -62,36 +62,29 @@ switch ($_GET["op"]) {
             echo json_encode(['status' => 'error', 'message' => 'Colaborador no encontrado']);
         }
         break;
-
-
-    // case "combo";
-    //     $datos = $colaborador->get_colaboradores();
-    //     if (is_array($datos) == true and count($datos) > 0) {
-    //         $html .= "<option label='Seleccionar'></option>";
-    //         foreach ($datos as $row) {
-    //             $html .= "<option value='" . $row['col_id'] . "'>" . $row['col_nombre'] . " - " . $row['col_cedula'] . "</option>";
-    //         }
-    //         echo $html;
-    //     }
-    //     break;
-    
+ 
     case "combo":
         $datos = $colaborador->get_colaboradores();
         $data = array();
         if (is_array($datos) && count($datos) > 0) {
             foreach ($datos as $row) {
+                $empresa = $row['empresa_id'] == 1 ? '<span class="label label-pill label-info">CNEL</span>' : ($row['empresa_id'] == 2 ? '<span class="label label-pill label-danger">CLARO</span>' : "Otro");
+    
                 $data[] = array(
-                    "0" => $row['col_nombre'],
-                    "1" => $row['col_cedula'],
+                    "0" => '<button class="btn btn-warning" onclick="imprimirColaborador(' . $row['col_id'] . ')"><span class="fa fa-plus"></span></button>',
+                    "1" => $row['col_nombre'],
+                    "2" => $row['col_cedula'],
+                    "3" => $empresa,
                 );
             }
         }
         $results = array(
-            "sEcho"=>1, //Información para el datatables
-            "iTotalRecords"=>count($data), //enviamos el total registros al datatable
-            "iTotalDisplayRecords"=>count($data), //enviamos el total registros a visualizar
-            "aaData"=>$data);
-            echo json_encode($results);
+            "sEcho" => 1, 
+            "iTotalRecords" => count($data),
+            "iTotalDisplayRecords" => count($data), 
+            "aaData" => $data
+        );
+        echo json_encode($results);
         break;
     
     

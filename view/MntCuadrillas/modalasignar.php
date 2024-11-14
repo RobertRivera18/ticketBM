@@ -40,8 +40,10 @@
                     <table id="tblcolaboradores" class="table table-striped table-bordered table-condensed table-hover" style="width: 100%;">
                         <thead>
                             <tr>
+                                <th>Opciones</th>
                                 <th>Nombre</th>
                                 <th>Cédula</th>
+                                <th>Empresa</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -49,8 +51,10 @@
                         </tbody>
                         <tfoot>
                             <tr>
+                                <th>Opciones</th>
                                 <th>Nombre</th>
                                 <th>Cédula</th>
+                                <th>Empresa</th>
                             </tr>
                         </tfoot>
                     </table>
