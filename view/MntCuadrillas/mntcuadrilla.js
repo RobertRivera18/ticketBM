@@ -1,25 +1,26 @@
 var tabla;
 function init() {
     $("#cuadrilla_form").on("submit", function (e) {
-        guardaryeditar(e);
+        guardar(e);
         listarColaboradores();
     });
 }
 
-function guardaryeditar(e) {
+function guardar(e) {
     e.preventDefault();
     var formData = new FormData($("#cuadrilla_form")[0]);
     $.ajax({
-        url: "../../controller/cuadrilla.php?op=guardaryeditar",
+        url: "../../controller/cuadrilla.php?op=guardar",
         type: "POST",
         data: formData,
         contentType: false,
         processData: false,
-        success: function (datos) {
+        success: function(datos){    
             console.log(datos);
             $('#cuadrilla_form')[0].reset();
             $("#modalmantenimiento").modal('hide');
-            tabla.ajax.reload();
+            $('#cuadrilla_data').DataTable().ajax.reload();
+
             swal({
                 title: "HelpDesk!",
                 text: "Completado.",
@@ -30,7 +31,7 @@ function guardaryeditar(e) {
     });
 }
 $(document).ready(function () {
-     listarColaboradores()
+     
     tabla = $('#cuadrilla_data').DataTable({
         "lengthMenu": [5, 10, 25, 75, 100],
         "aProcessing": true,
@@ -79,16 +80,7 @@ $(document).ready(function () {
         }
     });
 });
-function editar(cua_id) {
-    $('#mdltitulo').html('Editar Registro');
-    $.post("../../controller/cuadrilla.php?op=mostrar", {cua_id: cua_id }, function (data) {
-        data = JSON.parse(data);
-        $('#cua_id').val(data.cua_id);
-        $('#cua_nombre').val(data.cua_nombre);
-      
-    });
-    $('#modalmantenimiento').modal('show');
-}
+
 function eliminar(cua_id){
     swal({
         title: "HelpDesk",
@@ -121,9 +113,9 @@ function listarColaboradores()
 {
 	tabla=$('#tblcolaboradores').dataTable(
 	{
-		"aProcessing": true,//Activamos el procesamiento del datatables
-	    "aServerSide": true,//Paginación y filtrado realizados por el servidor
-	    dom: 'Bfrtip',//Definimos los elementos del control de tabla
+		"aProcessing": true,
+	    "aServerSide": true,
+	    dom: 'Bfrtip',
 	    buttons: [		          
 		            
 		        ],
@@ -138,7 +130,23 @@ function listarColaboradores()
 				},
 		"bDestroy": true,
 		"iDisplayLength": 5,//Paginación
-	    "order": [[ 0, "desc" ]]//Ordenar (columna,orden)
+	    "order": [[ 0, "desc" ]],//Ordenar (columna,orden)
+        "language": {
+            "sProcessing": "Procesando...",
+            "sLengthMenu": "Mostrar _MENU_ registros",
+            "sZeroRecords": "No se encontraron resultados",
+            "sEmptyTable": "Ningún dato disponible en esta tabla",
+            "sInfo": "Mostrando un total de _TOTAL_ registros",
+            "sInfoEmpty": "Mostrando un total de 0 registros",
+            "sInfoFiltered": "(filtrado de un total de _MAX_ registros)",
+            "sSearch": "Buscar:",
+            "oPaginate": {
+                "sFirst": "Primero",
+                "sLast": "Último",
+                "sNext": "Siguiente",
+                "sPrevious": "Anterior"
+            }
+        }
 	}).DataTable();
 }
 
@@ -147,12 +155,48 @@ $(document).on("click","#btnnuevo", function(){
     $('#cuadrilla_form')[0].reset();
     $('#modalmantenimiento').modal('show');
 });
-
 init();
       
 function asignar() {
-        $("#modalasignar").modal('show');
+   console.log("Desde asignacion de tecnico operador") 
 }
+
+let currentCuaId;
+
+function agregar(cua_id) {
+    currentCuaId = cua_id;
+    listarColaboradores();
+    $("#modalasignar").modal('show');
+}
+
+function asignar(col_id) {
+    $.ajax({
+        url: "../../controller/cuadrilla.php?op=asignar",
+        type: "POST",
+        data: { cua_id: currentCuaId, col_id: col_id },
+        success: function(response) {
+            console.log("Colaborador asignado:", response);
+            
+            if (response) {
+                swal({
+                    title: "HelpDesk!",
+                    text: "Colaborador asignado correctamente.",
+                    type: "success",
+                    confirmButtonClass: "btn-success"
+                });
+                $("#modalasignar").modal('hide');
+                $('#cuadrilla_data').DataTable().ajax.reload();
+            } else {
+                console.error("Error al asignar colaborador.");
+            }
+        },
+        error: function(error) {
+            console.error("Error en la asignación", error);
+        }
+    });
+}
+
+
 
 
 

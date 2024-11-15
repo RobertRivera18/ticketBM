@@ -15,23 +15,12 @@ class Cuadrilla extends Conectar
             error_log("ID insertado: " . $lastInsertId);
             return $lastInsertId;
         } else {
-            error_log("Error en la inserción: " . implode(" ", $stmt->errorInfo())); 
+            error_log("Error en la inserción: " . implode(" ", $stmt->errorInfo()));
             return false;
         }
     }
 
-    // Método para actualizar el nombre de una cuadrilla
-    public function update_cuadrilla($cua_id, $cua_nombre)
-    {
-        $conectar = parent::conexion();
-        parent::set_names();
-        $sql = "UPDATE tm_cuadrilla SET cua_nombre = ? WHERE cua_id = ?";
-        $stmt = $conectar->prepare($sql);
-        $stmt->bindValue(1, $cua_nombre);
-        $stmt->bindValue(2, $cua_id);
-        $stmt->execute();
-        return $resultado = $stmt->fetchAll();
-    }
+
 
     public function get_cuadrilla()
     {
@@ -60,7 +49,7 @@ class Cuadrilla extends Conectar
         $stmt->bindValue(1, $cua_id);
         $result = $stmt->execute();
         if ($result) {
-            return true; 
+            return true;
         } else {
             return false;
         }
@@ -77,25 +66,22 @@ class Cuadrilla extends Conectar
         return $resultado = $sql->fetchAll();
     }
 
-    public function update_cuadrilla_asignacion($cua_id, $col_id)
+    public function insert_cuadrilla_asignacion($cua_id, $col_id)
     {
         $conectar = parent::conexion();
         parent::set_names();
-        $sql = "UPDATE tm_cuadrilla_colaborador 
-                SET col_id = ? 
-                WHERE cua_id = ?";
-
+        $sql = "INSERT INTO tm_cuadrilla_colaborador (cua_id, col_id) 
+            VALUES (?, ?)";
         $sql = $conectar->prepare($sql);
-        $sql->bindValue(1, $col_id);
-        $sql->bindValue(2, $cua_id);
-
-        // Verificar si la ejecución fue exitosa
+        $sql->bindValue(1, $cua_id, PDO::PARAM_INT);
+        $sql->bindValue(2, $col_id, PDO::PARAM_INT);
         if ($sql->execute()) {
             return true;
         } else {
             return false;
         }
     }
+
 
 
 
@@ -126,19 +112,6 @@ class Cuadrilla extends Conectar
     //     }
 
     //     return true;
-
-
-
-    // public function get_colaboradores(){
-    //     $conectar= parent::conexion();
-    //     parent::set_names();
-    //     $sql="SELECT * FROM tm_colaborador";
-    //     $sql=$conectar->prepare($sql);
-    //     $sql->execute();
-    //     return $resultado=$sql->fetchAll();
-    // }
-
-
 
     //Metodo usado para mostar los colaboradores por cuadrilla en el DataTable
     public function get_colaboradores_por_cuadrilla($cua_id)
