@@ -5,7 +5,7 @@ $colaborador = new Colaborador();
 
 switch ($_GET["op"]) {
     case "guardaryeditar":
-        if (empty($_POST["cua_id"])) {
+        if (empty($_POST["col_id"])) {
             $colaborador->insert_colaborador($_POST["col_nombre"], $_POST["col_cedula"], $_POST["empresa_id"]);
         } else {
             $colaborador->update_colaborador($_POST["col_id"], $_POST["col_nombre"], $_POST["col_cedula"], $_POST["empresa_id"]);

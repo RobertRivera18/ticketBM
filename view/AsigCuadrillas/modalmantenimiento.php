@@ -12,12 +12,10 @@
                     <input type="hidden" id="cua_id" name="cua_id">
 
                     <div class="form-group">
-                        <label class="form-label" for="cua_nombre">Nombre de la Cuadrilla</label>
-                        <input type="text" class="form-control" id="cua_nombre" name="cua_nombre" placeholder="Ingrese Nombre identificativo de la Cuadrilla" required>
-                        
+                        <label class="form-label" for="cua_nombre">Nombre Cuadrilla</label>
+                        <input type="text" class="form-control" id="cua_nombre" name="cua_nombre" placeholder="Ingrese Nombre Cuadrilla" required>
                     </div>
 
-                    
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-rounded btn-default" data-dismiss="modal">Cerrar</button>

@@ -157,12 +157,8 @@ $(document).on("click","#btnnuevo", function(){
 });
 init();
       
-function asignar() {
-   console.log("Desde asignacion de tecnico operador") 
-}
 
 let currentCuaId;
-
 function agregar(cua_id) {
     currentCuaId = cua_id;
     listarColaboradores();
