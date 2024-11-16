@@ -21,16 +21,14 @@ class Cuadrilla_creacion extends Conectar
     {
         $conectar = parent::conexion();
         parent::set_names();
-        $sql = "UPDATE tm_cuadrilla set 
-             cua_nombre = ?
-              WHERE 
-              cua_id = ?";
+        $sql = "UPDATE tm_cuadrilla SET cua_nombre = ? WHERE cua_id = ?";
         $stmt = $conectar->prepare($sql);
         $stmt->bindValue(1, $cua_nombre);
         $stmt->bindValue(2, $cua_id);
         $stmt->execute();
-        return $resultado = $stmt->fetchAll();
+        return $stmt->rowCount();
     }
+
 
     public function get_cuadrillas()
     {
@@ -74,6 +72,4 @@ class Cuadrilla_creacion extends Conectar
         $sql->execute();
         return $resultado = $sql->fetchAll();
     }
-
-    
 }

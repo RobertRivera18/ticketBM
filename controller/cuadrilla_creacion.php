@@ -8,9 +8,14 @@ switch ($_GET["op"]) {
         if (empty($_POST["cua_id"])) {
             $cuadrilla->insert_cuadrilla($_POST["cua_nombre"]);
         } else {
-            $cuadrilla->update_cuadrilla($_POST["cua_id"], $_POST["cua_nombre"]);
+            $rows_affected = $cuadrilla->update_cuadrilla($_POST["cua_nombre"], $_POST["cua_id"]);
+            echo json_encode([
+                "status" => $rows_affected > 0 ? "success" : "error",
+                "message" => $rows_affected > 0 ? "Registro actualizado correctamente." : "No se pudo actualizar el registro."
+            ]);
         }
         break;
+    
 
     case "listar":
         $datos = $cuadrilla->get_cuadrillas();
