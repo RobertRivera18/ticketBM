@@ -58,6 +58,12 @@ if ($_SESSION["rol_id"] == 1 || $_SESSION["rol_id"] == 3) {
                     <span class="lbl">Consultar Ticket</span>
                 </a>
             </li>
+            <li class="blue-dirty">
+                <a href="..\MntEquipos\">
+                    <span class="glyphicon glyphicon-hdd"></span>
+                    <span class="lbl">Equipos Informaticos</span>
+                </a>
+            </li>
 
             <li class="blue-dirty dropdown">
                 <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">

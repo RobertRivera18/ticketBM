@@ -22,10 +22,10 @@
 				<div class="tbl">
 					<div class="tbl-row">
 						<div class="tbl-cell">
-							<h3>Mantenimiento Colaboradores</h3>
+							<h3>Mantenimiento Equipos Informaticos</h3>
 							<ol class="breadcrumb breadcrumb-simple">
 								<li><a href="#">Home</a></li>
-								<li class="active">Mantenimiento Colaboradores</li>
+								<li class="active">Mantenimiento Equipos Informaticos</li>
 							</ol>
 						</div>
 					</div>
@@ -37,9 +37,9 @@
 				<table id="colaborador_data" class="table table-bordered table-striped table-vcenter js-dataTable-full">
 					<thead>
 						<tr>
-							<th style="width: 10%;">Nombre Colaborador</th>
-							<th style="width: 10%;">Cedula</th>
-							<th class="d-none d-sm-table-cell" style="width: 5%;">Empresa</th>
+							<th style="width: 10%;">Nombre del Equipo</th>
+							<th style="width: 10%;">Marca</th>
+							<th class="d-none d-sm-table-cell" style="width: 5%;">Serie/IMEI</th>
 							<th class="text-center" style="width: 5%;"></th>
 							<th class="text-center" style="width: 5%;"></th>
 						</tr>
@@ -58,7 +58,7 @@
 
 	<?php require_once("../MainJs/js.php");?>
 	
-	<script type="text/javascript" src="mntcolaborador.js"></script>
+	<script type="text/javascript" src="mntequipos.js"></script>
 
 </body>
 </html>

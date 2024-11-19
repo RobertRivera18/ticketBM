@@ -43,7 +43,6 @@ class Equipo extends Conectar
             $conectar = parent::conexion();
             parent::set_names();
             $sql = "SELECT * FROM tm_equipos";
-            // Preparar y ejecutar la consulta
             $stmt = $conectar->prepare($sql);
             $stmt->execute();
 
@@ -62,11 +61,10 @@ class Equipo extends Conectar
         parent::set_names();
 
         // Preparamos la sentencia DELETE
-        $sql = "DELETE FROM tm_colaborador WHERE col_id = ?";
+        $sql = "DELETE FROM tm_equipos WHERE equipo_id = ?";
         $stmt = $conectar->prepare($sql);
         // Enlazamos el valor del parámetro
-        $stmt->bindValue(1, $col_id);
-        // Ejecutamos la consulta
+        $stmt->bindValue(1, $equipo_id);
         $result = $stmt->execute();
         // Retornamos un valor booleano que indica si la eliminación fue exitosa
         if ($result) {
@@ -76,41 +74,15 @@ class Equipo extends Conectar
         }
     }
 
-    public function get_colaborador_x_id($col_id)
+    public function get_equipo_x_id($equipo_id)
     {
         $conectar = parent::conexion();
         parent::set_names();
-        $sql = "call sp_l_colaborador_01(?)";
+        $sql = "SELECT * FROM tm_equipos WHERE equipo_id = ?";
         $sql = $conectar->prepare($sql);
-        $sql->bindValue(1, $col_id);
+        $sql->bindValue(1, $equipo_id);
         $sql->execute();
         return $resultado = $sql->fetchAll();
     }
 
-    // public function get_colaboradores_x_id()
-    // {
-    //     $conectar = parent::conexion();
-    //     parent::set_names();
-    //     $sql = "SELECT c.*
-    //          FROM tm_colaborador c
-    //          LEFT JOIN tm_cuadrilla_colaborador cc ON c.col_id = cc.col_id
-    //          WHERE cc.col_id IS NULL";
-    //     $sql = $conectar->prepare($sql);
-    //     $sql->execute();
-    //     return $resultado = $sql->fetchAll();
-    // }
-
-    //Muestra los colaboradores que no tienen asignado una cuadrilla 
-    public function get_colaboradores()
-    {
-        $conectar = parent::conexion();
-        parent::set_names();
-        $sql = "SELECT c.*
-             FROM tm_colaborador c
-             LEFT JOIN tm_cuadrilla_colaborador cc ON c.col_id = cc.col_id
-             WHERE cc.col_id IS NULL";
-        $sql = $conectar->prepare($sql);
-        $sql->execute();
-        return $resultado = $sql->fetchAll();
-    }
 }

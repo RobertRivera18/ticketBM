@@ -1,38 +1,32 @@
 <?php
 require_once("../config/conexion.php");
-require_once("../models/Colaborador.php");
-$colaborador = new Colaborador();
+require_once("../models/Equipo.php");
+$equipo = new Equipo();
 
 switch ($_GET["op"]) {
     case "guardaryeditar":
-        if (empty($_POST["col_id"])) {
-            $colaborador->insert_colaborador($_POST["col_nombre"], $_POST["col_cedula"], $_POST["empresa_id"]);
+        if (empty($_POST["equipo_id"])) {
+            $equipo->insert_equipo($_POST["nombre_equipo"], $_POST["marca"], $_POST["serie"]);
         } else {
-            $colaborador->update_colaborador($_POST["col_id"], $_POST["col_nombre"], $_POST["col_cedula"], $_POST["empresa_id"]);
+            $equipo->update_equipo($_POST["equipo_id"], $_POST["nombre_equipo"], $_POST["marca"], $_POST["serie"]);
         }
         break;
 
     case "listar":
-        $datos = $colaborador->get_colaborador();
+        $datos = $equipo->get_equipo();
         $data = array();
         foreach ($datos as $row) {
             $sub_array = array();
-            $sub_array[] = $row["col_nombre"];
-            $sub_array[] = $row["col_cedula"];
-            // Verificamos el valor de 'empresa_id' y asignamos el texto correspondiente
-            if ($row["empresa_id"] == 1) {
-                $sub_array[] = '<span class="label label-pill label-info">CNEL</span>';
-            } elseif ($row["empresa_id"] == 2) {
-                $sub_array[] = '<span class="label label-pill label-danger">CLARO</span>';
-            } else {
-                $sub_array[] = '<span>No asignado</span>'; // En caso de que el 'empresa_id' no sea ni 1 ni 2
-            }
-
-            $sub_array[] = '<button type="button" onClick="editar(' . $row["col_id"] . ');"  id="' . $row["col_id"] . '" class="btn btn-inline btn-warning btn-sm ladda-button"><i class="fa fa-edit"></i></button>';
-            $sub_array[] = '<button type="button" onClick="eliminar(' . $row["col_id"] . ');"  id="' . $row["col_id"] . '" class="btn btn-inline btn-danger btn-sm ladda-button"><i class="fa fa-trash"></i></button>';
+            $sub_array[] = $row["nombre_equipo"];
+            $sub_array[] = $row["marca"];
+            $sub_array[] = $row["serie"];
+            $sub_array[] = '<button type="button" onClick="editar(' . $row["equipo_id"] . ');"  id="' . $row["equipo_id"] . '" class="btn btn-inline btn-warning btn-sm ladda-button"><div><i class="fa fa-edit"></i></div></button>';
+            $sub_array[] = '<button type="button" onClick="eliminar(' . $row["equipo_id"] . ');"  id="' . $row["equipo_id"] . '" class="btn btn-inline btn-danger btn-sm ladda-button"><div><i class="fa fa-close"></i></div></button>';
             $data[] = $sub_array;
         }
 
+
+       
         $results = array(
             "sEcho" => 1,
             "iTotalRecords" => count($data),
@@ -43,49 +37,24 @@ switch ($_GET["op"]) {
         break;
 
     case "eliminar":
-        $colaborador->delete_colaborador($_POST["col_id"]);
+        $equipo->delete_equipo($_POST["equipo_id"]);
         break;
 
     case "mostrar":
-        $datos = $colaborador->get_colaborador_x_id($_POST["col_id"]);
+        $datos = $equipo->get_equipo_x_id($_POST["equipo_id"]);
 
         if (is_array($datos) && count($datos) > 0) {
             $output = array();
             foreach ($datos as $row) {
-                $output["col_id"] = $row["col_id"];
-                $output["col_nombre"] = $row["col_nombre"];
-                $output["col_cedula"] = $row["col_cedula"];
-                $output["empresa_id"] = $row["empresa_id"];
+                $output["equipo_id"] = $row["equipo_id"];
+                $output["nombre_equipo"] = $row["nombre_equipo"];
+                $output["marca"] = $row["marca"];
+                $output["serie"] = $row["serie"];
             }
             echo json_encode($output);
         } else {
             echo json_encode(['status' => 'error', 'message' => 'Colaborador no encontrado']);
         }
         break;
- 
-    case "combo":
-        $datos = $colaborador->get_colaboradores();
-        $data = array();
-        if (is_array($datos) && count($datos) > 0) {
-            foreach ($datos as $row) {
-                $empresa = $row['empresa_id'] == 1 ? '<span class="label label-pill label-info">CNEL</span>' : ($row['empresa_id'] == 2 ? '<span class="label label-pill label-danger">CLARO</span>' : "Otro");
-    
-                $data[] = array(
-                    "0" => '<button class="btn btn-warning" onclick="asignar(' . $row['col_id'] . ')"><span class="fa fa-plus"></span></button>',
-                    "1" => $row['col_nombre'],
-                    "2" => $row['col_cedula'],
-                    "3" => $empresa,
-                );
-            }
-        }
-        $results = array(
-            "sEcho" => 1, 
-            "iTotalRecords" => count($data),
-            "iTotalDisplayRecords" => count($data), 
-            "aaData" => $data
-        );
-        echo json_encode($results);
-        break;
-    
-    
+
 }

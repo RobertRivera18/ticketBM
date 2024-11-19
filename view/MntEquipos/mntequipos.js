@@ -10,7 +10,7 @@ function guardaryeditar(e) {
     e.preventDefault();
     var formData = new FormData($("#colaborador_form")[0]);
     $.ajax({
-        url: "../../controller/colaborador.php?op=guardaryeditar",
+        url: "../../controller/equipo.php?op=guardaryeditar",
         type: "POST",
         data: formData,
         contentType: false,
@@ -50,7 +50,7 @@ $(document).ready(function () {
             'pdfHtml5'
         ],
         "ajax": {
-            url: '../../controller/colaborador.php?op=listar',
+            url: '../../controller/equipo.php?op=listar',
             type: "post",
             dataType: "json",
             error: function (e) {
@@ -81,20 +81,20 @@ $(document).ready(function () {
     });
 });
 
-function editar(col_id) {
+function editar(equipo_id) {
     $('#mdltitulo').html('Editar Registro');
-    $.post("../../controller/colaborador.php?op=mostrar", { col_id: col_id }, function (data) {
+    $.post("../../controller/equipo.php?op=mostrar", { equipo_id: equipo_id }, function (data) {
         data = JSON.parse(data);
-        $('#col_id').val(data.col_id);
-        $('#col_nombre').val(data.col_nombre);
-        $('#col_cedula').val(data.col_cedula);
-        $('#empresa_id').val(data.empresa_id).trigger('change');
+        $('#equipo_id').val(data.equipo_id);
+        $('#nombre_equipo').val(data.nombre_equipo);
+        $('#marca').val(data.marca);
+        $('#serie').val(data.serie);
       
     });
     $('#modalmantenimiento').modal('show');
 }
 
-function eliminar(col_id) {
+function eliminar(equipo_id) {
     var table = $('#colaborador_data').DataTable(); // Asegurarse de que la tabla esté inicializada
     swal({
         title: "HelpDesk",
@@ -107,7 +107,7 @@ function eliminar(col_id) {
         closeOnConfirm: false
     }, function (isConfirm) {
         if (isConfirm) {
-            $.post("../../controller/colaborador.php?op=eliminar", { col_id: col_id }, function (data) {
+            $.post("../../controller/equipo.php?op=eliminar", { equipo_id: equipo_id }, function (data) {
                 table.ajax.reload(); // Recargar la tabla
                 swal({
                     title: "HelpDesk!",

@@ -9,26 +9,23 @@
             </div>
             <form method="post" id="colaborador_form">
                 <div class="modal-body">
-                    <input type="hidden" id="col_id" name="col_id">
+                    <input type="hidden" id="equipo_id" name="equipo_id">
 
                     <div class="form-group">
-                        <label class="form-label" for="col_nombre">Nombres del Colaborador</label>
-                        <input type="text" class="form-control" id="col_nombre" name="col_nombre" placeholder="Ingrese Nombres del Colaborador" required>
+                        <label class="form-label" for="nombre_equipo">Nombres del Equipo</label>
+                        <input type="text" class="form-control" id="nombre_equipo" name="nombre_equipo" placeholder="Ingrese Nombre del Equipo" required>
                         
                     </div>
 
                     <div class="form-group">
-                        <label class="form-label" for="col_cedula">Cedula del Colaborador</label>
-                        <input type="text" class="form-control" id="col_cedula" name="col_cedula" placeholder="Ingrese Cedula del Colaborador" required>
+                        <label class="form-label" for="marca">Marca</label>
+                        <input type="text" class="form-control" id="marca" name="marca" placeholder="Ingrese Marca del equipo" required>
                         
                     </div>
                     <div class="form-group">
-                        <label class="form-label" for="empresa_id">Empresa</label>
-                        <select class="select2" id="empresa_id" name="empresa_id">
-                            <option value="1">CNEL</option>
-                            <option value="2">CLARO</option>
-                            
-                        </select>
+                        <label class="form-label" for="serie">Serie/IMEI</label>
+                        <input type="text" class="form-control" id="serie" name="serie" placeholder="Ingrese serie del equipo" required>
+                        
                     </div>
 
                     
