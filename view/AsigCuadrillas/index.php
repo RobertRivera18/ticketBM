@@ -40,7 +40,9 @@
 							<th style="width: 10%;">Nombre Cuadrilla</th>
 							<th class="d-none d-sm-table-cell" style="width: 10%;">Colaborador Integrantes</th>
 							<th class="d-none d-sm-table-cell" style="width: 10%;">Cantidad Asignados</th>
-							<th class="text-center" style="width: 5%;"></th>
+							<th class="d-none d-sm-table-cell" style="width: 10%;">Equipos Entregados</th>
+					
+							
 							
 						</tr>
 					</thead>
@@ -55,6 +57,7 @@
 	<!-- Contenido -->
 
 	<?php require_once("modalasignar.php");?>
+	<?php require_once("modalequipos.php");?>
 	<?php require_once("modalmantenimiento.php");?>
 
 	<?php require_once("../MainJs/js.php");?>

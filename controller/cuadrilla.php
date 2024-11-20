@@ -7,50 +7,51 @@ switch ($_GET["op"]) {
     case "guardar":
         $cuadrilla->insert_cuadrilla($_POST["cua_nom"]);
         break;
-
-
     case "listar":
         $datos = $cuadrilla->get_cuadrilla();
         $data = array();
+
         foreach ($datos as $row) {
             $sub_array = array();
-            $sub_array[] = $row["cua_nombre"];
-            
+            $sub_array[] = $row["cua_nombre"]; // Nombre de la cuadrilla
+
+            // Manejo de colaboradores
             $colaboradores = $cuadrilla->get_colaboradores_por_cuadrilla($row["cua_id"]);
-            $colaboradores_array = array();
+            $cantidad_colaboradores = is_array($colaboradores) ? count($colaboradores) : 0;
 
-            if (is_array($colaboradores) && count($colaboradores) > 0) {
-                $cantidad_colaboradores = count($colaboradores); // Cantidad de colaboradores
+            if ($cantidad_colaboradores > 0) {
+                $colaboradores_array = array_map(function ($colaborador) {
+                    return $colaborador["col_nombre"];
+                }, $colaboradores);
 
-                if ($cantidad_colaboradores == 1) {
-                    // Si hay solo un colaborador, mostrar su nombre y "Falta por asignar"
-                    $colaborador = $colaboradores[0]["col_nombre"];
-                    $sub_array[] = $colaborador . '<a onClick="agregar(' . $row["cua_id"] . ');"><span class="label label-pill label-warning">(Falta por asignar)</span></a>';
-                } elseif ($cantidad_colaboradores > 1) {
-                    // Si hay dos o más colaboradores, mostrar los nombres
-                    $colaboradores_array = array(); // Reiniciar el array de colaboradores
-                    foreach ($colaboradores as $colaborador) {
-                        $colaboradores_array[] = $colaborador["col_nombre"];
-                    }
-
-                   $sub_array[] = implode("</br>", $colaboradores_array) . 
-               '<br><a onClick="agregar(' . $row["cua_id"] . ')"><span class="label label-primary">Agregar más</span></a>';
-
-                }
-                
-                // Mostrar la cantidad de colaboradores asignados
+                $sub_array[] = implode("<br>", $colaboradores_array) .
+                    '<br><a onClick="agregar(' . $row["cua_id"] . ')"><span class="label label-primary">Agregar más</span></a>';
                 $sub_array[] = '<span class="label label-success">' . $cantidad_colaboradores . ' asignados</span>';
             } else {
-                // Si no hay ningún registro, mostrar "Sin Asignar"
                 $sub_array[] = '<a onClick="agregar(' . $row["cua_id"] . ');"><span class="label label-pill label-warning">Sin Asignar</span></a>';
                 $sub_array[] = '<span class="label label-danger">0 asignados</span>';
             }
 
-            // Botones para editar y eliminar
-            $sub_array[] = '<button type="button" onClick="eliminar(' . $row["cua_id"] . ');" id="' . $row["cua_id"] . '" class="btn btn-inline btn-danger btn-sm ladda-button"><i class="fa fa-trash"></i></button>';
+            // Manejo de equipos
+            $equipos = $cuadrilla->get_equipos_por_cuadrilla($row["cua_id"]);
+            $cantidad_equipos = is_array($equipos) ? count($equipos) : 0;
+
+            if ($cantidad_equipos > 0) {
+                $equipos_array = array_map(function ($equipo) {
+                    return '<li>'.$equipo["nombre_equipo"] .  ' - ' . $equipo["serie"].'</li>';
+                }, $equipos);
+
+                $sub_array[] = implode("<br>", $equipos_array) .
+                    '<br><a onClick="agregarEquipo(' . $row["cua_id"] . ')"><span class="label label-primary">Agregar más</span></a>';
+            } else {
+                $sub_array[] = '<a onClick="agregarEquipo(' . $row["cua_id"] . ');"><span class="label label-pill label-warning">No se le han otorgados equipos</span></a>';
+                
+            }
+            // Agregar fila al resultado final
             $data[] = $sub_array;
         }
-        
+
+        // Preparar los resultados en formato JSON
         $results = array(
             "sEcho" => 1,
             "iTotalRecords" => count($data),
@@ -59,6 +60,10 @@ switch ($_GET["op"]) {
         );
         echo json_encode($results);
         break;
+
+
+
+
 
 
     case "eliminar":
@@ -80,5 +85,9 @@ switch ($_GET["op"]) {
     case "asignar":
         $cuadrilla->insert_cuadrilla_asignacion($_POST["cua_id"], $_POST["col_id"]);
 
+        break;
+
+    case "asignarEquipo":
+        $cuadrilla->insert_cuadrilla_equipos($_POST["cua_id"], $_POST["equipo_id"]);
         break;
 }

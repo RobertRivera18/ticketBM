@@ -85,4 +85,17 @@ class Equipo extends Conectar
         return $resultado = $sql->fetchAll();
     }
 
+    public function get_equipos_disponibles()
+    {
+        $conectar = parent::conexion();
+        parent::set_names();
+        $sql = "SELECT e.*
+             FROM tm_equipos e
+             LEFT JOIN tm_cuadrilla_equipo cc ON e.equipo_id = cc.equipo_id
+             WHERE cc.equipo_id IS NULL";
+        $sql = $conectar->prepare($sql);
+        $sql->execute();
+        return $resultado = $sql->fetchAll();
+    }
+
 }

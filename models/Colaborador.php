@@ -87,18 +87,6 @@ class Colaborador extends Conectar
         return $resultado = $sql->fetchAll();
     }
 
-    // public function get_colaboradores_x_id()
-    // {
-    //     $conectar = parent::conexion();
-    //     parent::set_names();
-    //     $sql = "SELECT c.*
-    //          FROM tm_colaborador c
-    //          LEFT JOIN tm_cuadrilla_colaborador cc ON c.col_id = cc.col_id
-    //          WHERE cc.col_id IS NULL";
-    //     $sql = $conectar->prepare($sql);
-    //     $sql->execute();
-    //     return $resultado = $sql->fetchAll();
-    // }
 
     //Muestra los colaboradores que no tienen asignado una cuadrilla 
     public function get_colaboradores()

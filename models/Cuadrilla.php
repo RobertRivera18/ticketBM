@@ -66,6 +66,7 @@ class Cuadrilla extends Conectar
         return $resultado = $sql->fetchAll();
     }
 
+    //Asigno colaboradores a una cuadrilla 
     public function insert_cuadrilla_asignacion($cua_id, $col_id)
     {
         $conectar = parent::conexion();
@@ -82,36 +83,23 @@ class Cuadrilla extends Conectar
         }
     }
 
+    public function insert_cuadrilla_equipos($cua_id, $equipo_id)
+    {
+        $conectar = parent::conexion();
+        parent::set_names();
+        $sql = "INSERT INTO tm_cuadrilla_equipo (cua_id, equipo_id) 
+            VALUES (?, ?)";
+        $sql = $conectar->prepare($sql);
+        $sql->bindValue(1, $cua_id, PDO::PARAM_INT);
+        $sql->bindValue(2, $equipo_id, PDO::PARAM_INT);
+        if ($sql->execute()) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 
 
-
-    //     $conectar = parent::conexion();
-    //     parent::set_names();
-
-    //     // Primero verificamos si ya existe una asignación para esa cuadrilla
-    //     $sql = "SELECT * FROM tm_cuadrilla_colaborador WHERE cua_id = ? AND col_id = ?";
-    //     $sql = $conectar->prepare($sql);
-    //     $sql->bindValue(1, $cua_id);
-    //     $sql->bindValue(2, $col_id);
-    //     $sql->execute();
-
-    //     // Si no existe una asignación, realizamos un INSERT
-    //     if ($sql->rowCount() == 0) {
-    //         $sql = "INSERT INTO tm_cuadrilla_colaborador (cua_id, col_id) VALUES (?, ?)";
-    //         $sql = $conectar->prepare($sql);
-    //         $sql->bindValue(1, $cua_id);
-    //         $sql->bindValue(2, $col_id);
-    //         $sql->execute();
-    //     } else {
-    //         // Si ya existe, simplemente actualizamos el registro
-    //         $sql = "UPDATE tm_cuadrilla_colaborador SET col_id = ? WHERE cua_id = ?";
-    //         $sql = $conectar->prepare($sql);
-    //         $sql->bindValue(1, $col_id);
-    //         $sql->bindValue(2, $cua_id);
-    //         $sql->execute();
-    //     }
-
-    //     return true;
 
     //Metodo usado para mostar los colaboradores por cuadrilla en el DataTable
     public function get_colaboradores_por_cuadrilla($cua_id)
@@ -124,6 +112,26 @@ class Cuadrilla extends Conectar
         FROM tm_cuadrilla_colaborador
         INNER JOIN tm_colaborador col ON tm_cuadrilla_colaborador.col_id = col.col_id
         WHERE tm_cuadrilla_colaborador.cua_id = ?";
+        $stmt = $conectar->prepare($sql);
+        $stmt->bindValue(1, $cua_id);
+        $stmt->execute();
+
+        return $stmt->fetchAll();
+    }
+
+
+
+    //Metodo usado para mostar los equipos otorgados a las cuadrillas
+    public function get_equipos_por_cuadrilla($cua_id)
+    {
+        $conectar = parent::conexion();
+        parent::set_names();
+
+        // Consulta para obtener los colaboradores de una cuadrilla
+        $sql = "SELECT eq.nombre_equipo,eq.marca,eq.serie
+        FROM tm_cuadrilla_equipo
+        INNER JOIN tm_equipos eq ON tm_cuadrilla_equipo.equipo_id = eq.equipo_id
+        WHERE tm_cuadrilla_equipo.cua_id = ?";
         $stmt = $conectar->prepare($sql);
         $stmt->bindValue(1, $cua_id);
         $stmt->execute();
