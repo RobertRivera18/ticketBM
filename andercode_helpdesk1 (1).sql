@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 19-11-2024 a las 23:44:38
+-- Tiempo de generación: 20-11-2024 a las 20:37:58
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -372,9 +372,38 @@ CREATE TABLE `tm_cuadrilla_colaborador` (
 --
 
 INSERT INTO `tm_cuadrilla_colaborador` (`cua_id`, `col_id`) VALUES
+(45, 10),
+(45, 12),
 (45, 76),
 (47, 4),
-(48, 5);
+(48, 3),
+(48, 5),
+(48, 8),
+(48, 9),
+(50, 1),
+(50, 2),
+(50, 6),
+(50, 7);
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `tm_cuadrilla_equipo`
+--
+
+CREATE TABLE `tm_cuadrilla_equipo` (
+  `cua_id` int(11) NOT NULL,
+  `equipo_id` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+
+--
+-- Volcado de datos para la tabla `tm_cuadrilla_equipo`
+--
+
+INSERT INTO `tm_cuadrilla_equipo` (`cua_id`, `equipo_id`) VALUES
+(50, 7),
+(50, 5),
+(50, 6);
 
 -- --------------------------------------------------------
 
@@ -394,8 +423,9 @@ CREATE TABLE `tm_equipos` (
 --
 
 INSERT INTO `tm_equipos` (`equipo_id`, `nombre_equipo`, `marca`, `serie`) VALUES
-(5, 'CPU Idepad2010', 'Lenovo', 'FGBDHE4564'),
-(6, 'Monitor', 'ThinkCentre', 'FGBDHE4564877856HTRJTYJT');
+(5, 'CPU Idepad2010', 'Samsung', 'FGBDHE4564'),
+(6, 'Monitor', 'ThinkCentre', 'FGBDHE4564877856HTRJTYJT'),
+(7, 'CPU', 'Intel Core i7 8va Generacion DELL', '9494HFB4');
 
 -- --------------------------------------------------------
 
@@ -552,6 +582,13 @@ ALTER TABLE `tm_cuadrilla_colaborador`
   ADD KEY `col_id` (`col_id`);
 
 --
+-- Indices de la tabla `tm_cuadrilla_equipo`
+--
+ALTER TABLE `tm_cuadrilla_equipo`
+  ADD KEY `fk_cuadrilla` (`cua_id`),
+  ADD KEY `fk_equipo` (`equipo_id`);
+
+--
 -- Indices de la tabla `tm_equipos`
 --
 ALTER TABLE `tm_equipos`
@@ -613,7 +650,7 @@ ALTER TABLE `tm_cuadrilla`
 -- AUTO_INCREMENT de la tabla `tm_equipos`
 --
 ALTER TABLE `tm_equipos`
-  MODIFY `equipo_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `equipo_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT de la tabla `tm_grupo`
@@ -638,11 +675,11 @@ ALTER TABLE `tm_usuario`
 --
 
 --
--- Filtros para la tabla `tm_cuadrilla_colaborador`
+-- Filtros para la tabla `tm_cuadrilla_equipo`
 --
-ALTER TABLE `tm_cuadrilla_colaborador`
-  ADD CONSTRAINT `tm_cuadrilla_colaborador_ibfk_1` FOREIGN KEY (`cua_id`) REFERENCES `tm_cuadrilla` (`cua_id`) ON DELETE CASCADE,
-  ADD CONSTRAINT `tm_cuadrilla_colaborador_ibfk_2` FOREIGN KEY (`col_id`) REFERENCES `tm_colaborador` (`col_id`) ON DELETE CASCADE;
+ALTER TABLE `tm_cuadrilla_equipo`
+  ADD CONSTRAINT `fk_cuadrilla` FOREIGN KEY (`cua_id`) REFERENCES `tm_cuadrilla` (`cua_id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_equipo` FOREIGN KEY (`equipo_id`) REFERENCES `tm_equipos` (`equipo_id`) ON DELETE CASCADE ON UPDATE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
