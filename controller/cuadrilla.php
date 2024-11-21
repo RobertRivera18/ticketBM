@@ -7,13 +7,35 @@ switch ($_GET["op"]) {
     case "guardar":
         $cuadrilla->insert_cuadrilla($_POST["cua_nom"]);
         break;
+
     case "listar":
-        $datos = $cuadrilla->get_cuadrilla();
+        $datos = $cuadrilla->get_cuadrilla(); // Obtener todas las cuadrillas
         $data = array();
 
         foreach ($datos as $row) {
             $sub_array = array();
-            $sub_array[] = $row["cua_nombre"]; // Nombre de la cuadrilla
+
+            // Nombre de la cuadrilla
+            $sub_array[] = $row["cua_nombre"];
+
+            // Obtener información adicional de la cuadrilla, incluida la empresa y la ciudad
+            $empresa_info = $cuadrilla->get_empresa_cuadrilla($row["cua_id"]);
+            if (is_array($empresa_info) && count($empresa_info) > 0) {
+                $empresa_id = $empresa_info[0]["cua_empresa"];
+                $ciudad_id = $empresa_info[0]["cua_ciudad"];
+
+                // Empresa (Claro/CNEL/No definido)
+                $empresa_nombre = ($empresa_id == 1) ? "CLARO" : (($empresa_id == 2) ? "CNEL" : "No definido");
+
+                // Ciudad (Guayaquil/Quito)
+
+                $ciudad_nombre = ($ciudad_id == 1) ? "Guayaquil" : (($ciudad_id == 2) ? "Quito" : "No definido");
+                // Concatenar empresa y ciudad
+                $sub_array[] = '<span class="label label-danger">' . $empresa_nombre . '</span><br>' .
+                    '<span class="label label-info">' . $ciudad_nombre . '</span>';
+            } else {
+                $sub_array[] = '<span>No definido</span><br><span>No definida</span>';
+            }
 
             // Manejo de colaboradores
             $colaboradores = $cuadrilla->get_colaboradores_por_cuadrilla($row["cua_id"]);
@@ -38,15 +60,15 @@ switch ($_GET["op"]) {
 
             if ($cantidad_equipos > 0) {
                 $equipos_array = array_map(function ($equipo) {
-                    return '<li>'.$equipo["nombre_equipo"] .  ' - ' . $equipo["serie"].'</li>';
+                    return '<li>' . $equipo["nombre_equipo"] . ' - ' . $equipo["serie"] . '</li>';
                 }, $equipos);
 
                 $sub_array[] = implode("<br>", $equipos_array) .
                     '<br><a onClick="agregarEquipo(' . $row["cua_id"] . ')"><span class="label label-primary">Agregar más</span></a>';
             } else {
-                $sub_array[] = '<a onClick="agregarEquipo(' . $row["cua_id"] . ');"><span class="label label-pill label-warning">No se le han otorgados equipos</span></a>';
-                
+                $sub_array[] = '<a onClick="agregarEquipo(' . $row["cua_id"] . ');"><span class="label label-pill label-warning">No se le han otorgado equipos</span></a>';
             }
+
             // Agregar fila al resultado final
             $data[] = $sub_array;
         }
@@ -60,11 +82,6 @@ switch ($_GET["op"]) {
         );
         echo json_encode($results);
         break;
-
-
-
-
-
 
     case "eliminar":
         $cuadrilla->delete_cuadrilla($_POST["cua_id"]);

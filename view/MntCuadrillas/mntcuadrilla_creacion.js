@@ -87,7 +87,9 @@ function editar(cua_id) {
         data = JSON.parse(data);
         console.log(data)
         $('#cua_id').val(data.cua_id);
-        $('#cua_nombre').val(data.cua_nombre);      
+        $('#cua_nombre').val(data.cua_nombre);     
+        $('#cua_empresa').val(data.cua_empresa).trigger('change'); 
+        $('#cua_ciudad').val(data.cua_ciudad).trigger('change'); 
     });
     $('#modalmantenimiento').modal('show');
 }

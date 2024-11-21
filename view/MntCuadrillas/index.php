@@ -38,6 +38,7 @@
 					<thead>
 						<tr>
 							<th style="width: 10%;">Nombre Cuadrilla</th>
+							<th style="width: 5%;">Empresa</th>
 							<th class="text-center" style="width: 5%;"></th>
 							<th class="text-center" style="width: 5%;"></th>
 						</tr>

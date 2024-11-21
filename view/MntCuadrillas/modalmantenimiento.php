@@ -18,6 +18,23 @@
                     </div>
 
                     
+                    <div class="form-group">
+                        <label class="form-label" for="cua_empresa">Empresa</label>
+                        <select class="select2" id="cua_empresa" name="cua_empresa">
+                            <option value="1">Claro</option>
+                            <option value="2">CNEL</option>
+                        
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="cua_ciudad">Ciudad</label>
+                        <select class="select2" id="cua_ciudad" name="cua_ciudad">
+                            <option value="1">Guayaquil</option>
+                            <option value="2">Quito</option>
+                        
+                        </select>
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-rounded btn-default" data-dismiss="modal">Cerrar</button>

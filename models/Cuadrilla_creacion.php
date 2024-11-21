@@ -2,13 +2,15 @@
 class Cuadrilla_creacion extends Conectar
 {
 
-    public function insert_cuadrilla($cua_nombre)
+    public function insert_cuadrilla($cua_nombre,$cua_empresa,$cua_ciudad)
     {
         $conectar = parent::conexion();
         parent::set_names();
-        $sql = "INSERT INTO tm_cuadrilla (cua_nombre) VALUES (?)";
+        $sql = "INSERT INTO tm_cuadrilla (cua_nombre,cua_empresa,cua_ciudad) VALUES (?,?,?)";
         $stmt = $conectar->prepare($sql);
         $stmt->bindValue(1, $cua_nombre);
+        $stmt->bindValue(2, $cua_empresa);
+        $stmt->bindValue(3, $cua_ciudad);
 
         $stmt->execute();
         if ($stmt->rowCount() > 0) {
@@ -17,14 +19,16 @@ class Cuadrilla_creacion extends Conectar
             return false;
         }
     }
-    public function update_cuadrilla($cua_nombre, $cua_id)
+    public function update_cuadrilla($cua_nombre, $cua_empresa, $cua_ciudad,$cua_id)
     {
         $conectar = parent::conexion();
         parent::set_names();
-        $sql = "UPDATE tm_cuadrilla SET cua_nombre = ? WHERE cua_id = ?";
+        $sql = "UPDATE tm_cuadrilla SET cua_nombre = ?, cua_empresa = ?, cua_ciudad = ? WHERE cua_id = ?";
         $stmt = $conectar->prepare($sql);
         $stmt->bindValue(1, $cua_nombre);
-        $stmt->bindValue(2, $cua_id);
+        $stmt->bindValue(2, $cua_empresa);
+        $stmt->bindValue(3, $cua_ciudad);
+        $stmt->bindValue(4, $cua_id);
         $stmt->execute();
         return $stmt->rowCount();
     }

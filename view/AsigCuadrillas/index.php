@@ -38,7 +38,8 @@
 					<thead>
 						<tr>
 							<th style="width: 10%;">Nombre Cuadrilla</th>
-							<th class="d-none d-sm-table-cell" style="width: 10%;">Colaborador Integrantes</th>
+							<th style="width: 10%;">Empresa</th>
+							<th style="width: 10%;">Colaborador Integrantes</th>
 							<th class="d-none d-sm-table-cell" style="width: 10%;">Cantidad Asignados</th>
 							<th class="d-none d-sm-table-cell" style="width: 10%;">Equipos Entregados</th>
 					

@@ -138,4 +138,21 @@ class Cuadrilla extends Conectar
 
         return $stmt->fetchAll();
     }
+
+    //Metodo usado para mostar los equipos otorgados a las cuadrillas
+    public function get_empresa_cuadrilla($cua_id)
+    {
+        $conectar = parent::conexion();
+        parent::set_names();
+
+        // Consulta para obtener los colaboradores de una cuadrilla
+        $sql = "SELECT cua_empresa,cua_ciudad
+         FROM tm_cuadrilla
+         WHERE cua_id = ?";
+        $stmt = $conectar->prepare($sql);
+        $stmt->bindValue(1, $cua_id);
+        $stmt->execute();
+
+        return $stmt->fetchAll();
+    }
 }
