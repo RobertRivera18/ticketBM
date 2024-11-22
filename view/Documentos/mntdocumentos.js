@@ -6,8 +6,8 @@ function init() {
     });
 }
 
-function listarColaboradores() {
-    tabla = $('#tblcolaboradores').dataTable(
+function listarEquipos() {
+    tabla = $('#tblequipos').dataTable(
         {
             "aProcessing": true,
             "aServerSide": true,
