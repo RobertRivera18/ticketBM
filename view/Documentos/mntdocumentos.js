@@ -6,8 +6,8 @@ function init() {
     });
 }
 
-function listarEquipos() {
-    tabla = $('#tblequipos').dataTable(
+function listarColaboradores() {
+    tabla = $('#tblcolaboradores').dataTable(
         {
             "aProcessing": true,
             "aServerSide": true,
@@ -17,7 +17,7 @@ function listarEquipos() {
             ],
             "ajax":
             {
-                url: '../../controller/equipo.php?op=combo',
+                url: '../../controller/colaborador.php?op=combo',
                 type: "get",
                 dataType: "json",
                 error: function (e) {
@@ -47,11 +47,6 @@ function listarEquipos() {
 
 }
 $(document).ready(function () {
-
-    $('#tipo_acta').select2({
-        dropdownParent: $('#modalmantenimiento')
-    });
-
     tabla = $('#documento_data').DataTable({
         "lengthMenu": [5, 10, 25, 75, 100],//mostramos el menú de registros a revisar
         "aProcessing": true,//Activamos el procesamiento del datatables

@@ -15,20 +15,19 @@
                     <div class="form-group">
                         <label class="form-label" for="tipo_acta">Tipo de Acta</label>
                         <select class="control-form select2" id="tipo_acta" name="tipo_acta">
-                            <option label="Seleccione"></option>
                             <option value="1">Acta de Entrega</option>
                             <option value="2">Acta de descarga</option>
                         </select>
                     </div>
 
                     <div class="modal-body table-responsive" style="overflow-x: auto;">
-                    <table id="tblequipos" class="table table-striped table-bordered table-condensed table-hover" style="width: 100%;">
+                    <table id="tblcolaboradopre" class="table table-striped table-bordered table-condensed table-hover" style="width: 100%;">
                         <thead>
                             <tr>
                                 <th>Opciones</th>
-                                <th>Nombre Equipo</th>
-                                <th>Marca</th>
-                                <th>Serie</th>
+                                <th>Nombres</th>
+                                <th>Cedula</th>
+                                <th>Empresa</th>
                             </tr>
                         </thead>
                         <tbody>
