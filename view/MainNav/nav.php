@@ -92,6 +92,12 @@ if ($_SESSION["rol_id"] == 1 || $_SESSION["rol_id"] == 3) {
 
                 </ul>
             </li>
+            <li class="blue-dirty">
+                <a href="..\Documentos\">
+                    <span class="glyphicon glyphicon-check"></span>
+                    <span class="lbl">Generar Actas</span>
+                </a>
+            </li>
 
         </ul>
     </nav>
