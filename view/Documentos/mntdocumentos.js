@@ -1,12 +1,7 @@
 var tabla;
 
-function init() {
-    $("#documento_form").on("submit", function (e) {
-       
-    });
-}
 
-function listarEquipos() {
+function listarColaboradores() {
     tabla = $('#tblequipos').dataTable(
         {
             "aProcessing": true,
@@ -46,6 +41,54 @@ function listarEquipos() {
         }).DataTable();
 
 }
+function asignar(col_id) {
+    var tipo_acta = $("#tipo_acta").val();
+    $.ajax({
+        url: "../../controller/acta.php?op=asignar",
+        type: "POST",
+        data: {
+            tipo_acta: tipo_acta,
+            col_id: col_id
+        },
+        success: function (response) {
+            try {
+                var res = JSON.parse(response);
+
+                if (res.status === "success") {
+                    swal({
+                        title: "¡Éxito!",
+                        text: "Colaborador asignado correctamente.",
+                        type: "success",
+                        confirmButtonClass: "btn-success"
+                    });
+
+                    // Actualizamos la tabla para reflejar cambios
+                    $('#documento_data').DataTable().ajax.reload();
+                } else {
+                    swal({
+                        title: "Error",
+                        text: res.message || "Ocurrió un problema al asignar el colaborador.",
+                        type: "error",
+                        confirmButtonClass: "btn-danger"
+                    });
+                }
+            } catch (error) {
+                console.error("Error al procesar la respuesta:", error);
+            }
+        },
+        error: function (error) {
+            console.error("Error en la asignación:", error);
+            swal({
+                title: "Error",
+                text: "No se pudo completar la asignación del colaborador.",
+                type: "error",
+                confirmButtonClass: "btn-danger"
+            });
+        }
+    });
+}
+
+
 $(document).ready(function () {
     tabla = $('#documento_data').DataTable({
         "lengthMenu": [5, 10, 25, 75, 100],//mostramos el menú de registros a revisar
@@ -100,9 +143,8 @@ $(document).ready(function () {
 
 $(document).on("click", "#btnnuevo", function () {
     $('#mdltitulo').html('Nuevo Registro');
-    $('#documento_form')[0].reset();
     $('#modalmantenimiento').modal('show');
-    listarEquipos();
+    listarColaboradores();
 });
 
-init();
+
