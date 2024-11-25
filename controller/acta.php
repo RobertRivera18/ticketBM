@@ -1,113 +1,84 @@
 <?php
 require_once("../config/conexion.php");
 require_once("../models/Acta.php");
+require_once('../public/tbs_class.php');
+require_once('../public/plugins/tbs_plugin_opentbs.php');
 $acta = new Acta();
 
 switch ($_GET["op"]) {
     case "guardaryeditar":
-        $acta->insert_acta($_POST["tipo_acta"], $_POST["col_id"]);
+        $acta->insert_acta($_POST["tipo_acta"], $_POST["cua_id"]);
         break;
     case "asignar":
-        $acta->insert_acta($_POST["tipo_acta"], $_POST["col_id"]);
+        $acta->insert_acta($_POST["tipo_acta"], $_POST["cua_id"]);
         break;
+
+    case "listar":
+        $datos = $acta->get_acta();
+        $data = array();
+        foreach ($datos as $row) {
+            $sub_array = array();
+            if ($row["tipo_acta"] == 1) {
+                $sub_array[] = '<span class="label label-pill label-info">Acta de Entrega</span>';
+            } elseif ($row["tipo_acta"] == 2) {
+                $sub_array[] = '<span class="label label-pill label-danger">Acta de Descarga</span>';
+            } else {
+                $sub_array[] = '<span>No asignado</span>';
+            }
+
+            $sub_array[] = $row["cua_nombre"] ? $row["cua_nombre"] : 'Sin cuadrilla';
+
+
+            $sub_array[] = '<button type="button" onClick="eliminar(' . $row["id_acta"] . ');"  
+                                  id="' . $row["id_acta"] . '" 
+                                  class="btn btn-inline btn-danger btn-sm ladda-button">
+                                  <i class="fa fa-trash"></i></button>';
+
+            $sub_array[] = '<button type="button" onClick="generar(' . $row["id_acta"] . ');"  
+                                  id="' . $row["id_acta"] . '" 
+                                  class="btn btn-inline btn-danger btn-sm ladda-button">
+                                  <i class="fa fa-save"></i></button>';
+            $data[] = $sub_array;
+        }
+        $results = array(
+            "sEcho" => 1,
+            "iTotalRecords" => count($data),
+            "iTotalDisplayRecords" => count($data),
+            "aaData" => $data
+        );
+        echo json_encode($results);
+        break;
+
+        case "generar_word":
+            $id_acta = isset($_GET['id_acta']) ? intval($_GET['id_acta']) : 0;
+    
+            $datos = $acta->get_acta_by_id($id_acta);
+    
+            if (!$datos) {
+                echo json_encode(["status" => "error", "message" => "No se encontró el acta."]);
+                exit();
+            }
+    
+            // Inicializar TinyButStrong y OpenTBS
+            $TBS = new clsTinyButStrong;
+            $TBS->Plugin(TBS_INSTALL, OPENTBS_PLUGIN);
+    
+            // Ruta de la plantilla
+            $template = '../public/templates/acta.docx';
+    
+            // Cargar la plantilla
+            $TBS->LoadTemplate($template, OPENTBS_ALREADY_UTF8);
+    
+            // Asignar los valores al documento
+            $TBS->MergeField('pro.id', $datos['id_acta']);
+            $TBS->MergeField('pro.tipo', $datos['tipo_acta'] == 1 ? "ACTA DE ENTREGA" : "ACTA DE DESCARGA");
+            $TBS->MergeField('pro.cuadrilla', $datos['cua_nombre'] ?? 'Sin asignar');
+    
+            // Generar nombre dinámico
+            $output_file_name = "acta_" . $datos['id_acta'] . "_" . date('Y-m-d') . ".docx";
+    
+            // Descargar archivo
+            $TBS->Show(OPENTBS_DOWNLOAD, $output_file_name);
+            exit();
+            break;
 }
-
-        // case "listar":
-        //     $datos = $cuadrilla->get_cuadrilla(); // Obtener todas las cuadrillas
-        //     $data = array();
-
-        //     foreach ($datos as $row) {
-        //         $sub_array = array();
-
-        //         // Nombre de la cuadrilla
-        //         $sub_array[] = $row["cua_nombre"];
-
-        //         // Obtener información adicional de la cuadrilla, incluida la empresa y la ciudad
-        //         $empresa_info = $cuadrilla->get_empresa_cuadrilla($row["cua_id"]);
-        //         if (is_array($empresa_info) && count($empresa_info) > 0) {
-        //             $empresa_id = $empresa_info[0]["cua_empresa"];
-        //             $ciudad_id = $empresa_info[0]["cua_ciudad"];
-
-        //             // Empresa (Claro/CNEL/No definido)
-        //             $empresa_nombre = ($empresa_id == 1) ? "CLARO" : (($empresa_id == 2) ? "CNEL" : "No definido");
-
-        //             // Ciudad (Guayaquil/Quito)
-
-        //             $ciudad_nombre = ($ciudad_id == 1) ? "Guayaquil" : (($ciudad_id == 2) ? "Quito" : "No definido");
-        //             // Concatenar empresa y ciudad
-        //             $sub_array[] = '<span class="label label-danger">' . $empresa_nombre . '</span><br>' .
-        //                 '<span class="label label-info">' . $ciudad_nombre . '</span>';
-        //         } else {
-        //             $sub_array[] = '<span>No definido</span><br><span>No definida</span>';
-        //         }
-
-        //         // Manejo de colaboradores
-        //         $colaboradores = $cuadrilla->get_colaboradores_por_cuadrilla($row["cua_id"]);
-        //         $cantidad_colaboradores = is_array($colaboradores) ? count($colaboradores) : 0;
-
-        //         if ($cantidad_colaboradores > 0) {
-        //             $colaboradores_array = array_map(function ($colaborador) {
-        //                 return $colaborador["col_nombre"];
-        //             }, $colaboradores);
-
-        //             $sub_array[] = implode("<br>", $colaboradores_array) .
-        //                 '<br><a onClick="agregar(' . $row["cua_id"] . ')"><span class="label label-primary">Agregar más</span></a>';
-        //             $sub_array[] = '<span class="label label-success">' . $cantidad_colaboradores . ' asignados</span>';
-        //         } else {
-        //             $sub_array[] = '<a onClick="agregar(' . $row["cua_id"] . ');"><span class="label label-pill label-warning">Sin Asignar</span></a>';
-        //             $sub_array[] = '<span class="label label-danger">0 asignados</span>';
-        //         }
-
-        //         // Manejo de equipos
-        //         $equipos = $cuadrilla->get_equipos_por_cuadrilla($row["cua_id"]);
-        //         $cantidad_equipos = is_array($equipos) ? count($equipos) : 0;
-
-        //         if ($cantidad_equipos > 0) {
-        //             $equipos_array = array_map(function ($equipo) {
-        //                 return '<li>' . $equipo["nombre_equipo"] . ' - ' . $equipo["serie"] . '</li>';
-        //             }, $equipos);
-
-        //             $sub_array[] = implode("<br>", $equipos_array) .
-        //                 '<br><a onClick="agregarEquipo(' . $row["cua_id"] . ')"><span class="label label-primary">Agregar más</span></a>';
-        //         } else {
-        //             $sub_array[] = '<a onClick="agregarEquipo(' . $row["cua_id"] . ');"><span class="label label-pill label-warning">No se le han otorgado equipos</span></a>';
-        //         }
-
-        //         // Agregar fila al resultado final
-        //         $data[] = $sub_array;
-        //     }
-
-        //     // Preparar los resultados en formato JSON
-        //     $results = array(
-        //         "sEcho" => 1,
-        //         "iTotalRecords" => count($data),
-        //         "iTotalDisplayRecords" => count($data),
-        //         "aaData" => $data
-        //     );
-        //     echo json_encode($results);
-        //     break;
-
-        // case "eliminar":
-        //     $cuadrilla->delete_cuadrilla($_POST["cua_id"]);
-        //     break;
-
-        // case "mostrar";
-        //     $datos = $cuadrilla->get_cuadrilla_x_id($_POST["cua_id"]);
-        //     if (is_array($datos) == true and count($datos) > 0) {
-        //         foreach ($datos as $row) {
-        //             $output["cua_id"] = $row["cua_id"];
-        //             $output["cua_nombre"] = $row["cua_nombre"];
-        //         }
-        //         echo json_encode($output);
-        //     }
-        //     break;
-
-
-        // case "asignar":
-        //     $cuadrilla->insert_cuadrilla_asignacion($_POST["cua_id"], $_POST["col_id"]);
-
-        //     break;
-
-        // case "asignarEquipo":
-        //     $cuadrilla->insert_cuadrilla_equipos($_POST["cua_id"], $_POST["equipo_id"]);
-        //     break;

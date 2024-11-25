@@ -87,7 +87,7 @@ switch ($_GET["op"]) {
         $cuadrilla->delete_cuadrilla($_POST["cua_id"]);
         break;
 
-    case "mostrar";
+    case "mostrar":
         $datos = $cuadrilla->get_cuadrilla_x_id($_POST["cua_id"]);
         if (is_array($datos) == true and count($datos) > 0) {
             foreach ($datos as $row) {
@@ -107,4 +107,29 @@ switch ($_GET["op"]) {
     case "asignarEquipo":
         $cuadrilla->insert_cuadrilla_equipos($_POST["cua_id"], $_POST["equipo_id"]);
         break;
-}
+        case "combo":
+            $datos = $cuadrilla->get_cuadrilla();
+            $data = array();
+            if (is_array($datos) && count($datos) > 0) {
+                foreach ($datos as $row) {
+                    $empresa = $row['cua_empresa'] == 1 ? '<span class="label label-pill label-info">Claro</span>' : ($row['cua_empresa'] == 2 ? '<span class="label label-pill label-danger">CNEL</span>' : "Otro");
+                    $ciudad = $row['cua_ciudad'] == 1 ? '<span class="label label-pill label-info">Guayaquil</span>' : ($row['cua_ciudad'] == 2 ? '<span class="label label-pill label-danger">Quito</span>' : "Otro");
+                    
+        
+                    $data[] = array(
+                        "0" => '<button class="btn btn-warning" onclick="asignar(' . $row['cua_id'] . ')"><span class="fa fa-plus"></span></button>',
+                        "1" => $row['cua_nombre'],
+                        "2" => $ciudad,
+                        "3" => $empresa,
+                    );
+                }
+            }
+            $results = array(
+                "sEcho" => 1, 
+                "iTotalRecords" => count($data),
+                "iTotalDisplayRecords" => count($data), 
+                "aaData" => $data
+            );
+            echo json_encode($results);
+            break;
+    }

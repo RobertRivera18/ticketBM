@@ -12,7 +12,7 @@ function listarColaboradores() {
             ],
             "ajax":
             {
-                url: '../../controller/colaborador.php?op=combo',
+                url: '../../controller/cuadrilla.php?op=combo',
                 type: "get",
                 dataType: "json",
                 error: function (e) {
@@ -41,14 +41,14 @@ function listarColaboradores() {
         }).DataTable();
 
 }
-function asignar(col_id) {
+function asignar(cua_id) {
     var tipo_acta = $("#tipo_acta").val();
     $.ajax({
         url: "../../controller/acta.php?op=asignar",
         type: "POST",
         data: {
             tipo_acta: tipo_acta,
-            col_id: col_id
+            cua_id: cua_id
         },
         success: function (response) {
             try {
@@ -108,7 +108,7 @@ $(document).ready(function () {
             'pdfHtml5'
         ],
         "ajax": {
-            url: '../../controller/equipo.php?op=listar',
+            url: '../../controller/acta.php?op=listar',
             type: "post",
             dataType: "json",
             error: function (e) {
@@ -140,6 +140,9 @@ $(document).ready(function () {
 });
 
 
+function generar(id_acta) {
+    window.location.href = '../../controller/acta.php?op=generar_word&id_acta=' + id_acta;
+}
 
 $(document).on("click", "#btnnuevo", function () {
     $('#mdltitulo').html('Nuevo Registro');

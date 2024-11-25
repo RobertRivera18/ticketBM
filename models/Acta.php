@@ -2,14 +2,14 @@
 class Acta extends Conectar
 {
 
-    public function insert_acta($tipo_acta,$col_id)
+    public function insert_acta($tipo_acta, $cua_id)
     {
         $conectar = parent::conexion();
         parent::set_names();
-        $sql = "INSERT INTO acta (tipo_acta,col_id) VALUES (?,?)";
+        $sql = "INSERT INTO acta (tipo_acta,cua_id) VALUES (?,?)";
         $stmt = $conectar->prepare($sql);
         $stmt->bindValue(1, $tipo_acta);
-        $stmt->bindValue(2, $col_id);
+        $stmt->bindValue(2, $cua_id);
 
         if ($stmt->execute()) {
             $lastInsertId = $conectar->lastInsertId();
@@ -22,39 +22,43 @@ class Acta extends Conectar
     }
 
 
+    public function get_acta()
+    {
+        try {
+            $conectar = parent::conexion();
+            parent::set_names();
+            $sql = "SELECT a.id_acta, a.tipo_acta, a.cua_id, c.cua_nombre
+                    FROM acta a
+                    LEFT JOIN tm_cuadrilla c ON a.cua_id = c.cua_id";
+            $stmt = $conectar->prepare($sql);
+            $stmt->execute();
+
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            // Manejo de errores
+            echo "Error en la consulta: " . $e->getMessage();
+            return false;
+        }
+    }
+
+
+    public function get_acta_by_id($id_acta)
+    {
+        try {
+            $conectar = parent::conexion();
+            parent::set_names();
+            $sql = "SELECT a.id_acta, a.tipo_acta, a.cua_id, c.cua_nombre, c.cua_id
+                FROM acta a
+                LEFT JOIN tm_cuadrilla c ON a.cua_id = c.cua_id
+                WHERE a.id_acta = ?";
+            $stmt = $conectar->prepare($sql);
+            $stmt->bindValue(1, $id_acta, PDO::PARAM_INT);
+            $stmt->execute();
+            return $stmt->fetch(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            // Manejo de errores
+            echo "Error en la consulta: " . $e->getMessage();
+            return false;
+        }
+    }
 }
- 
-//     //Asigno colaboradores a una cuadrilla 
-//     public function insert_cuadrilla_asignacion($cua_id, $col_id)
-//     {
-//         $conectar = parent::conexion();
-//         parent::set_names();
-//         $sql = "INSERT INTO tm_cuadrilla_colaborador (cua_id, col_id) 
-//             VALUES (?, ?)";
-//         $sql = $conectar->prepare($sql);
-//         $sql->bindValue(1, $cua_id, PDO::PARAM_INT);
-//         $sql->bindValue(2, $col_id, PDO::PARAM_INT);
-//         if ($sql->execute()) {
-//             return true;
-//         } else {
-//             return false;
-//         }
-//     }
-
-//     public function insert_cuadrilla_equipos($cua_id, $equipo_id)
-//     {
-//         $conectar = parent::conexion();
-//         parent::set_names();
-//         $sql = "INSERT INTO tm_cuadrilla_equipo (cua_id, equipo_id) 
-//             VALUES (?, ?)";
-//         $sql = $conectar->prepare($sql);
-//         $sql->bindValue(1, $cua_id, PDO::PARAM_INT);
-//         $sql->bindValue(2, $equipo_id, PDO::PARAM_INT);
-//         if ($sql->execute()) {
-//             return true;
-//         } else {
-//             return false;
-//         }
-//     }
-
-
