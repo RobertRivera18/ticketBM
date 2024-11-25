@@ -29,11 +29,6 @@ switch ($_GET["op"]) {
             $sub_array[] = $row["cua_nombre"] ? $row["cua_nombre"] : 'Sin cuadrilla';
 
 
-            $sub_array[] = '<button type="button" onClick="eliminar(' . $row["id_acta"] . ');"  
-                                  id="' . $row["id_acta"] . '" 
-                                  class="btn btn-inline btn-danger btn-sm ladda-button">
-                                  <i class="fa fa-trash"></i></button>';
-
             $sub_array[] = '<button type="button" onClick="generar(' . $row["id_acta"] . ');"  
                                   id="' . $row["id_acta"] . '" 
                                   class="btn btn-inline btn-danger btn-sm ladda-button">
