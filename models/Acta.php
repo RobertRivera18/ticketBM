@@ -21,6 +21,25 @@ class Acta extends Conectar
         }
     }
 
+    public function insert_actaEquipos($tipo_acta, $equipo_id)
+    {
+        $conectar = parent::conexion();
+        parent::set_names();
+        $sql = "INSERT INTO acta (tipo_acta,equipo_id) VALUES (?,?)";
+        $stmt = $conectar->prepare($sql);
+        $stmt->bindValue(1, $tipo_acta);
+        $stmt->bindValue(2, $equipo_id);
+
+        if ($stmt->execute()) {
+            $lastInsertId = $conectar->lastInsertId();
+            error_log("ID insertado: " . $lastInsertId);
+            return $lastInsertId;
+        } else {
+            error_log("Error en la inserción: " . implode(" ", $stmt->errorInfo()));
+            return false;
+        }
+    }
+
 
     public function get_acta()
     {
@@ -43,6 +62,27 @@ class Acta extends Conectar
 
 
     public function get_acta_by_id($id_acta)
+    {
+        try {
+            $conectar = parent::conexion();
+            parent::set_names();
+            $sql = "SELECT a.id_acta, a.tipo_acta, a.cua_id, c.cua_nombre, c.cua_id
+                FROM acta a
+                LEFT JOIN tm_cuadrilla c ON a.cua_id = c.cua_id
+                WHERE a.id_acta = ?";
+            $stmt = $conectar->prepare($sql);
+            $stmt->bindValue(1, $id_acta, PDO::PARAM_INT);
+            $stmt->execute();
+            return $stmt->fetch(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            // Manejo de errores
+            echo "Error en la consulta: " . $e->getMessage();
+            return false;
+        }
+    }
+
+    
+    public function get_acta_by_equipos($id_acta)
     {
         try {
             $conectar = parent::conexion();

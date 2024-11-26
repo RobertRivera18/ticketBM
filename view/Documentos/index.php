@@ -37,10 +37,9 @@
 				<table id="documento_data" class="table table-bordered table-striped table-vcenter js-dataTable-full">
 					<thead>
 						<tr>
-							<th style="width: 10%;">Tipo de Acta</th>
-							<th style="width: 10%;">Nombre Cuadrilla</th>
+							<th style="width: 5%;">Tipo de Acta</th>
+							<th style="width: 5%;">Nombre Cuadrilla</th>
 							<th class="text-center" style="width: 5%;"></th>
-	
 						</tr>
 					</thead>
 					<tbody>

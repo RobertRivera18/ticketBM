@@ -13,26 +13,31 @@ switch ($_GET["op"]) {
         $acta->insert_acta($_POST["tipo_acta"], $_POST["cua_id"]);
         break;
 
+
+        case "asignarEquipo":
+            $acta->insert_actaEquipos($_POST["tipo_acta"], $_POST["equipo_id"]);
+            break;
     case "listar":
         $datos = $acta->get_acta();
         $data = array();
         foreach ($datos as $row) {
             $sub_array = array();
             if ($row["tipo_acta"] == 1) {
-                $sub_array[] = '<span class="label label-pill label-info">Acta de Entrega</span>';
+                $sub_array[] = '<span class="label label-pill label-info">Acta de Entrega Credencial</span>';
             } elseif ($row["tipo_acta"] == 2) {
-                $sub_array[] = '<span class="label label-pill label-danger">Acta de Descarga</span>';
+                $sub_array[] = '<span class="label label-pill label-danger">Acta de Entrega de Equipos</span>';
             } else {
                 $sub_array[] = '<span>No asignado</span>';
             }
 
-            $sub_array[] = $row["cua_nombre"] ? $row["cua_nombre"] : 'Sin cuadrilla';
+            $sub_array[] = $row["cua_nombre"] ? $row["cua_nombre"] : '-';
 
 
-            $sub_array[] = '<button type="button" onClick="generar(' . $row["id_acta"] . ');"  
-                                  id="' . $row["id_acta"] . '" 
-                                  class="btn btn-inline btn-danger btn-sm ladda-button">
-                                  <i class="fa fa-save"></i></button>';
+            $sub_array[] = '<button type="button" onClick="generar(' . $row["id_acta"] . ');" 
+                id="' . $row["id_acta"] . '" 
+                                   class="btn btn-inline btn-success btn-sm ladda-button">
+                               <i class="fa fa-print"></i>
+                           </button>';
             $data[] = $sub_array;
         }
         $results = array(
@@ -46,34 +51,51 @@ switch ($_GET["op"]) {
 
         case "generar_word":
             $id_acta = isset($_GET['id_acta']) ? intval($_GET['id_acta']) : 0;
-    
             $datos = $acta->get_acta_by_id($id_acta);
-    
+        
             if (!$datos) {
                 echo json_encode(["status" => "error", "message" => "No se encontró el acta."]);
                 exit();
             }
-    
-            // Inicializar TinyButStrong y OpenTBS
+        
             $TBS = new clsTinyButStrong;
             $TBS->Plugin(TBS_INSTALL, OPENTBS_PLUGIN);
+        
+            // Validar el tipo de acta y realizar acciones
+            if ($datos['tipo_acta'] == 1) {
+                // Caso: Acta de entrega
+                $template = '../public/templates/acta.docx';
+                $TBS->LoadTemplate($template, OPENTBS_ALREADY_UTF8);
+        
+                $TBS->MergeField('pro.id', $datos['id_acta']);
+                $TBS->MergeField('pro.tipo', "ACTA DE ENTREGA");
+                $TBS->MergeField('pro.cuadrilla', $datos['cua_nombre'] ?? 'Sin asignar');
+        
+                $file_name = "acta_entrega_" . $datos['id_acta'] . "_" . date('Y-m-d') . ".docx";
+            } elseif ($datos['tipo_acta'] == 2) {
+                // Caso: Acta de descarga
+                $template = '../public/templates/acta_entregaequipo.docx';
+                $TBS->LoadTemplate($template, OPENTBS_ALREADY_UTF8);
+        
+                $TBS->MergeField('pro.id', $datos['id_acta']);
+                $TBS->MergeField('pro.tipo', "ACTA DE ENTREGA");
+                $TBS->MergeField('pro.cuadrilla', $datos['cua_nombre'] ?? 'Sin asignar');
+        
+                $file_name = "acta_descarga_" . $datos['id_acta'] . "_" . date('Y-m-d') . ".docx";
+            } else {
+                echo json_encode(["status" => "error", "message" => "El tipo de acta no es válido."]);
+                exit();
+            }
+        
+            // Ruta donde guardar el archivo
+            $save_path = "../public/actas/" . $file_name;
+        
+            // Guardar el archivo en el servidor
+            $TBS->Show(OPENTBS_FILE, $save_path);
+        
     
-            // Ruta de la plantilla
-            $template = '../public/templates/acta.docx';
-    
-            // Cargar la plantilla
-            $TBS->LoadTemplate($template, OPENTBS_ALREADY_UTF8);
-    
-            // Asignar los valores al documento
-            $TBS->MergeField('pro.id', $datos['id_acta']);
-            $TBS->MergeField('pro.tipo', $datos['tipo_acta'] == 1 ? "ACTA DE ENTREGA" : "ACTA DE DESCARGA");
-            $TBS->MergeField('pro.cuadrilla', $datos['cua_nombre'] ?? 'Sin asignar');
-    
-            // Generar nombre dinámico
-            $output_file_name = "acta_" . $datos['id_acta'] . "_" . date('Y-m-d') . ".docx";
-    
-            // Descargar archivo
-            $TBS->Show(OPENTBS_DOWNLOAD, $output_file_name);
+            header("Location:".Conectar::ruta()."/view/Documentos");
             exit();
             break;
+        
 }
