@@ -26,9 +26,9 @@
                             <thead>
                                 <tr>
                                     <th>Opciones</th>
-                                    <th>Nombre de Cuadrilla</th>
-                                    <th>Ciudad</th>
-                                    <th>Compañia</th>
+                                    <th>Nombre</th>
+                                    <th>Cedula</th>
+                                    <th>Empresa</th>
                                 </tr>
                             </thead>
                             <tbody>

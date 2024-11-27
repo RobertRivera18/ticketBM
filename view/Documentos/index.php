@@ -38,7 +38,8 @@
 					<thead>
 						<tr>
 							<th style="width: 5%;">Tipo de Acta</th>
-							<th style="width: 5%;">Nombre Cuadrilla</th>
+							<th style="width: 5%;">Equipos Entregados en la Acta</th>
+							<th style="width: 5%;">Entregado a</th>
 							<th class="text-center" style="width: 5%;"></th>
 						</tr>
 					</thead>

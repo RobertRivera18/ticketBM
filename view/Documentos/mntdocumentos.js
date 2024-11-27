@@ -51,7 +51,7 @@ function listarColaboradores() {
             ],
             "ajax":
             {
-                url: '../../controller/cuadrilla.php?op=combo',
+                url: '../../controller/colaborador.php?op=combo',
                 type: "get",
                 dataType: "json",
                 error: function (e) {
@@ -80,17 +80,18 @@ function listarColaboradores() {
         }).DataTable();
 
 }
-function asignar(cua_id) {
+function asignar(col_id) {
     var tipo_acta = $("#tipo_acta").val();
     $.ajax({
         url: "../../controller/acta.php?op=asignar",
         type: "POST",
         data: {
             tipo_acta: tipo_acta,
-            cua_id: cua_id
+            col_id: col_id
         },
         success: function (response) {
             try {
+                // Intentamos parsear la respuesta JSON
                 var res = JSON.parse(response);
 
                 if (res.status === "success") {
@@ -100,8 +101,6 @@ function asignar(cua_id) {
                         type: "success",
                         confirmButtonClass: "btn-success"
                     });
-
-                    // Actualizamos la tabla para reflejar cambios
                     $('#documento_data').DataTable().ajax.reload();
                 } else {
                     swal({
@@ -113,6 +112,12 @@ function asignar(cua_id) {
                 }
             } catch (error) {
                 console.error("Error al procesar la respuesta:", error);
+                swal({
+                    title: "Error",
+                    text: "La respuesta del servidor no es válida.",
+                    type: "error",
+                    confirmButtonClass: "btn-danger"
+                });
             }
         },
         error: function (error) {
@@ -126,6 +131,8 @@ function asignar(cua_id) {
         }
     });
 }
+
+
 function asignarEquipo(equipo_id) {
     var tipo_acta = $("#tipo_acta").val();
     $.ajax({
@@ -172,6 +179,7 @@ function asignarEquipo(equipo_id) {
         }
     });
 }
+
 
 
 $(document).ready(function () {
@@ -254,7 +262,6 @@ $("#tipo_acta").on("change", function () {
 
 $(document).on("click", "#btnnuevo", function () {
     // Mostrar el modal al hacer clic en el botón de nuevo
-    tblcuadrillas
     $('#modalmantenimiento').modal('show');
 });
 
