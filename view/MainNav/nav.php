@@ -100,6 +100,13 @@ if ($_SESSION["rol_id"] == 1 || $_SESSION["rol_id"] == 3) {
                 </a>
             </li>
 
+            <li class="blue-dirty">
+                <a href="..\AsigChip\">
+                    <span class="glyphicon glyphicon-credit-card"></span>
+                    <span class="lbl">Generar Actas Cuadrillas-Chip</span>
+                </a>
+            </li>
+
         </ul>
     </nav>
 <?php

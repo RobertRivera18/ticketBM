@@ -1,14 +1,36 @@
 <?php
 require_once("../config/conexion.php");
-require_once("../models/Cuadrilla.php");
+require_once("../models/Cuadrilla_Chip.php");
 require_once('../public/tbs_class.php');
 require_once('../public/plugins/tbs_plugin_opentbs.php');
-$cuadrilla = new Cuadrilla();
+$cuadrilla = new Cuadrilla_Chip();
 
 switch ($_GET["op"]) {
     case "guardar":
         $cuadrilla->insert_cuadrilla($_POST["cua_nom"]);
         break;
+
+        case "combo":
+            $datos = $cuadrilla->get_chips_disponibles();
+            $data = array();
+            if (is_array($datos) && count($datos) > 0) {
+                foreach ($datos as $row) {
+                    $data[] = array(
+                        "0" => '<button class="btn btn-warning" onclick="asignarEquipo(' . $row['equipo_id'] . ')"><span class="fa fa-plus"></span></button>',
+                        "1" => $row['nombre_equipo'],
+                        "2" => $row['marca'],
+                        "3" => $row['serie'],
+                    );
+                }
+            }
+            $results = array(
+                "sEcho" => 1, 
+                "iTotalRecords" => count($data),
+                "iTotalDisplayRecords" => count($data), 
+                "aaData" => $data
+            );
+            echo json_encode($results);
+            break;
 
     case "listar":
         $datos = $cuadrilla->get_cuadrilla(); // Obtener todas las cuadrillas
@@ -50,10 +72,6 @@ switch ($_GET["op"]) {
 
                 $sub_array[] = implode("<br>", $colaboradores_array) .
                     '<br><a onClick="agregar(' . $row["cua_id"] . ')"><span class="label label-primary">Agregar más</span></a>';
-                $sub_array[] = '<span class="label label-success">' . $cantidad_colaboradores . ' asignados</span>';
-            } else {
-                $sub_array[] = '<a onClick="agregar(' . $row["cua_id"] . ');"><span class="label label-pill label-warning">Sin Asignar</span></a>';
-                $sub_array[] = '<span class="label label-danger">0 asignados</span>';
             }
 
             // Manejo de equipos
@@ -68,7 +86,7 @@ switch ($_GET["op"]) {
                 $sub_array[] = implode("<br>", $equipos_array) .
                     '<br><a onClick="agregarEquipo(' . $row["cua_id"] . ')"><span class="label label-primary">Agregar más</span></a>';
             } else {
-                $sub_array[] = '<a onClick="agregarEquipo(' . $row["cua_id"] . ');"><span class="label label-pill label-warning">No se le han otorgado equipos</span></a>';
+                $sub_array[] = '<a onClick="agregarEquipo(' . $row["cua_id"] . ');"><span class="label label-pill label-danger">Sin Chip</span></a>';
             }
 
             $sub_array[] = '<button type="button" onClick="generar(' . $row["cua_id"] . ');" 
@@ -149,22 +167,7 @@ switch ($_GET["op"]) {
 
         exit();
 
-
-    case "eliminar":
-        $cuadrilla->delete_cuadrilla($_POST["cua_id"]);
-        break;
-
-    case "mostrar":
-        $datos = $cuadrilla->get_cuadrilla_x_id($_POST["cua_id"]);
-        if (is_array($datos) == true and count($datos) > 0) {
-            foreach ($datos as $row) {
-                $output["cua_id"] = $row["cua_id"];
-                $output["cua_nombre"] = $row["cua_nombre"];
-            }
-            echo json_encode($output);
-        }
-        break;
-
+   
 
     case "asignar":
         $cuadrilla->insert_cuadrilla_asignacion($_POST["cua_id"], $_POST["col_id"]);
