@@ -155,4 +155,44 @@ class Cuadrilla extends Conectar
 
         return $stmt->fetchAll();
     }
+
+    public function create_word($cua_id)
+    {
+        try {
+            $conectar = parent::conexion();
+            parent::set_names();
+            $sql = "SELECT 
+    GROUP_CONCAT(DISTINCT c.col_nombre SEPARATOR ',') AS nombres_colaboradores,
+    GROUP_CONCAT(DISTINCT c.col_cedula SEPARATOR ',') AS cedulas_colaboradores,
+    GROUP_CONCAT(DISTINCT e.serie SEPARATOR ',') AS equipos_asignados,
+    cu.cua_nombre AS nombre_cuadrilla
+FROM
+    tm_cuadrilla_colaborador cc
+INNER JOIN
+    tm_colaborador c ON cc.col_id = c.col_id
+LEFT JOIN
+    tm_cuadrilla_equipo ce ON ce.cua_id = cc.cua_id
+LEFT JOIN
+    tm_equipos e ON ce.equipo_id = e.equipo_id
+INNER JOIN
+    tm_cuadrilla cu ON cu.cua_id = cc.cua_id
+WHERE
+    cc.cua_id = ?
+";
+            $stmt = $conectar->prepare($sql);
+            $stmt->bindValue(1, $cua_id, PDO::PARAM_INT);
+            $stmt->execute();
+            $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if (!$result) {
+                return false;
+            }
+
+            return $result;
+        } catch (PDOException $e) {
+            // Manejo de errores
+            echo "Error en la consulta: " . $e->getMessage();
+            return false;
+        }
+    }
 }

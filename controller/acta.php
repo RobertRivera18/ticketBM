@@ -108,9 +108,10 @@ switch ($_GET["op"]) {
             $TBS->MergeField('pro.colaborador', $datos['col_nombre'] ?? 'Sin asignar');
             $TBS->MergeField('pro.tipo', "Acta de Entrega");
             $TBS->MergeField('pro.cedula', $datos['col_cedula']);
-            
+            $TBS->MergeField('pro.fecha', date('d/m/Y'));
 
-            $file_name = "acta_entrega_" . $datos['id_acta'] . "_" . date('Y-m-d') . ".docx";
+            //Guardo el nombre de la acta a generar
+            $file_name = $datos['col_cedula'] . "_".$datos['col_nombre'] ."_". date('Y-m-d') . ".docx";
         } elseif ($datos['tipo_acta'] == 2) {
             // Caso: Acta de descarga
             $template = '../public/templates/acta_entregaequipo.docx';
@@ -120,13 +121,13 @@ switch ($_GET["op"]) {
             $TBS->MergeField('pro.tipo', "ACTA DE ENTREGA");
             $TBS->MergeField('pro.fecha', $datos['cua_nombre'] ?? 'Sin asignar');
 
-            $file_name = "acta_descarga_" . $datos['id_acta'] . "_" . date('Y-m-d') . ".docx";
+            $file_name = "acta_descarga_" . $datos['col_cedula'] . "_" . date('Y-m-d') . ".docx";
         } else {
             echo json_encode(["status" => "error", "message" => "El tipo de acta no es válido."]);
             exit();
         }
 
-        $save_path = "../public/actas/" . $file_name;
+        $save_path = "../public/actas/credencialesCuadrillas/" . $file_name;
 
         // Guardar el archivo en el servidor
         $TBS->Show(OPENTBS_FILE, $save_path);

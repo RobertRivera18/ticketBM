@@ -42,6 +42,7 @@
 							<th class="d-none d-sm-table-cell" style="width: 20%;">Colaboradores Integrantes</th>
 							<th class="d-none d-sm-table-cell" style="width: 10%;">Cantidad Asignados</th>
 							<th class="d-none d-sm-table-cell" style="width: 10%;">Equipos Entregados</th>
+							<th class="d-none d-sm-table-cell" style="width: 3%;">Generar Acta</th>
 					
 							
 							

@@ -268,6 +268,16 @@ function asignarEquipo(equipo_id) {
         }
     });
 }
+function generar(cua_id) {
+    window.location.href = '../../controller/cuadrilla.php?op=generar_word&cua_id=' + cua_id;
+    swal({
+        title: "HelpDesk!",
+        text: "Completado.",
+        type: "success",
+        confirmButtonClass: "btn-success"
+    });
+}
+
 
 
 

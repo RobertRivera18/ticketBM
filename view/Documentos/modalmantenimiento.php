@@ -17,7 +17,7 @@
                         <select class="control-form select2" id="tipo_acta" name="tipo_acta">
                             <option>Seleccione el tipo de Acta a Generar</option>
                             <option value="1">Acta de Entrega Credencial</option>
-                            <option value="2">Acta de Entrega de Equipos</option>
+                        
                         </select>
                     </div>
 
@@ -46,7 +46,7 @@
                     </div>
 
 
-                    <div class="modal-body table-responsive" style="overflow-x: auto;" id="tabla_equipos">
+                    <!-- <div class="modal-body table-responsive" style="overflow-x: auto;" id="tabla_equipos">
                         <table id="tblequipos" class="table table-striped table-bordered table-condensed table-hover" style="width: 100%;">
                             <thead>
                                 <tr>
@@ -57,7 +57,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <!-- Aquí se agregarían los colaboradores dinámicamente -->
+                                 Aquí se agregarían los colaboradores dinámicamente
                             </tbody>
                             <tfoot>
                                 <tr>
@@ -68,7 +68,7 @@
                                 </tr>
                             </tfoot>
                         </table>
-                    </div>
+                    </div> -->
                     <div class="modal-footer">
                         <button type="button" class="btn btn-rounded btn-default" data-dismiss="modal">Cerrar</button>
                         <button type="submit" name="action" id="#" value="add" class="btn btn-rounded btn-primary">Guardar</button>

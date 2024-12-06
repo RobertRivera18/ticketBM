@@ -80,9 +80,10 @@ if ($_SESSION["rol_id"] == 1 || $_SESSION["rol_id"] == 3) {
                     </li>
                     <li class="blue-dirty">
                         <a href="..\AsigCuadrillas\">
-                            <span class="lbl">Asignacion Cuadrillas-Colaboradores</span>
+                            <span class="lbl">Asignacion Cuadrillas-Colaboradores-Generacion Actas Chip</span>
                         </a>
                     </li>
+                   
 
                     <li class="blue-dirty">
                         <a href="..\MntColaboradores\">
@@ -94,8 +95,8 @@ if ($_SESSION["rol_id"] == 1 || $_SESSION["rol_id"] == 3) {
             </li>
             <li class="blue-dirty">
                 <a href="..\Documentos\">
-                    <span class="glyphicon glyphicon-check"></span>
-                    <span class="lbl">Generar Actas</span>
+                    <span class="glyphicon glyphicon-credit-card"></span>
+                    <span class="lbl">Generar Actas Entregas Credenciales</span>
                 </a>
             </li>
 

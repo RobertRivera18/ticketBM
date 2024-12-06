@@ -1,6 +1,8 @@
 <?php
 require_once("../config/conexion.php");
 require_once("../models/Cuadrilla.php");
+require_once('../public/tbs_class.php');
+require_once('../public/plugins/tbs_plugin_opentbs.php');
 $cuadrilla = new Cuadrilla();
 
 switch ($_GET["op"]) {
@@ -69,6 +71,13 @@ switch ($_GET["op"]) {
                 $sub_array[] = '<a onClick="agregarEquipo(' . $row["cua_id"] . ');"><span class="label label-pill label-warning">No se le han otorgado equipos</span></a>';
             }
 
+            $sub_array[] = '<button type="button" onClick="generar(' . $row["cua_id"] . ');" 
+            id="' . $row["cua_id"] . '" 
+            class="btn btn-inline btn-success btn-sm ladda-button">
+            <i class="fa fa-print"></i>
+        </button>';
+
+
             // Agregar fila al resultado final
             $data[] = $sub_array;
         }
@@ -82,6 +91,64 @@ switch ($_GET["op"]) {
         );
         echo json_encode($results);
         break;
+
+    case "generar_word":
+        $cua_id = $_GET['cua_id'] ?? null;
+
+        if (!$cua_id) {
+            echo json_encode(["status" => "error", "message" => "ID de cuadrilla no proporcionado."]);
+            exit();
+        }
+
+        $datos = $cuadrilla->create_word($cua_id);
+
+        if (!$datos) {
+            echo json_encode(["status" => "error", "message" => "No se encontraron datos para la cuadrilla."]);
+            exit();
+        }
+
+        $TBS = new clsTinyButStrong;
+        $TBS->Plugin(TBS_INSTALL, OPENTBS_PLUGIN);
+
+        // Ruta de la plantilla
+        $template = '../public/templates/acta_entregachip.docx';
+        $TBS->LoadTemplate($template, OPENTBS_ALREADY_UTF8);
+
+        $nombres = explode(",", $datos['nombres_colaboradores']);
+        // Fusionar datos
+        $TBS->MergeField('cuadrilla.colaborador1', $nombres[0]);  // Primer nombre
+        $TBS->MergeField('cuadrilla.colaborador2', $nombres[1]);  // Segundo nombre
+         
+        $cedulas = explode(",", $datos['cedulas_colaboradores']);
+        $TBS->MergeField('cuadrilla.cedula1', $cedulas[0]);  // Cedula del primer colaborador
+        $TBS->MergeField('cuadrilla.cedula2', $cedulas[1]);  // Cedula del segundo colaborador
+
+        $TBS->MergeField('cuadrilla.nombre', $datos['nombre_cuadrilla']);
+        $TBS->MergeField('cuadrilla.equipos', $datos['equipos_asignados']);
+
+        $file_name = "acta_cuadrilla_" . $cua_id . "_" . date('Y-m-d') . ".docx";
+        $save_path = "../public/actas/" . $file_name;
+
+        // Guardar el archivo
+        $TBS->Show(OPENTBS_FILE, $save_path);
+
+        // Descargar el archivo
+        if (file_exists($save_path)) {
+            header('Content-Description: File Transfer');
+            header('Content-Type: application/octet-stream');
+            header('Content-Disposition: attachment; filename="' . basename($file_name) . '"');
+            header('Expires: 0');
+            header('Cache-Control: must-revalidate');
+            header('Pragma: public');
+            header('Content-Length: ' . filesize($save_path));
+            readfile($save_path);
+            exit();
+        } else {
+            echo "El archivo no se pudo generar correctamente.";
+        }
+
+        exit();
+
 
     case "eliminar":
         $cuadrilla->delete_cuadrilla($_POST["cua_id"]);
@@ -107,29 +174,29 @@ switch ($_GET["op"]) {
     case "asignarEquipo":
         $cuadrilla->insert_cuadrilla_equipos($_POST["cua_id"], $_POST["equipo_id"]);
         break;
-        case "combo":
-            $datos = $cuadrilla->get_cuadrilla();
-            $data = array();
-            if (is_array($datos) && count($datos) > 0) {
-                foreach ($datos as $row) {
-                    $empresa = $row['cua_empresa'] == 1 ? '<span class="label label-pill label-info">Claro</span>' : ($row['cua_empresa'] == 2 ? '<span class="label label-pill label-danger">CNEL</span>' : "Otro");
-                    $ciudad = $row['cua_ciudad'] == 1 ? '<span class="label label-pill label-info">Guayaquil</span>' : ($row['cua_ciudad'] == 2 ? '<span class="label label-pill label-danger">Quito</span>' : "Otro");
-                    
-        
-                    $data[] = array(
-                        "0" => '<button class="btn btn-warning" onclick="asignar(' . $row['cua_id'] . ')"><span class="fa fa-plus"></span></button>',
-                        "1" => $row['cua_nombre'],
-                        "2" => $ciudad,
-                        "3" => $empresa,
-                    );
-                }
+    case "combo":
+        $datos = $cuadrilla->get_cuadrilla();
+        $data = array();
+        if (is_array($datos) && count($datos) > 0) {
+            foreach ($datos as $row) {
+                $empresa = $row['cua_empresa'] == 1 ? '<span class="label label-pill label-info">Claro</span>' : ($row['cua_empresa'] == 2 ? '<span class="label label-pill label-danger">CNEL</span>' : "Otro");
+                $ciudad = $row['cua_ciudad'] == 1 ? '<span class="label label-pill label-info">Guayaquil</span>' : ($row['cua_ciudad'] == 2 ? '<span class="label label-pill label-danger">Quito</span>' : "Otro");
+
+
+                $data[] = array(
+                    "0" => '<button class="btn btn-warning" onclick="asignar(' . $row['cua_id'] . ')"><span class="fa fa-plus"></span></button>',
+                    "1" => $row['cua_nombre'],
+                    "2" => $ciudad,
+                    "3" => $empresa,
+                );
             }
-            $results = array(
-                "sEcho" => 1, 
-                "iTotalRecords" => count($data),
-                "iTotalDisplayRecords" => count($data), 
-                "aaData" => $data
-            );
-            echo json_encode($results);
-            break;
-    }
+        }
+        $results = array(
+            "sEcho" => 1,
+            "iTotalRecords" => count($data),
+            "iTotalDisplayRecords" => count($data),
+            "aaData" => $data
+        );
+        echo json_encode($results);
+        break;
+}
