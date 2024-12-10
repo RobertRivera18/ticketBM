@@ -28,8 +28,17 @@ switch ($_GET["op"]) {
                 $sub_array[] = '<span>No asignado</span>'; // En caso de que el 'empresa_id' no sea ni 1 ni 2
             }
 
-            $sub_array[] = '<button type="button" onClick="editar(' . $row["col_id"] . ');"  id="' . $row["col_id"] . '" class="btn btn-inline btn-warning btn-sm ladda-button"><i class="fa fa-edit"></i></button>';
-            $sub_array[] = '<button type="button" onClick="eliminar(' . $row["col_id"] . ');"  id="' . $row["col_id"] . '" class="btn btn-inline btn-danger btn-sm ladda-button"><i class="fa fa-trash"></i></button>';
+            $sub_array[] = '<td class="text-center" colspan="2">
+            <div style="display: flex; justify-content: center; gap: 5px;">
+                <button type="button" onClick="editar(' . $row["col_id"] . ');" id="' . $row["col_id"] . '" class="btn btn-inline btn-warning btn-sm ladda-button">
+                    <i class="fa fa-edit"></i>
+                </button>
+                <button type="button" onClick="eliminar(' . $row["col_id"] . ');" id="' . $row["col_id"] . '" class="btn btn-inline btn-danger btn-sm ladda-button">
+                    <i class="fa fa-trash"></i>
+                </button>
+            </div>
+        </td>';
+
             $data[] = $sub_array;
         }
 
@@ -62,14 +71,14 @@ switch ($_GET["op"]) {
             echo json_encode(['status' => 'error', 'message' => 'Colaborador no encontrado']);
         }
         break;
- 
+
     case "combo":
         $datos = $colaborador->get_colaboradores();
         $data = array();
         if (is_array($datos) && count($datos) > 0) {
             foreach ($datos as $row) {
                 $empresa = $row['empresa_id'] == 1 ? '<span class="label label-pill label-info">CNEL</span>' : ($row['empresa_id'] == 2 ? '<span class="label label-pill label-danger">CLARO</span>' : "Otro");
-    
+
                 $data[] = array(
                     "0" => '<button class="btn btn-warning" onclick="asignar(' . $row['col_id'] . ')"><span class="fa fa-plus"></span></button>',
                     "1" => $row['col_nombre'],
@@ -79,13 +88,11 @@ switch ($_GET["op"]) {
             }
         }
         $results = array(
-            "sEcho" => 1, 
+            "sEcho" => 1,
             "iTotalRecords" => count($data),
-            "iTotalDisplayRecords" => count($data), 
+            "iTotalDisplayRecords" => count($data),
             "aaData" => $data
         );
         echo json_encode($results);
         break;
-    
-    
 }

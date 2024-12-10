@@ -10,27 +10,27 @@ switch ($_GET["op"]) {
         $cuadrilla->insert_cuadrilla($_POST["cua_nom"]);
         break;
 
-        case "combo":
-            $datos = $cuadrilla->get_chips_disponibles();
-            $data = array();
-            if (is_array($datos) && count($datos) > 0) {
-                foreach ($datos as $row) {
-                    $data[] = array(
-                        "0" => '<button class="btn btn-warning" onclick="asignarEquipo(' . $row['equipo_id'] . ')"><span class="fa fa-plus"></span></button>',
-                        "1" => $row['nombre_equipo'],
-                        "2" => $row['marca'],
-                        "3" => $row['serie'],
-                    );
-                }
+    case "combo":
+        $datos = $cuadrilla->get_chips_disponibles();
+        $data = array();
+        if (is_array($datos) && count($datos) > 0) {
+            foreach ($datos as $row) {
+                $data[] = array(
+                    "0" => '<button class="btn btn-warning" onclick="asignarEquipo(' . $row['equipo_id'] . ')"><span class="fa fa-plus"></span></button>',
+                    "1" => $row['nombre_equipo'],
+                    "2" => $row['marca'],
+                    "3" => $row['serie'],
+                );
             }
-            $results = array(
-                "sEcho" => 1, 
-                "iTotalRecords" => count($data),
-                "iTotalDisplayRecords" => count($data), 
-                "aaData" => $data
-            );
-            echo json_encode($results);
-            break;
+        }
+        $results = array(
+            "sEcho" => 1,
+            "iTotalRecords" => count($data),
+            "iTotalDisplayRecords" => count($data),
+            "aaData" => $data
+        );
+        echo json_encode($results);
+        break;
 
     case "listar":
         $datos = $cuadrilla->get_cuadrilla(); // Obtener todas las cuadrillas
@@ -136,7 +136,7 @@ switch ($_GET["op"]) {
         // Fusionar datos
         $TBS->MergeField('cuadrilla.colaborador1', $nombres[0]);  // Primer nombre
         $TBS->MergeField('cuadrilla.colaborador2', $nombres[1]);  // Segundo nombre
-         
+
         $cedulas = explode(",", $datos['cedulas_colaboradores']);
         $TBS->MergeField('cuadrilla.cedula1', $cedulas[0]);  // Cedula del primer colaborador
         $TBS->MergeField('cuadrilla.cedula2', $cedulas[1]);  // Cedula del segundo colaborador
@@ -144,8 +144,8 @@ switch ($_GET["op"]) {
         $TBS->MergeField('cuadrilla.nombre', $datos['nombre_cuadrilla']);
         $TBS->MergeField('cuadrilla.equipos', $datos['equipos_asignados']);
 
-        $file_name = "acta_cuadrilla_" . $cua_id . "_" . date('Y-m-d') . ".docx";
-        $save_path = "../public/actas/" . $file_name;
+        $file_name = "acta_chip_" . $cua_id . "_" . date('Y-m-d') . ".docx";
+        $save_path = "../public/actas/chipsCuadrillas/" . $file_name;
 
         // Guardar el archivo
         $TBS->Show(OPENTBS_FILE, $save_path);
@@ -167,7 +167,7 @@ switch ($_GET["op"]) {
 
         exit();
 
-   
+
 
     case "asignar":
         $cuadrilla->insert_cuadrilla_asignacion($_POST["cua_id"], $_POST["col_id"]);

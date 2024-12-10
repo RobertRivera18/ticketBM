@@ -38,10 +38,10 @@
 					<thead>
 						<tr>
 							<th style="width: 10%;">Nombre Colaborador</th>
-							<th style="width: 10%;">Cedula</th>
+							<th style="width: 5%;">Cedula</th>
 							<th class="d-none d-sm-table-cell" style="width: 5%;">Empresa</th>
 							<th class="text-center" style="width: 5%;"></th>
-							<th class="text-center" style="width: 5%;"></th>
+							
 						</tr>
 					</thead>
 					<tbody>

@@ -70,6 +70,12 @@ switch ($_GET["op"]) {
                     <i class="fa fa-print"></i>
                 </button>';
 
+            // Asegúrate de que 'fecha_entrega' esté presente y sea válida
+            if (!empty($row["fecha_entrega"])) {
+                $sub_array[] = date("d/m/Y H:i:s", strtotime($row["fecha_entrega"]));
+            } else {
+                $sub_array[] = '<span class="label label-pill label-warning">Sin fecha</span>';
+            }
             // Agregar fila al resultado final
 
             $data[] = $sub_array;
@@ -111,7 +117,7 @@ switch ($_GET["op"]) {
             $TBS->MergeField('pro.fecha', date('d/m/Y'));
 
             //Guardo el nombre de la acta a generar
-            $file_name = $datos['col_cedula'] . "_".$datos['col_nombre'] ."_". date('Y-m-d') . ".docx";
+            $file_name = 'ACTA_ENTREGA_CREDENCIAL'.$datos['col_cedula'] . "_" . $datos['col_nombre'] . "_" . date('Y-m-d') . ".docx";
         } elseif ($datos['tipo_acta'] == 2) {
             // Caso: Acta de descarga
             $template = '../public/templates/acta_entregaequipo.docx';
@@ -131,12 +137,12 @@ switch ($_GET["op"]) {
 
         // Guardar el archivo en el servidor
         $TBS->Show(OPENTBS_FILE, $save_path);
-        
+
         // Descargar el archivo
         if (file_exists($save_path)) {
             header('Content-Description: File Transfer');
             header('Content-Type: application/octet-stream');
-            header('Content-Disposition: attachment; filename="'.basename($file_name).'"');
+            header('Content-Disposition: attachment; filename="' . basename($file_name) . '"');
             header('Expires: 0');
             header('Cache-Control: must-revalidate');
             header('Pragma: public');

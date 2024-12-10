@@ -33,7 +33,7 @@ class Equipo extends Conectar
         $stmt->bindValue(3, $serie);
         $stmt->bindValue(4, $equipo_id);
         $stmt->execute();
-        return $resultado=$stmt->fetchAll();
+        return $resultado = $stmt->fetchAll();
     }
 
     public function get_equipo()
@@ -92,10 +92,23 @@ class Equipo extends Conectar
         $sql = "SELECT e.*
              FROM tm_equipos e
              LEFT JOIN tm_cuadrilla_equipo cc ON e.equipo_id = cc.equipo_id
-             WHERE cc.equipo_id IS NULL";
+             WHERE cc.equipo_id IS NULL AND e.datos=0";
         $sql = $conectar->prepare($sql);
         $sql->execute();
         return $resultado = $sql->fetchAll();
     }
 
+
+    public function get_equipos_disponibles_usuarios()
+    {
+        $conectar = parent::conexion();
+        parent::set_names();
+        $sql = "SELECT e.*
+             FROM tm_equipos e
+             LEFT JOIN tm_usuario_equipo ue ON e.equipo_id = ue.equipo_id
+             WHERE ue.equipo_id IS NULL AND e.datos=0";
+        $sql = $conectar->prepare($sql);
+        $sql->execute();
+        return $resultado = $sql->fetchAll();
+    }
 }

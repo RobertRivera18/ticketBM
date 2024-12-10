@@ -37,10 +37,17 @@ switch ($_GET["op"]) {
                 $sub_array[] = '<span>No definido</span>';
             }
 
-            // Botones de acción
-            $sub_array[] = '<button type="button" onClick="editar(' . $row["cua_id"] . ');" id="' . $row["cua_id"] . '" class="btn btn-inline btn-warning btn-sm ladda-button"><i class="fa fa-edit"></i></button>';
-            $sub_array[] = '<button type="button" onClick="eliminar(' . $row["cua_id"] . ');" id="' . $row["cua_id"] . '" class="btn btn-inline btn-danger btn-sm ladda-button"><i class="fa fa-trash"></i></button>';
 
+            $sub_array[] = '<td class="text-center" colspan="2">
+            <div style="display: flex; gap: 2px;">
+                <button type="button" onClick="editar(' . $row["cua_id"] . ');" id="' . $row["cua_id"] . '" class="btn btn-inline btn-warning btn-sm ladda-button">
+                    <i class="fa fa-edit"></i>
+                </button>
+                <button type="button" onClick="eliminar(' . $row["cua_id"] . ');" id="' . $row["cua_id"] . '" class="btn btn-inline btn-danger btn-sm ladda-button">
+                    <i class="fa fa-trash"></i>
+                </button>
+            </div>
+        </td>';
             // Agregar fila al arreglo de datos
             $data[] = $sub_array;
         }

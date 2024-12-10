@@ -80,4 +80,28 @@ switch ($_GET["op"]) {
             echo json_encode($results);
             break;
 
+            //Comdo para equipos disponibles para usuarios(Administrativos)
+
+            case "comboEquipos":
+                $datos = $equipo->get_equipos_disponibles_usuarios();
+                $data = array();
+                if (is_array($datos) && count($datos) > 0) {
+                    foreach ($datos as $row) {
+                        $data[] = array(
+                            "0" => '<button class="btn btn-warning" onclick="asignarEquipo(' . $row['equipo_id'] . ')"><span class="fa fa-plus"></span></button>',
+                            "1" => $row['nombre_equipo'],
+                            "2" => $row['marca'],
+                            "3" => $row['serie'],
+                        );
+                    }
+                }
+                $results = array(
+                    "sEcho" => 1, 
+                    "iTotalRecords" => count($data),
+                    "iTotalDisplayRecords" => count($data), 
+                    "aaData" => $data
+                );
+                echo json_encode($results);
+                break;
+
 }

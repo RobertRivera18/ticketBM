@@ -46,12 +46,28 @@ if ($_SESSION["rol_id"] == 1 || $_SESSION["rol_id"] == 3) {
                 </a>
             </li>
 
-            <li class="blue-dirty">
-                <a href="..\MntUsuario\">
-                    <span class="glyphicon glyphicon-user"></span>
-                    <span class="lbl">Mantenimiento Usuario</span>
+
+
+            <li class="blue-dirty dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                    <span class="glyphicon glyphicon-tasks"></span>
+                    <span class="lbl">Mantenimiento Usuarios</span>
+                    <span class="caret"></span>
                 </a>
+                <ul class="dropdown-menu">
+                    <li class="blue-dirty">
+                        <a href="..\MntUsuario\">
+                            <span class="lbl">Usuarios del Sistema</span>
+                        </a>
+                    </li>
+                    <li class="blue-dirty">
+                        <a href="..\UsuariosEquipos\">
+                            <span class="lbl">Usuarios-Equipos</span>
+                        </a>
+                    </li>
+                </ul>
             </li>
+
             <li class="blue-dirty">
                 <a href="..\ConsultarTicket\">
                     <span class="glyphicon glyphicon-th"></span>
@@ -83,7 +99,7 @@ if ($_SESSION["rol_id"] == 1 || $_SESSION["rol_id"] == 3) {
                             <span class="lbl">Asignacion Cuadrillas-Colaboradores-Generacion Actas Chip</span>
                         </a>
                     </li>
-                   
+
 
                     <li class="blue-dirty">
                         <a href="..\MntColaboradores\">
