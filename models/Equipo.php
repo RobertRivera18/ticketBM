@@ -2,15 +2,16 @@
 class Equipo extends Conectar
 {
 
-    public function insert_equipo($nombre_equipo, $marca, $serie)
+    public function insert_equipo($nombre_equipo, $marca, $modelo, $serie)
     {
         $conectar = parent::conexion();
         parent::set_names();
-        $sql = "INSERT INTO tm_equipos (nombre_equipo,marca,serie) VALUES (?,?,?)";
+        $sql = "INSERT INTO tm_equipos (nombre_equipo,marca,modelo,serie) VALUES (?,?,?,?)";
         $stmt = $conectar->prepare($sql);
         $stmt->bindValue(1, $nombre_equipo);
         $stmt->bindValue(2, $marca);
-        $stmt->bindValue(3, $serie);
+        $stmt->bindValue(3, $modelo);
+        $stmt->bindValue(4, $serie);
         $stmt->execute();
         if ($stmt->rowCount() > 0) {
             return $conectar->lastInsertId();
@@ -18,20 +19,23 @@ class Equipo extends Conectar
             return false;
         }
     }
-    public function update_equipo($equipo_id, $nombre_equipo, $marca, $serie)
+    public function update_equipo($equipo_id, $nombre_equipo, $marca, $modelo, $serie)
     {
         $conectar = parent::conexion();
         parent::set_names();
         $sql = "UPDATE tm_equipos set 
              nombre_equipo = ?,
               marca = ?, 
-              serie = ? WHERE 
+              modelo = ?,
+              serie = ?,
+               WHERE 
               equipo_id = ?";
         $stmt = $conectar->prepare($sql);
         $stmt->bindValue(1, $nombre_equipo);
         $stmt->bindValue(2, $marca);
-        $stmt->bindValue(3, $serie);
-        $stmt->bindValue(4, $equipo_id);
+        $stmt->bindValue(3, $modelo);
+        $stmt->bindValue(4, $serie);
+        $stmt->bindValue(5, $equipo_id);
         $stmt->execute();
         return $resultado = $stmt->fetchAll();
     }

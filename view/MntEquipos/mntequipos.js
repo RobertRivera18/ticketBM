@@ -88,7 +88,9 @@ function editar(equipo_id) {
         $('#equipo_id').val(data.equipo_id);
         $('#nombre_equipo').val(data.nombre_equipo);
         $('#marca').val(data.marca);
+        $('#modelo').val(data.modelo);
         $('#serie').val(data.serie);
+       
       
     });
     $('#modalmantenimiento').modal('show');

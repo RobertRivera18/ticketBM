@@ -110,8 +110,32 @@ function agregarEquipo(usu_id) {
     $("#modalequipos").modal('show'); // Mostrar modal de equipos
 }
 
+
+
+function eliminarItem(usu_id, equipo_id) {
+    // Llamada AJAX para eliminar el equipo del usuario
+    $.ajax({
+        url: "../../controller/usuario_equipo.php?op=eliminarEquipo",
+        type: "POST",
+        data: { usu_id: usu_id, equipo_id: equipo_id },
+        success: function (response) {
+            if (response) {
+                swal({
+                    title: "HelpDesk!",
+                    text: "Equipo eliminado correctamente.",
+                    type: "success",
+                    confirmButtonClass: "btn-success"
+                });
+                 // Recargar tabla
+            } 
+            $('#cuadrilla_data').DataTable().ajax.reload();
+        }
+
+    });
+}
+
 function asignarEquipo(equipo_id) {
-    console.log(equipo_id);
+ 
     $.ajax({
         url: "../../controller/usuario_equipo.php?op=asignarEquipo",
         type: "POST",
@@ -129,29 +153,6 @@ function asignarEquipo(equipo_id) {
                 $('#cuadrilla_data').DataTable().ajax.reload();
             } 
         }
-    });
-}
-
-function eliminarItem(usu_id, equipo_id) {
-    // Llamada AJAX para eliminar el equipo del usuario
-    $.ajax({
-        url: "../../controller/usuario_equipo.php?op=eliminarEquipo",
-        type: "POST",
-        data: { usu_id: usu_id, equipo_id: equipo_id },
-        success: function (response) {
-            
-            if (response) {
-                swal({
-                    title: "HelpDesk!",
-                    text: "Equipo eliminado correctamente.",
-                    type: "success",
-                    confirmButtonClass: "btn-success"
-                });
-                 // Recargar tabla
-            } 
-            $('#cuadrilla_data').DataTable().ajax.reload();
-        }
-
     });
 }
 

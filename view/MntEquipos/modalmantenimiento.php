@@ -22,6 +22,12 @@
                         <input type="text" class="form-control" id="marca" name="marca" placeholder="Ingrese Marca del equipo" required>
                         
                     </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="serie">Modelo Equipo</label>
+                        <input type="text" class="form-control" id="modelo" name="modelo" placeholder="Ingrese modelo del equipo" required>
+                        
+                    </div>
                     <div class="form-group">
                         <label class="form-label" for="serie">Serie/IMEI</label>
                         <input type="text" class="form-control" id="serie" name="serie" placeholder="Ingrese serie del equipo" required>
