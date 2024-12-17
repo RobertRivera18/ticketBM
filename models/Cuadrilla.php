@@ -156,6 +156,38 @@ class Cuadrilla extends Conectar
         return $stmt->fetchAll();
     }
 
+
+
+    public function delete_cuadrilla_colaborador($cua_id, $col_id)
+    {
+        try {
+            $conectar = parent::conexion();
+            parent::set_names();
+            $sql = "DELETE FROM tm_cuadrilla_colaborador WHERE cua_id = ? AND col_id = ?";
+            $stmt = $conectar->prepare($sql);
+            $stmt->bindValue(1, $cua_id, PDO::PARAM_INT);
+            $stmt->bindValue(2, $col_id, PDO::PARAM_INT);
+
+            // Ejecutar la consulta
+            if ($stmt->execute()) {
+                // Verificar si se eliminó al menos una fila
+                if ($stmt->rowCount() > 0) {
+                    return true;  // Registro eliminado con éxito
+                } else {
+                    return false;  // No se encontró ningún registro para eliminar
+                }
+            } else {
+                return false;  // Error en la ejecución de la consulta
+            }
+        } catch (Exception $e) {
+            // Manejar el error y devolver un valor adecuado
+            return false;
+        }
+    }
+
+
+
+
     public function create_word($cua_id)
     {
         try {

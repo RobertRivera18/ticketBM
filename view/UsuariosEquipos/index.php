@@ -37,9 +37,9 @@
 				<table id="cuadrilla_data" class="table table-bordered table-striped table-vcenter js-dataTable-full">
 					<thead>
 						<tr>
-							<th class="d-none d-sm-table-cell" style="width: 10%;">Usuarios</th>
-							<th class="d-none d-sm-table-cell" style="width: 10%;">Equipos Entregados</th>
-							<th class="d-none d-sm-table-cell" style="width: 3%;">Fecha de Entrega</th>
+							<th class="d-none d-sm-table-cell" style="width: 5%;">Usuarios</th>
+							<th class="d-none d-sm-table-cell" style="width: 5%;">Equipos Entregados</th>
+							<th class="d-none d-sm-table-cell" style="width: 3%;">Generar Actas Entrega/Descarga</th>
 					
 							
 							
@@ -59,7 +59,7 @@
 
 	<?php require_once("../MainJs/js.php");?>
 	
-	<script type="text/javascript" src="mntcuadrilla.js"></script>
+	<script type="text/javascript" src="usuarios_equipos.js"></script>
 
 </body>
 </html>

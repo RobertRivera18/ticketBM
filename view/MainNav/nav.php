@@ -9,7 +9,7 @@ if ($_SESSION["rol_id"] == 1 || $_SESSION["rol_id"] == 3) {
                     <span class="lbl">Inicio</span>
                 </a>
             </li>
-            6
+            
             <li class="blue-dirty">
                 <a href="..\NuevoTicket\">
                     <span class="glyphicon glyphicon-th"></span>

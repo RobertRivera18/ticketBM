@@ -1,9 +1,11 @@
 var tabla;
 function init() {
     $("#cuadrilla_form").on("submit", function (e) {
+        e.preventDefault(); 
         listarEquipos();
     });
 }
+
 
 $(document).ready(function () {
     tabla = $('#cuadrilla_data').DataTable({
@@ -55,8 +57,6 @@ $(document).ready(function () {
     });
 });
 
-
-
 function listarEquipos() {
     tabla = $('#tblequipos').dataTable({
         "aProcessing": true,
@@ -102,7 +102,6 @@ $(document).on("click", "#btnnuevo", function () {
 });
 init();
 
-
 let currentUsuId;
 function agregarEquipo(usu_id) {
     currentUsuId = usu_id;
@@ -126,8 +125,8 @@ function eliminarItem(usu_id, equipo_id) {
                     type: "success",
                     confirmButtonClass: "btn-success"
                 });
-                 // Recargar tabla
-            } 
+                // Recargar tabla
+            }
             $('#cuadrilla_data').DataTable().ajax.reload();
         }
 
@@ -135,7 +134,6 @@ function eliminarItem(usu_id, equipo_id) {
 }
 
 function asignarEquipo(equipo_id) {
- 
     $.ajax({
         url: "../../controller/usuario_equipo.php?op=asignarEquipo",
         type: "POST",
@@ -150,14 +148,16 @@ function asignarEquipo(equipo_id) {
                     confirmButtonClass: "btn-success"
                 });
                 $("#modalequipos").modal('hide');
-                $('#cuadrilla_data').DataTable().ajax.reload();
+                // Actualiza la tabla sin recargar toda la página
+                $('#cuadrilla_data').DataTable().ajax.reload(null, false);
             } 
         }
     });
 }
 
-function generar(cua_id) {
-    window.location.href = '../../controller/cuadrilla.php?op=generar_word&cua_id=' + cua_id;
+
+function generar(usu_id) {
+    window.location.href = '../../controller/usuario_equipo.php?op=generar_word&usu_id=' + usu_id;
     swal({
         title: "HelpDesk!",
         text: "Completado.",

@@ -39,22 +39,58 @@ switch ($_GET["op"]) {
                 $sub_array[] = '<span>No definido</span><br><span>No definida</span>';
             }
 
+            // Manejo de colaboradores antigua version sin eliminacion individual
+            // $colaboradores = $cuadrilla->get_colaboradores_por_cuadrilla($row["cua_id"]);
+            // $cantidad_colaboradores = is_array($colaboradores) ? count($colaboradores) : 0;
+
+            // if ($cantidad_colaboradores > 0) {
+            //     $colaboradores_array = array_map(function ($colaborador) {
+            //         return $colaborador["col_nombre"];
+            //     }, $colaboradores);
+
+            //     $sub_array[] = implode("<br>", $colaboradores_array) .
+            //         '<br><a onClick="agregar(' . $row["cua_id"] . ')"><span class="label label-primary">Agregar más</span></a>';
+            //     $sub_array[] = '<span class="label label-success">' . $cantidad_colaboradores . ' asignados</span>';
+            // } else {
+            //     $sub_array[] = '<a onClick="agregar(' . $row["cua_id"] . ');"><span class="label label-pill label-warning">Sin Asignar</span></a>';
+            //     $sub_array[] = '<span class="label label-danger">0 asignados</span>';
+            // }
+
+
             // Manejo de colaboradores
             $colaboradores = $cuadrilla->get_colaboradores_por_cuadrilla($row["cua_id"]);
             $cantidad_colaboradores = is_array($colaboradores) ? count($colaboradores) : 0;
 
             if ($cantidad_colaboradores > 0) {
-                $colaboradores_array = array_map(function ($colaborador) {
-                    return $colaborador["col_nombre"];
+                // Mapeo de los colaboradores
+                $colaboradores_array = array_map(function ($colaborador) use ($row) {
+                    // Verificar si las claves existen antes de acceder a ellas
+                    $nombre = isset($colaborador["col_nombre"]) ? htmlspecialchars($colaborador["col_nombre"], ENT_QUOTES, 'UTF-8') : 'Nombre no disponible';
+                    $col_id = isset($colaborador["col_id"]) ? (int)$colaborador["col_id"] : 0;
+
+                    return '<li class="fs-6 d-flex align-items-center">' .
+                        $nombre .
+                        // Corregir el uso de $colaborador["col_id"] en lugar de $row["col_id"]
+                        '<i class="fa fa-times text-danger ms-2 mt-1" style="cursor: pointer;" onClick="eliminarItem(' . (int)$row["cua_id"] . ', ' . (int)$col_id . ')"></i>' .
+                        '</li>';
                 }, $colaboradores);
 
-                $sub_array[] = implode("<br>", $colaboradores_array) .
-                    '<br><a onClick="agregar(' . $row["cua_id"] . ')"><span class="label label-primary">Agregar más</span></a>';
+                // Crear la lista de colaboradores y el botón de agregar más
+                $sub_array[] = '<ul class="mb-1">' . implode("", $colaboradores_array) . '</ul>' .
+                    '<a class="btn btn-sm btn-primary mt-1" onClick="agregar(' . (int)$row["cua_id"] . ')">Agregar más</a>';
+
+                // Mostrar la cantidad de colaboradores asignados
                 $sub_array[] = '<span class="label label-success">' . $cantidad_colaboradores . ' asignados</span>';
             } else {
-                $sub_array[] = '<a onClick="agregar(' . $row["cua_id"] . ');"><span class="label label-pill label-warning">Sin Asignar</span></a>';
-                $sub_array[] = '<span class="label label-danger">0 asignados</span>';
+                // Si no hay colaboradores asignados, mostrar el mensaje de agregar colaboradores
+                $sub_array[] = '
+<div style="display: flex; align-items: center; cursor: pointer;" onclick="agregar(' . (int)htmlspecialchars($row["cua_id"], ENT_QUOTES, 'UTF-8') . ');">
+    <i class="fa fa-exclamation-circle" style="color: #ffc107; margin-right: 5px;" title="Agregar Colaborador"></i>
+    <span>0 Colaboradores asignados</span>
+</div>';
             }
+
+
 
             // Manejo de equipos
             $equipos = $cuadrilla->get_equipos_por_cuadrilla($row["cua_id"]);
@@ -64,7 +100,6 @@ switch ($_GET["op"]) {
                 $equipos_array = array_map(function ($equipo) {
                     return '<li>' . $equipo["nombre_equipo"] . ' - ' . $equipo["serie"] . '</li>';
                 }, $equipos);
-
                 $sub_array[] = implode("<br>", $equipos_array) .
                     '<br><a onClick="agregarEquipo(' . $row["cua_id"] . ')"><span class="label label-primary">Agregar más</span></a>';
             } else {
@@ -118,7 +153,7 @@ switch ($_GET["op"]) {
         // Fusionar datos
         $TBS->MergeField('cuadrilla.colaborador1', $nombres[0]);  // Primer nombre
         $TBS->MergeField('cuadrilla.colaborador2', $nombres[1]);  // Segundo nombre
-         
+
         $cedulas = explode(",", $datos['cedulas_colaboradores']);
         $TBS->MergeField('cuadrilla.cedula1', $cedulas[0]);  // Cedula del primer colaborador
         $TBS->MergeField('cuadrilla.cedula2', $cedulas[1]);  // Cedula del segundo colaborador
@@ -169,6 +204,9 @@ switch ($_GET["op"]) {
     case "asignar":
         $cuadrilla->insert_cuadrilla_asignacion($_POST["cua_id"], $_POST["col_id"]);
 
+        break;
+    case "eliminarColaborador":
+        $cuadrilla->delete_cuadrilla_colaborador($_POST["cua_id"], $_POST["col_id"]);
         break;
 
     case "asignarEquipo":

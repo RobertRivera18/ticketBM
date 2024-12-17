@@ -14,29 +14,37 @@ switch ($_GET["op"]) {
         foreach ($datos as $row) {
             $sub_array = array();
             // Nombre de la cuadrilla
-            $sub_array[] = $row["usu_nom"];
+            $sub_array[] = $row["usu_nom"] . ' ' . $row["usu_ape"] . ' ' . '<span class="label label-info">' . $row["usu_correo"] . '</span>';
+
             // Manejo de equipos
             $equipos = $usuario_equipo->get_equipos_por_usuario($row["usu_id"]);
             $cantidad_equipos = is_array($equipos) ? count($equipos) : 0;
 
             if ($cantidad_equipos > 0) {
                 $equipos_array = array_map(function ($equipo) use ($row) {
-                    return '<li>' . $equipo["nombre_equipo"] . ' - ' . $equipo["serie"] .
-                           '<button class="btn btn-sm btn-danger ml-2" onClick="eliminarItem(' . $row["usu_id"] . ', ' . $equipo["equipo_id"] . ')">
-                               <i class="fa fa-times"></i>
-                           </button>' .
-                           '</li>';
+                    return '<li class="fs-6 d-flex align-items-center">' .
+                        $equipo["nombre_equipo"] . ' - ' . $equipo["marca"] . ' - ' . $equipo["serie"] .
+                        '<i class="fa fa-times text-danger ms-2 mt-1" style="cursor: pointer;" onClick="eliminarItem(' . $row["usu_id"] . ', ' . $equipo["equipo_id"] . ')"></i>' .
+                        '</li>';
                 }, $equipos);
-                $sub_array[] = '<ul>' . implode("", $equipos_array) . '</ul>' .
-                               '<br><a onClick="agregarEquipo(' . $row["usu_id"] . ')"><span class="label label-primary">Agregar más</span></a>';
+                $sub_array[] = '<ul class="mb-1">' . implode("", $equipos_array) . '</ul>' .
+                    '<a class="btn btn-sm btn-primary mt-1" onClick="agregarEquipo(' . $row["usu_id"] . ')">Agregar más</a>';
             } else {
-                $sub_array[] = '<a onClick="agregarEquipo(' . $row["usu_id"] . ');"><span class="label label-pill label-warning">No se le han otorgado equipos</span></a>';
+                $sub_array[] = '
+<div style="display: flex; align-items: center; cursor: pointer;" onclick="agregarEquipo(' . htmlspecialchars($row["usu_id"], ENT_QUOTES, 'UTF-8') . ');">
+    <i class="fa fa-exclamation-circle" style="color: #ffc107; margin-right: 5px;" title="Agregar equipo"></i>
+    <span>No tiene equipos asignados</span>
+</div>';
             }
 
             $sub_array[] = '<button type="button" onClick="generar(' . $row["usu_id"] . ');" 
             id="' . $row["usu_id"] . '" 
             class="btn btn-inline btn-success btn-sm ladda-button">
             <i class="fa fa-print"></i>
+        </button> <button type="button" onClick="generar(' . $row["usu_id"] . ');" 
+            id="' . $row["usu_id"] . '" 
+            class="btn btn-inline btn-danger btn-sm ladda-button">
+            <i class="fa fa-download"></i>
         </button>';
 
 
@@ -83,46 +91,63 @@ switch ($_GET["op"]) {
         $usuario_equipo->delete_usuario_equipo($_POST["usu_id"], $_POST["equipo_id"]);
         break;
     case "generar_word":
-        $cua_id = $_GET['cua_id'] ?? null;
+        $usu_id = $_GET['usu_id'] ?? null;
 
-        if (!$cua_id) {
-            echo json_encode(["status" => "error", "message" => "ID de cuadrilla no proporcionado."]);
+        if (!$usu_id) {
+            echo json_encode(["status" => "error", "message" => "ID de usuario no proporcionado."]);
             exit();
         }
 
-        $datos = $cuadrilla->create_word($cua_id);
+        $datos = $usuario_equipo->create_word($usu_id);
 
         if (!$datos) {
-            echo json_encode(["status" => "error", "message" => "No se encontraron datos para la cuadrilla."]);
+            echo json_encode(["status" => "error", "message" => "No se encontraron datos para el usuario."]);
             exit();
         }
 
         $TBS = new clsTinyButStrong;
         $TBS->Plugin(TBS_INSTALL, OPENTBS_PLUGIN);
 
-        // Ruta de la plantilla
-        $template = '../public/templates/acta_entregachip.docx';
+        $equipos = [];
+
+        // Agrego los equipos existentes al array
+        foreach ($datos as $equipo) {
+            $equipos[] = [
+                'descripcion' => $equipo['descripcion'] ?? 'N/A',
+                'marca'       => $equipo['marca'] ?? 'N/A',
+                'modelo'      => $equipo['modelo'] ?? 'N/A',
+                'serie'       => $equipo['serie'] ?? 'N/A',
+            ];
+        }
+
+        //Verifica la cantidad de equipos por usuarios
+        while (count($equipos) < 5) {
+            $equipos[] = [
+                'descripcion' => 'N/A',
+                'marca'       => 'N/A',
+                'modelo'      => 'N/A',
+                'serie'       => 'N/A',
+            ];
+        }
+
+
+        $template = '../public/templates/acta_entregaequipo.docx';
         $TBS->LoadTemplate($template, OPENTBS_ALREADY_UTF8);
+        $nombre_completo = ($datos[0]['nombre_usuario'] ?? 'Sin asignar') . ' ' . ($datos[0]['apellido_usuario'] ?? '');
+        $TBS->MergeField('usu.nombre', trim($nombre_completo));
+        $TBS->MergeField('fecha', date('d/m/Y'));
 
-        $nombres = explode(",", $datos['nombres_colaboradores']);
-        // Fusionar datos
-        $TBS->MergeField('cuadrilla.colaborador1', $nombres[0]);  // Primer nombre
-        $TBS->MergeField('cuadrilla.colaborador2', $nombres[1]);  // Segundo nombre
 
-        $cedulas = explode(",", $datos['cedulas_colaboradores']);
-        $TBS->MergeField('cuadrilla.cedula1', $cedulas[0]);  // Cedula del primer colaborador
-        $TBS->MergeField('cuadrilla.cedula2', $cedulas[1]);  // Cedula del segundo colaborador
+        foreach ($equipos as $index => $equipo) {
+            $TBS->MergeField("equipos.descripcion_$index", $equipo['descripcion']);
+            $TBS->MergeField("equipos.marca_$index", $equipo['marca']);
+            $TBS->MergeField("equipos.modelo_$index", $equipo['modelo']);
+            $TBS->MergeField("equipos.serie_$index", $equipo['serie']);
+        }
 
-        $TBS->MergeField('cuadrilla.nombre', $datos['nombre_cuadrilla']);
-        $TBS->MergeField('cuadrilla.equipos', $datos['equipos_asignados']);
-
-        $file_name = "acta_cuadrilla_" . $cua_id . "_" . date('Y-m-d') . ".docx";
-        $save_path = "../public/actas/" . $file_name;
-
-        // Guardar el archivo
+        $file_name = "acta_entrega_equipo_" . $nombre_completo . "_" . date('Y-m-d') . ".docx";
+        $save_path = "../public/actas/entrega_equiposUsuarios/" . $file_name;
         $TBS->Show(OPENTBS_FILE, $save_path);
-
-        // Descargar el archivo
         if (file_exists($save_path)) {
             header('Content-Description: File Transfer');
             header('Content-Type: application/octet-stream');
@@ -137,5 +162,6 @@ switch ($_GET["op"]) {
             echo "El archivo no se pudo generar correctamente.";
         }
 
+        var_dump($datos);
         exit();
 }

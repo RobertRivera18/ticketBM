@@ -278,6 +278,44 @@ function generar(cua_id) {
     });
 }
 
+function eliminarItem(cua_id, col_id) {
+    // Llamada AJAX para eliminar el colaborador del equipo
+    $.ajax({
+        url: "../../controller/cuadrilla.php?op=eliminarColaborador",
+        type: "POST",
+        data: { cua_id: cua_id, col_id: col_id },
+        success: function (response) {
+            if (response == 'success') { // Asegurarse de que la respuesta sea 'success'
+                swal({
+                    title: "HelpDesk!",
+                    text: "Colaborador eliminado correctamente.",
+                    type: "success",
+                    confirmButtonClass: "btn-success"
+                });
+                // Recargar tabla de cuadrillas
+                $('#cuadrilla_data').DataTable().ajax.reload();
+            } else {
+                swal({
+                    title: "Error!",
+                    text: "Hubo un problema al eliminar el colaborador.",
+                    type: "error",
+                    confirmButtonClass: "btn-danger"
+                });
+            }
+        },
+        error: function (error) {
+            console.error("Error al eliminar colaborador", error);
+            swal({
+                title: "Error!",
+                text: "Error al procesar la solicitud.",
+                type: "error",
+                confirmButtonClass: "btn-danger"
+            });
+        }
+    });
+}
+
+
 
 
 

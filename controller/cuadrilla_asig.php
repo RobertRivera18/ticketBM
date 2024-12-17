@@ -174,6 +174,7 @@ switch ($_GET["op"]) {
 
         break;
 
+
     case "asignarEquipo":
         $cuadrilla->insert_cuadrilla_equipos($_POST["cua_id"], $_POST["equipo_id"]);
         break;
