@@ -13,7 +13,7 @@ switch ($_GET["op"]) {
         break;
 
     case "listar":
-        $datos = $equipo->get_equipo();
+        $datos = $equipo->get_equipo_con_asignacion();
         $data = array();
         foreach ($datos as $row) {
             $sub_array = array();
@@ -21,6 +21,17 @@ switch ($_GET["op"]) {
             $sub_array[] = $row["marca"];
             $sub_array[] = $row["modelo"];
             $sub_array[] = $row["serie"];
+
+
+            if (!empty($row["nombre_usuario"])) {
+                
+                $sub_array[] = '<span class="label label-danger">'.'Equipo Asignado'.'</span>'.'<span class="label label-warning">' . $row["nombre_usuario"] . ' ' . $row["usu_ape"] . '</span>';
+
+                
+            } else {
+                $sub_array[] =  '<span class="label label-success">Equipo Libre</span>';
+            }
+
             $sub_array[] = '<td class="text-center" colspan="2">
             <div style="display: flex; justify-content: center; gap: 5px;">
                 <button type="button" onClick="editar(' . $row["equipo_id"] . ');" id="' . $row["equipo_id"] . '" class="btn btn-inline btn-warning btn-sm ladda-button">
@@ -35,9 +46,6 @@ switch ($_GET["op"]) {
             
             $data[] = $sub_array;
         }
-
-
-       
         $results = array(
             "sEcho" => 1,
             "iTotalRecords" => count($data),

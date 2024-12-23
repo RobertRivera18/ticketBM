@@ -1,7 +1,7 @@
 var tabla;
 function init() {
     $("#cuadrilla_form").on("submit", function (e) {
-        e.preventDefault(); 
+        e.preventDefault();
         listarEquipos();
     });
 }
@@ -150,7 +150,7 @@ function asignarEquipo(equipo_id) {
                 $("#modalequipos").modal('hide');
                 // Actualiza la tabla sin recargar toda la página
                 $('#cuadrilla_data').DataTable().ajax.reload(null, false);
-            } 
+            }
         }
     });
 }
@@ -165,6 +165,68 @@ function generar(usu_id) {
         confirmButtonClass: "btn-success"
     });
 }
+
+function procesarArchivo(){
+    $("#modalmantenimiento").modal('show');  
+}
+
+$("#cuadrilla_form").on("submit", function (e) {
+    e.preventDefault();
+
+    const fileInput = document.getElementById("fileElem");
+    const file = fileInput.files[0];
+    console.log(file)
+
+    if (!file) {
+        swal("Error", "Por favor selecciona un archivo.", "error");
+        return;
+    }
+
+    const fileName = file.name;
+
+    // Opcional: Mostrar el nombre del archivo cargado
+    console.log("Archivo seleccionado:", fileName);
+
+    // Crear un objeto FormData para enviar el archivo
+    const formData = new FormData(this);
+
+    $.ajax({
+        url: "../../controller/usuario_equipo.php?op=subirArchivo",
+        type: "POST",
+        data: formData,
+        contentType: false,
+        processData: false,
+        success: function (response) {
+            const res = JSON.parse(response);
+            if (res.success) {
+                swal("Éxito", "Archivo subido correctamente: " + fileName, "success");
+                $("#modalmantenimiento").modal("hide");
+                $("#cuadrilla_data").DataTable().ajax.reload(null, false);
+            } else {
+                swal("Error", res.message || "Error al subir el archivo.", "error");
+            }
+        },
+        error: function (error) {
+            console.error("Error en la solicitud:", error);
+            swal("Error", "Error inesperado al procesar el archivo.", "error");
+        },
+    });
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

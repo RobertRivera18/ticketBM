@@ -38,14 +38,20 @@ switch ($_GET["op"]) {
             }
 
             $sub_array[] = '<button type="button" onClick="generar(' . $row["usu_id"] . ');" 
-            id="' . $row["usu_id"] . '" 
-            class="btn btn-inline btn-success btn-sm ladda-button">
+            id="' . $row["usu_id"] . '"class="btn btn-inline btn-success btn-sm ladda-button">
             <i class="fa fa-print"></i>
-        </button> <button type="button" onClick="generar(' . $row["usu_id"] . ');" 
-            id="' . $row["usu_id"] . '" 
-            class="btn btn-inline btn-danger btn-sm ladda-button">
-            <i class="fa fa-download"></i>
-        </button>';
+                       </button> <button type="button" onClick="generar(' . $row["usu_id"] . ')" 
+                           id="' . $row["usu_id"] . '" 
+                                class="btn btn-inline btn-danger btn-sm ladda-button">
+                               <i class="fa fa-download"></i>
+                       </button>
+                       
+                       <button class="btn btn-inline btn-primary btn-sm ladda-button" 
+                            onclick="procesarArchivo(' . $row["usu_id"] . ')" 
+                            title="Procesar archivo">
+                             <i class="fa fa-upload"></i>
+                        </button>
+                       ';
 
 
             // Agregar fila al resultado final
@@ -97,9 +103,7 @@ switch ($_GET["op"]) {
             echo json_encode(["status" => "error", "message" => "ID de usuario no proporcionado."]);
             exit();
         }
-
         $datos = $usuario_equipo->create_word($usu_id);
-
         if (!$datos) {
             echo json_encode(["status" => "error", "message" => "No se encontraron datos para el usuario."]);
             exit();
@@ -134,8 +138,10 @@ switch ($_GET["op"]) {
         $template = '../public/templates/acta_entregaequipo.docx';
         $TBS->LoadTemplate($template, OPENTBS_ALREADY_UTF8);
         $nombre_completo = ($datos[0]['nombre_usuario'] ?? 'Sin asignar') . ' ' . ($datos[0]['apellido_usuario'] ?? '');
+        $cedula = $datos[0]['cedula'] ?? 'No disponible';
         $TBS->MergeField('usu.nombre', trim($nombre_completo));
         $TBS->MergeField('fecha', date('d/m/Y'));
+        $TBS->MergeField('cedula', $cedula);
 
 
         foreach ($equipos as $index => $equipo) {
@@ -162,6 +168,30 @@ switch ($_GET["op"]) {
             echo "El archivo no se pudo generar correctamente.";
         }
 
-        var_dump($datos);
         exit();
+
+
+
+        case 'subirArchivo':
+            if (isset($_FILES['fileElem'])) {
+                $archivo = $_FILES['fileElem'];
+                $usu_id = $_POST['usu_id'];
+        
+                if ($archivo['error'] === UPLOAD_ERR_OK) {
+                    $nombreArchivo = basename($archivo['name']);
+                    $rutaDestino = "../../uploads/" . $nombreArchivo;
+        
+                    if (move_uploaded_file($archivo['tmp_name'], $rutaDestino)) {
+                        echo json_encode(['success' => true, 'message' => 'Archivo subido con éxito.']);
+                    } else {
+                        echo json_encode(['success' => false, 'message' => 'Error al mover el archivo.']);
+                    }
+                } else {
+                    echo json_encode(['success' => false, 'message' => 'Error al subir el archivo.']);
+                }
+            } else {
+                echo json_encode(['success' => false, 'message' => 'Archivo no recibido.']);
+            }
+            break;
+        
 }

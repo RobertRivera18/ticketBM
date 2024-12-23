@@ -56,6 +56,7 @@ class Usuario_Equipo extends Conectar
             $sql = "SELECT 
                         u.usu_nom AS nombre_usuario,
                         u.usu_ape AS apellido_usuario,
+                        u.usu_cedula AS cedula,
                         eq.equipo_id, 
                         eq.nombre_equipo AS descripcion, 
                         eq.marca, 
@@ -85,4 +86,14 @@ class Usuario_Equipo extends Conectar
             return false;
         }
     }
+
+
+
+   
+    
+    
+
+
+
+
 }

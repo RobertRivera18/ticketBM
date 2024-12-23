@@ -170,17 +170,15 @@ class Cuadrilla extends Conectar
 
             // Ejecutar la consulta
             if ($stmt->execute()) {
-                // Verificar si se eliminó al menos una fila
                 if ($stmt->rowCount() > 0) {
-                    return true;  // Registro eliminado con éxito
+                    return true;
                 } else {
-                    return false;  // No se encontró ningún registro para eliminar
+                    return false;
                 }
             } else {
-                return false;  // Error en la ejecución de la consulta
+                return false;
             }
         } catch (Exception $e) {
-            // Manejar el error y devolver un valor adecuado
             return false;
         }
     }
@@ -222,7 +220,7 @@ WHERE
 
             return $result;
         } catch (PDOException $e) {
-            // Manejo de errores
+           
             echo "Error en la consulta: " . $e->getMessage();
             return false;
         }

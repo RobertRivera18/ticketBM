@@ -76,4 +76,38 @@ class Cuadrilla_creacion extends Conectar
         $sql->execute();
         return $resultado = $sql->fetchAll();
     }
+
+    public function marcarRecarga($cua_id, $recargas)
+    {
+        $conectar = parent::conexion();
+        parent::set_names();
+        // Preparar la consulta para actualizar el campo recargas
+        $sql = "UPDATE tm_cuadrilla SET recargas = ? WHERE cua_id = ?";
+        $stmt = $conectar->prepare($sql);
+        
+        // Enlazar los valores
+        $stmt->bindValue(1, $recargas, PDO::PARAM_BOOL);  // True o False
+        $stmt->bindValue(2, $cua_id, PDO::PARAM_INT);     // ID de la cuadrilla
+    
+        // Ejecutar la consulta
+        $stmt->execute();
+    
+        // Retornar si la actualización fue exitosa
+        return $stmt->rowCount();
+    }
+    
+
+    //Todos los registros de recargas los establezco en false
+    public function desmarcarTodas(){
+        $conectar = parent::conexion();
+        parent::set_names();
+        $sql = "UPDATE tm_cuadrilla SET recargas = false";
+        $stmt = $conectar->prepare($sql);
+        $stmt->execute();
+        return $stmt->rowCount();
+    }
+        
+    
 }
+
+

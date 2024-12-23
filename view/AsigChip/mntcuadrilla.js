@@ -191,11 +191,11 @@ function listarEquipos() {
 
 }
 
-$(document).on("click", "#btnnuevo", function () {
-    $('#mdltitulo').html('Nuevo Registro');
-    $('#cuadrilla_form')[0].reset();
-});
-init();
+// $(document).on("click", "#btnnuevo", function () {
+//     $('#mdltitulo').html('Nuevo Registro');
+//     $('#cuadrilla_form')[0].reset();
+// });
+// init();
 
 
 let currentCuaId; // Declarada global para usar en colaboradores y equipos
@@ -277,6 +277,46 @@ function generar(cua_id) {
         confirmButtonClass: "btn-success"
     });
 }
+
+$(document).on('change', 'input[type="checkbox"]', function() {
+    var cua_id = $(this).attr('id').split('_')[1]; // Obtener el ID de la cuadrilla desde el checkbox
+    var recargas = $(this).prop('checked') ? 'true' : 'false'; // Determinar si el checkbox está marcado o desmarcado
+    
+    $.ajax({
+        url: '../../controller/cuadrilla_asig.php?op=marcarRecarga',
+        type: 'POST',
+        data: {
+            cua_id: cua_id,
+            recargas: recargas
+        },
+        success: function(response) {
+            var res = JSON.parse(response);
+            if (res.status === 'success') {
+                console.log('Recarga actualizada');
+            } else {
+                console.log('Error al actualizar recarga');
+            }
+        }
+    });
+});
+
+//Funcion para desmarcar todos los checkBox
+function refresh() {
+    $.ajax({
+        url: '../../controller/cuadrilla_asig.php?op=desmarcarTodas',
+        type: 'POST',
+        dataType: 'json',
+        success: function(response) {
+            if (response.status === 'success') {
+                console.log('Recargas reseteadas');
+                location.reload();
+            } else {
+                console.error('Error al actualizar recarga');
+            }
+        }
+    });
+}
+
 
 
 

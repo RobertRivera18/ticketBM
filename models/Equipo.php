@@ -40,16 +40,32 @@ class Equipo extends Conectar
         return $resultado = $stmt->fetchAll();
     }
 
-    public function get_equipo()
+    public function get_equipo_con_asignacion()
     {
         try {
             // Conexión a la base de datos
             $conectar = parent::conexion();
             parent::set_names();
-            $sql = "SELECT * FROM tm_equipos";
+            $sql = "
+                SELECT 
+                    e.equipo_id,
+                    e.nombre_equipo,
+                    e.marca,
+                    e.modelo,
+                    e.serie,
+                    u.usu_nom AS nombre_usuario,
+                    u.usu_ape
+                FROM 
+                    tm_equipos e
+                LEFT JOIN 
+                    tm_usuario_equipo ue ON e.equipo_id = ue.equipo_id
+                LEFT JOIN 
+                    tm_usuario u ON ue.usu_id = u.usu_id;
+            ";
+    
             $stmt = $conectar->prepare($sql);
             $stmt->execute();
-
+    
             return $stmt->fetchAll();
         } catch (PDOException $e) {
             // Manejo de errores si la consulta falla
@@ -57,6 +73,7 @@ class Equipo extends Conectar
             return false;
         }
     }
+    
 
     // Método para eliminar un colaborador
     public function delete_equipo($equipo_id)

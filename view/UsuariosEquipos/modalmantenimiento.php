@@ -9,12 +9,18 @@
             </div>
             <form method="post" id="cuadrilla_form">
                 <div class="modal-body">
-                    <input type="hidden" id="cua_id" name="cua_id">
+                    <div class="row">
 
-                    <div class="form-group">
-                        <label class="form-label" for="cua_nombre">Nombre Cuadrilla</label>
-                        <input type="text" class="form-control" id="cua_nombre" name="cua_nombre" placeholder="Ingrese Nombre Cuadrilla" required>
-                    </div>
+						<input type="hidden" id="usu_id" name="usu_id">
+
+						<div class="col-lg-6">
+							<fieldset class="form-group">
+								<label class="form-label semibold" for="exampleInput">Documento Firmado(Comprobante de Recepcion)</label>
+								<input type="file" name="fileElem" id="fileElem" class="form-control" multiple>
+							</fieldset>
+						</div>
+
+				</div>
 
                 </div>
                 <div class="modal-footer">

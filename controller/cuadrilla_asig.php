@@ -1,9 +1,11 @@
 <?php
 require_once("../config/conexion.php");
 require_once("../models/Cuadrilla_Chip.php");
+require_once("../models/Cuadrilla_creacion.php");
 require_once('../public/tbs_class.php');
 require_once('../public/plugins/tbs_plugin_opentbs.php');
 $cuadrilla = new Cuadrilla_Chip();
+$cuadrilla_creacion = new Cuadrilla_creacion();
 
 switch ($_GET["op"]) {
     case "guardar":
@@ -52,8 +54,8 @@ switch ($_GET["op"]) {
                 $empresa_nombre = ($empresa_id == 1) ? "CLARO" : (($empresa_id == 2) ? "CNEL" : "No definido");
 
                 // Ciudad (Guayaquil/Quito)
-
                 $ciudad_nombre = ($ciudad_id == 1) ? "Guayaquil" : (($ciudad_id == 2) ? "Quito" : "No definido");
+
                 // Concatenar empresa y ciudad
                 $sub_array[] = '<span class="label label-danger">' . $empresa_nombre . '</span><br>' .
                     '<span class="label label-info">' . $ciudad_nombre . '</span>';
@@ -72,6 +74,12 @@ switch ($_GET["op"]) {
 
                 $sub_array[] = implode("<br>", $colaboradores_array) .
                     '<br><a onClick="agregar(' . $row["cua_id"] . ')"><span class="label label-primary">Agregar más</span></a>';
+            } else {
+                $sub_array[] = '
+                    <div style="display: flex; align-items: center; cursor: pointer;" onclick="agregar(' . htmlspecialchars($row["cua_id"], ENT_QUOTES, 'UTF-8') . ');">
+                        <i class="fa fa-exclamation-circle" style="color: #ffc107; margin-right: 5px;" title="Agregar equipo"></i>
+                        <span>Sin Asignar</span>
+                    </div>';
             }
 
             // Manejo de equipos
@@ -89,12 +97,20 @@ switch ($_GET["op"]) {
                 $sub_array[] = '<a onClick="agregarEquipo(' . $row["cua_id"] . ');"><span class="label label-pill label-danger">Sin Chip</span></a>';
             }
 
-            $sub_array[] = '<button type="button" onClick="generar(' . $row["cua_id"] . ');" 
-            id="' . $row["cua_id"] . '" 
-            class="btn btn-inline btn-success btn-sm ladda-button">
-            <i class="fa fa-print"></i>
-        </button>';
+            // Validar si el campo 'recargas' es true o false
+            $checked = $row["recargas"] ? 'checked' : ''; // Si recargas es true, marcar el checkbox
 
+            $sub_array[] = '
+                <div class="d-flex align-items-center">
+                    <button type="button" onClick="generar(' . $row["cua_id"] . ');" 
+                        id="' . $row["cua_id"] . '" 
+                        class="btn btn-inline btn-success btn-sm ladda-button">
+                        <i class="fa fa-print"></i>
+                    </button>
+                    <input type="checkbox" id="checkbox_' . $row["cua_id"] . '" 
+                        class="mr-2" 
+                        style="width: 20px; height: 20px;" ' . $checked . '>
+                </div>';
 
             // Agregar fila al resultado final
             $data[] = $sub_array;
@@ -109,6 +125,7 @@ switch ($_GET["op"]) {
         );
         echo json_encode($results);
         break;
+
 
     case "generar_word":
         $cua_id = $_GET['cua_id'] ?? null;
@@ -172,6 +189,24 @@ switch ($_GET["op"]) {
     case "asignar":
         $cuadrilla->insert_cuadrilla_asignacion($_POST["cua_id"], $_POST["col_id"]);
 
+        break;
+
+    case 'marcarRecarga':
+        if (isset($_POST['cua_id']) && isset($_POST['recargas'])) {
+            $cua_id = $_POST['cua_id'];
+            $recargas = $_POST['recargas'] == 'true' ? true : false; // Convertir el valor a booleano
+            $result = $cuadrilla_creacion->marcarRecarga($cua_id, $recargas);
+
+            if ($result > 0) {
+                echo json_encode(['status' => 'success', 'message' => 'Recarga actualizada']);
+            } else {
+                echo json_encode(['status' => 'error', 'message' => 'No se pudo actualizar la recarga']);
+            }
+        }
+        break;
+
+    case "desmarcarTodas":
+        $result = $cuadrilla_creacion->desmarcarTodas();
         break;
 
 

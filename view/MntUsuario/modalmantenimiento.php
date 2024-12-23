@@ -25,6 +25,10 @@
                         <label class="form-label" for="usu_correo">Correo Electronico</label>
                         <input type="email" class="form-control" id="usu_correo" name="usu_correo" placeholder="test@test.com" required>
                     </div>
+                    <div class="form-group">
+                        <label class="form-label" for="usu_cedula">Cedula de Identidad</label>
+                        <input type="text" class="form-control" id="usu_cedula" name="usu_cedula" required>
+                    </div>
 
                     <div class="form-group">
                         <label class="form-label" for="usu_pass">Contraseña</label>

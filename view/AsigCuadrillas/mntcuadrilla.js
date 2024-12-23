@@ -279,41 +279,44 @@ function generar(cua_id) {
 }
 
 function eliminarItem(cua_id, col_id) {
-    // Llamada AJAX para eliminar el colaborador del equipo
     $.ajax({
-        url: "../../controller/cuadrilla.php?op=eliminarColaborador",
+        url: "../../controller/cuadrilla.php?op=eliminar_colaborador",
         type: "POST",
         data: { cua_id: cua_id, col_id: col_id },
         success: function (response) {
-            if (response == 'success') { // Asegurarse de que la respuesta sea 'success'
+            console.log("Colaborador eliminado:", response);
+
+            if (response) {
                 swal({
                     title: "HelpDesk!",
                     text: "Colaborador eliminado correctamente.",
                     type: "success",
                     confirmButtonClass: "btn-success"
                 });
-                // Recargar tabla de cuadrillas
+
+                // Recargar la tabla para reflejar los cambios
                 $('#cuadrilla_data').DataTable().ajax.reload();
             } else {
                 swal({
-                    title: "Error!",
-                    text: "Hubo un problema al eliminar el colaborador.",
+                    title: "Error",
+                    text: "No se pudo eliminar el colaborador.",
                     type: "error",
                     confirmButtonClass: "btn-danger"
                 });
             }
         },
         error: function (error) {
-            console.error("Error al eliminar colaborador", error);
+            console.error("Error en la eliminación:", error);
             swal({
-                title: "Error!",
-                text: "Error al procesar la solicitud.",
+                title: "Error",
+                text: "Ocurrió un error en el servidor.",
                 type: "error",
                 confirmButtonClass: "btn-danger"
             });
         }
     });
 }
+
 
 
 
