@@ -2,8 +2,23 @@
 require_once("../config/conexion.php");
 require_once("../models/Cuadrilla_Chip.php");
 require_once("../models/Cuadrilla_creacion.php");
+
+
+//Plugins creacion de Word Actas
 require_once('../public/tbs_class.php');
 require_once('../public/plugins/tbs_plugin_opentbs.php');
+
+
+
+
+//Plugins creacion de XML,Excel
+require_once __DIR__ . '/../vendor/autoload.php';
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\IOFactory;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+
+
+
 $cuadrilla = new Cuadrilla_Chip();
 $cuadrilla_creacion = new Cuadrilla_creacion();
 
@@ -237,4 +252,45 @@ switch ($_GET["op"]) {
         );
         echo json_encode($results);
         break;
+
+
+        case 'exportarRecargas':
+            $cuadrillas = $cuadrilla_creacion->obtenerRecargasTrue();
+        
+            if (!empty($cuadrillas)) {
+                // Cargar la plantilla Excel
+                $inputFileName = '../public/templates/formatoListadoRecargas.xlsx'; 
+                $spreadsheet = IOFactory::load($inputFileName);
+                $sheet = $spreadsheet->getActiveSheet();
+        
+                // Configurar las celdas con los datos obtenidos
+                $fila = 9;  // Comienza en la fila 2 porque la 1 es para encabezados
+                foreach ($cuadrillas as $cuadrilla) {
+                    $sheet->setCellValue('C' . $fila, $cuadrilla['cua_id']);
+                    $sheet->setCellValue('F' . $fila, $cuadrilla['cua_nombre']);
+                    $sheet->setCellValue('D' . $fila, $cuadrilla['ciudad_nombre']);  // Nombre de la ciudad
+                    $sheet->setCellValue('H' . $fila, $cuadrilla['recargas'] ? 'Sí' : 'No');
+                    $sheet->setCellValue('E' . $fila, $cuadrilla['serie']);
+                    $sheet->setCellValue('G' . $fila, 10.50);
+                    $fila++;
+                }
+        
+                // Guardar el archivo generado
+                $writer = new Xlsx($spreadsheet);
+                $fileName = 'cuadrillas_recargas_true_generado.xlsx';
+                $temp_file = tempnam(sys_get_temp_dir(), $fileName);
+                $writer->save($temp_file);
+        
+                // Descargar archivo
+                header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+                header('Content-Disposition: attachment; filename="' . $fileName . '"');
+                readfile($temp_file);
+                unlink($temp_file); // Eliminar archivo temporal
+            } else {
+                echo json_encode(['status' => 'error', 'message' => 'No hay cuadrillas con recargas en true']);
+            }
+            break;
+        
+       
 }
+

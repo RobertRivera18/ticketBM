@@ -316,6 +316,9 @@ function refresh() {
         }
     });
 }
+$('#exportarRecargas').on('click', function() {
+    window.location.href = '../../controller/cuadrilla_asig.php?op=exportarRecargas';
+});
 
 
 

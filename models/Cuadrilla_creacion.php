@@ -2,7 +2,7 @@
 class Cuadrilla_creacion extends Conectar
 {
 
-    public function insert_cuadrilla($cua_nombre,$cua_empresa,$cua_ciudad)
+    public function insert_cuadrilla($cua_nombre, $cua_empresa, $cua_ciudad)
     {
         $conectar = parent::conexion();
         parent::set_names();
@@ -19,7 +19,7 @@ class Cuadrilla_creacion extends Conectar
             return false;
         }
     }
-    public function update_cuadrilla($cua_nombre, $cua_empresa, $cua_ciudad,$cua_id)
+    public function update_cuadrilla($cua_nombre, $cua_empresa, $cua_ciudad, $cua_id)
     {
         $conectar = parent::conexion();
         parent::set_names();
@@ -84,21 +84,22 @@ class Cuadrilla_creacion extends Conectar
         // Preparar la consulta para actualizar el campo recargas
         $sql = "UPDATE tm_cuadrilla SET recargas = ? WHERE cua_id = ?";
         $stmt = $conectar->prepare($sql);
-        
+
         // Enlazar los valores
         $stmt->bindValue(1, $recargas, PDO::PARAM_BOOL);  // True o False
         $stmt->bindValue(2, $cua_id, PDO::PARAM_INT);     // ID de la cuadrilla
-    
+
         // Ejecutar la consulta
         $stmt->execute();
-    
+
         // Retornar si la actualización fue exitosa
         return $stmt->rowCount();
     }
-    
+
 
     //Todos los registros de recargas los establezco en false
-    public function desmarcarTodas(){
+    public function desmarcarTodas()
+    {
         $conectar = parent::conexion();
         parent::set_names();
         $sql = "UPDATE tm_cuadrilla SET recargas = false";
@@ -106,8 +107,32 @@ class Cuadrilla_creacion extends Conectar
         $stmt->execute();
         return $stmt->rowCount();
     }
-        
-    
+
+
+    //Obtener cuadrillas que se le han hecho las recargas 
+    public function obtenerRecargasTrue()
+    {
+        $conectar = parent::conexion();
+        parent::set_names();
+
+        $sql = "SELECT 
+    cua.cua_id, 
+    cua.cua_nombre, 
+    CASE cua.cua_ciudad
+        WHEN 1 THEN 'Guayaquil'
+        WHEN 2 THEN 'Quito'
+        ELSE 'Desconocida'  -- Para manejar valores que no sean 1 o 2
+    END AS ciudad_nombre, 
+    IF(cua.recargas, 'Recarga realizada', 'No realizada') AS recargas, -- Utilizamos IF para simplificar
+    eq.serie
+FROM tm_cuadrilla cua
+LEFT JOIN tm_cuadrilla_equipo cqe ON cua.cua_id = cqe.cua_id
+LEFT JOIN tm_equipos eq ON cqe.equipo_id = eq.equipo_id;
+ 
+";
+        $stmt = $conectar->prepare($sql);
+        $stmt->execute();
+
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
 }
-
-

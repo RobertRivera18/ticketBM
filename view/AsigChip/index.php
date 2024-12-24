@@ -35,21 +35,18 @@ if (isset($_SESSION["usu_id"])) {
 				</header>
 
 				<div class="box-typical box-typical-padding">
-					<div class="row mb-3">
-						<div class="col-md-12 text-right">
-							<!-- Primer botón -->
-							<button id="customButton1" class="btn btn-success">
-								<i class="fa fa-file"></i>
-							</button>
-							<!-- Segundo botón -->
-							<button onclick="refresh()" id="customButton2" class="btn btn-primary ml-2">
-								<i class="fa fa-refresh"></i> Recargar Tabla
-							</button>
-						</div>
-					</div>
-
-
 					<table id="cuadrilla_data" class="table table-bordered table-striped table-vcenter js-dataTable-full">
+						<div class="row mb-3">
+							<div class="col-md-12 text-right">
+								<button onclick="refresh()" class="btn btn-primary ml-2">
+									<i class="fa fa-refresh"></i> Resetear Recargas
+								</button>
+
+								<button id="exportarRecargas" class="btn btn-success ml-2">
+									<i class="fa fa-file"></i> Generar Excel
+								</button>
+							</div>
+						</div>
 						<thead>
 							<tr>
 								<th class="d-none d-sm-table-cell" style="width: 10%;">Nombre Cuadrilla</th>
