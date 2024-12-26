@@ -300,22 +300,44 @@ $(document).on('change', 'input[type="checkbox"]', function() {
     });
 });
 
-//Funcion para desmarcar todos los checkBox
+// Función para desmarcar todos los checkboxes
 function refresh() {
-    $.ajax({
-        url: '../../controller/cuadrilla_asig.php?op=desmarcarTodas',
-        type: 'POST',
-        dataType: 'json',
-        success: function(response) {
-            if (response.status === 'success') {
-                console.log('Recargas reseteadas');
-                location.reload();
-            } else {
-                console.error('Error al actualizar recarga');
-            }
-        }
+    // Mostrar spinner con SweetAlert
+    swal({
+        title: "Procesando...",
+        text: "Por favor, espere mientras se resetean las recargas.",
+        content: {
+            element: "div",
+            attributes: {
+                innerHTML: '<div class="loader" style="margin: auto;"></div>',
+            },
+        },
+        buttons: false,
+        closeOnClickOutside: false,
+        closeOnEsc: false, 
     });
+
+    // Simular un retraso antes de iniciar la solicitud
+    setTimeout(function () {
+        $.ajax({
+            url: '../../controller/cuadrilla_asig.php?op=desmarcarTodas',
+            type: 'POST',
+            dataType: 'json',
+            success: function (response) {
+                if (response.status === 'success') {
+                    console.log('Recargas reseteadas');
+                    // Desmarcar todas las casillas
+                    $('input[type="checkbox"]').prop('checked', false);
+                }
+            },complete: function () {
+                swal.close();
+            }
+        });
+    }, 1000);
 }
+
+
+
 $('#exportarRecargas').on('click', function() {
     window.location.href = '../../controller/cuadrilla_asig.php?op=exportarRecargas';
 });

@@ -220,9 +220,14 @@ switch ($_GET["op"]) {
         }
         break;
 
-    case "desmarcarTodas":
-        $result = $cuadrilla_creacion->desmarcarTodas();
-        break;
+        case "desmarcarTodas":
+            $result = $cuadrilla_creacion->desmarcarTodas();
+            echo json_encode([
+                "status" => $result > 0 ? "success" : "error",
+                "message" => $result > 0 ? "Recargas desmarcadas correctamente" : "No se realizaron cambios"
+            ]);
+            break;
+        
 
 
     case "asignarEquipo":
@@ -267,17 +272,18 @@ switch ($_GET["op"]) {
                 $fila = 9;  // Comienza en la fila 2 porque la 1 es para encabezados
                 foreach ($cuadrillas as $cuadrilla) {
                     $sheet->setCellValue('C' . $fila, $cuadrilla['cua_id']);
-                    $sheet->setCellValue('F' . $fila, $cuadrilla['cua_nombre']);
                     $sheet->setCellValue('D' . $fila, $cuadrilla['ciudad_nombre']);  // Nombre de la ciudad
-                    $sheet->setCellValue('H' . $fila, $cuadrilla['recargas'] ? 'Sí' : 'No');
                     $sheet->setCellValue('E' . $fila, $cuadrilla['serie']);
+                    $sheet->setCellValue('F' . $fila, $cuadrilla['cua_nombre']);
                     $sheet->setCellValue('G' . $fila, 10.50);
+                    $sheet->setCellValue('H' . $fila, $cuadrilla['recargas']);
                     $fila++;
                 }
         
                 // Guardar el archivo generado
+                $fActual = new DateTime();
                 $writer = new Xlsx($spreadsheet);
-                $fileName = 'cuadrillas_recargas_true_generado.xlsx';
+                $fileName = 'reporteRecagas'. $fActual->format('Y-m-d') . '.xlsx';
                 $temp_file = tempnam(sys_get_temp_dir(), $fileName);
                 $writer->save($temp_file);
         

@@ -5,6 +5,7 @@ if (isset($_SESSION["usu_id"])) {
 	<!DOCTYPE html>
 	<html>
 	<?php require_once("../MainHead/head.php"); ?>
+	<link rel="stylesheet" href="spinner.css">
 	<title>Admin Soporte Tecnico</>::Mantenimiento Cuadrillas</title>
 	</head>
 
@@ -36,11 +37,15 @@ if (isset($_SESSION["usu_id"])) {
 
 				<div class="box-typical box-typical-padding">
 					<table id="cuadrilla_data" class="table table-bordered table-striped table-vcenter js-dataTable-full">
+
+					<span id="spinner" class="loader" style="display: none;"></span>
+
 						<div class="row mb-3">
 							<div class="col-md-12 text-right">
 								<button onclick="refresh()" class="btn btn-primary ml-2">
 									<i class="fa fa-refresh"></i> Resetear Recargas
 								</button>
+
 
 								<button id="exportarRecargas" class="btn btn-success ml-2">
 									<i class="fa fa-file"></i> Generar Excel
@@ -64,6 +69,7 @@ if (isset($_SESSION["usu_id"])) {
 						</tbody>
 					</table>
 				</div>
+
 
 			</div>
 		</div>

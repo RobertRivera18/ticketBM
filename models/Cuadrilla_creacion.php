@@ -123,7 +123,7 @@ class Cuadrilla_creacion extends Conectar
         WHEN 2 THEN 'Quito'
         ELSE 'Desconocida'  -- Para manejar valores que no sean 1 o 2
     END AS ciudad_nombre, 
-    IF(cua.recargas, 'Recarga realizada', 'No realizada') AS recargas, -- Utilizamos IF para simplificar
+    IF(cua.recargas, 'Recarga realizada', 'No realizada') AS recargas,
     eq.serie
 FROM tm_cuadrilla cua
 LEFT JOIN tm_cuadrilla_equipo cqe ON cua.cua_id = cqe.cua_id
