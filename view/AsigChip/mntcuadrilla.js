@@ -191,12 +191,6 @@ function listarEquipos() {
 
 }
 
-// $(document).on("click", "#btnnuevo", function () {
-//     $('#mdltitulo').html('Nuevo Registro');
-//     $('#cuadrilla_form')[0].reset();
-// });
-// init();
-
 
 let currentCuaId; // Declarada global para usar en colaboradores y equipos
 
@@ -335,8 +329,6 @@ function refresh() {
         });
     }, 1000);
 }
-
-
 
 $('#exportarRecargas').on('click', function() {
     window.location.href = '../../controller/cuadrilla_asig.php?op=exportarRecargas';

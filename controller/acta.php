@@ -65,10 +65,15 @@ switch ($_GET["op"]) {
 
             // Botón para generar el acta
             $sub_array[] = '<button type="button" onClick="generar(' . $row["id_acta"] . ');" 
-                    id="' . $row["id_acta"] . '" 
-                    class="btn btn-inline btn-success btn-sm ladda-button">
-                    <i class="fa fa-print"></i>
-                </button>';
+            id="' . $row["id_acta"] . '" 
+            class="btn btn-inline btn-success btn-sm ladda-button">
+            <i class="fa fa-print"></i>
+        </button>
+        <button type="button" onClick="procesarArchivo(' . $row["id_acta"] . ');" 
+            id="' . $row["id_acta"] . '" 
+            class="btn btn-inline btn-info btn-sm ladda-button">
+            <i class="fa fa-upload"></i>
+        </button>';
 
             // Asegúrate de que 'fecha_entrega' esté presente y sea válida
             if (!empty($row["fecha_entrega"])) {
@@ -91,6 +96,7 @@ switch ($_GET["op"]) {
 
         echo json_encode($results);
         break;
+
 
 
     case "generar_word":
@@ -117,7 +123,7 @@ switch ($_GET["op"]) {
             $TBS->MergeField('pro.fecha', date('d/m/Y'));
 
             //Guardo el nombre de la acta a generar
-            $file_name = 'ACTA_ENTREGA_CREDENCIAL'.$datos['col_cedula'] . "_" . $datos['col_nombre'] . "_" . date('Y-m-d') . ".docx";
+            $file_name = 'ACTA_ENTREGA_CREDENCIAL' . $datos['col_cedula'] . "_" . $datos['col_nombre'] . "_" . date('Y-m-d') . ".docx";
         } elseif ($datos['tipo_acta'] == 2) {
             // Caso: Acta de descarga
             $template = '../public/templates/acta_entregaequipo.docx';
@@ -158,4 +164,42 @@ switch ($_GET["op"]) {
         header("Location:" . Conectar::ruta() . "/view/Documentos");
         exit();
         break;
+
+
+        case "subirArchivo":
+            header('Content-Type: application/json'); // Respuesta en formato JSON
+        
+            if (isset($_FILES['archivo']) && isset($_POST['id_acta'])) {
+                $id_acta = intval($_POST['id_acta']); // Asegura que el ID sea un entero
+                $archivo = $_FILES['archivo'];
+        
+                $destino = "../public/actas/comprobantes/";
+                if (!file_exists($destino)) {
+                    mkdir($destino, 0777, true); 
+                }
+        
+                $nombreArchivo = uniqid() . "-" . basename($archivo['name']);
+                $rutaCompleta = $destino . $nombreArchivo;
+        
+                if (move_uploaded_file($archivo['tmp_name'], $rutaCompleta)) {
+                    $guardar = $acta->guardarRutaArchivo($id_acta, $rutaCompleta);
+        
+                    if ($guardar) {
+                        echo json_encode([
+                            'success' => true,
+                            'message' => 'Archivo cargado con éxito',
+                            'nombre_guardado' => $nombreArchivo,
+                            'ruta' => $rutaCompleta
+                        ]);
+                    } else {
+                        echo json_encode(['success' => false, 'message' => 'Error al guardar la ruta en la base de datos']);
+                    }
+                } else {
+                    echo json_encode(['success' => false, 'message' => 'Error al mover el archivo al destino']);
+                }
+            } else {
+                echo json_encode(['success' => false, 'message' => 'No se recibió el archivo o el ID del acta']);
+            }
+            break;
+        
 }

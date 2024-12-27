@@ -101,8 +101,7 @@ class Acta extends Conectar
             return false;
         }
     }
-    public function get_equipos_asignados($id_acta)
-    {
+    public function get_equipos_asignados($id_acta){
         try {
             $conectar = parent::conexion();
             parent::set_names();
@@ -125,4 +124,28 @@ class Acta extends Conectar
             return [];
         }
     }
+
+
+    public function guardarRutaArchivo($id_acta, $ruta) {
+        try {
+            $conectar = parent::conexion();
+            if (!$conectar) {
+                throw new Exception("No se pudo establecer la conexión a la base de datos");
+            }
+            parent::set_names();
+            $sql = "UPDATE acta SET ruta_firma = ? WHERE id_acta = ?";
+            $stmt = $conectar->prepare($sql);
+            $stmt->bindValue(1, $ruta, PDO::PARAM_STR);
+            $stmt->bindValue(2, $id_acta, PDO::PARAM_INT);
+            if (!$stmt->execute()) {
+                error_log("Error al ejecutar la consulta: " . implode(", ", $stmt->errorInfo()));
+                return false;
+            }
+            return true;
+        } catch (PDOException $e) {
+            error_log("Error en guardarRutaArchivo: " . $e->getMessage());
+            return false;
+        }
+    }
+    
 }

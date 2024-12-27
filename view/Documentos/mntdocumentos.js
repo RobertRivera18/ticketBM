@@ -265,4 +265,59 @@ $(document).on("click", "#btnnuevo", function () {
     $('#modalmantenimiento').modal('show');
 });
 
+function procesarArchivo(id_acta) {
+    $('#id_acta').val(id_acta);
+    $('#cargarArchivo').modal('show');
+
+    // Escucha el cambio en el input de archivo
+    $('#archivo').on('change', function () {
+        var archivoInput = this.files[0];
+        console.log(archivoInput ? "Archivo seleccionado: " + archivoInput.name : "No se seleccionó ningún archivo.");
+    });
+
+    // Maneja el envío del formulario
+    $('#documento_form').off('submit').on('submit', function (e) {
+        e.preventDefault();
+
+        var archivoInput = $('#archivo')[0].files[0];
+        if (!archivoInput) {
+            alert("Por favor, selecciona un archivo antes de continuar.");
+            return;
+        }
+
+        var formData = new FormData(this);
+
+        $.ajax({
+            url: '../../controller/acta.php?op=subirArchivo',
+            type: 'POST',
+            data: formData,
+            contentType: false,
+            processData: false,
+            success: function (response) {
+                try {
+                    var res = JSON.parse(response);
+                    if (res.success) {
+                        alert("Archivo cargado con éxito: " + res.nombre_guardado);
+                        $('#cargarArchivo').modal('hide');
+                        // Opcional: Recarga datos en la tabla
+                    } else {
+                        alert("Error: " + res.message);
+                    }
+                } catch (e) {
+                    console.error("Error en la respuesta del servidor:", e);
+                    alert("Ocurrió un error inesperado.");
+                }
+            },
+            error: function (xhr, status, error) {
+                console.error("Error en la solicitud AJAX:", error);
+                alert("Error al cargar el archivo. Intenta nuevamente.");
+            }
+        });
+    });
+}
+
+
+
+
+
 
