@@ -147,5 +147,22 @@ class Acta extends Conectar
             return false;
         }
     }
+
+    //Para descargar el comprobante
+
+    public function obtenerRutaArchivo($id_acta) {
+        try {
+            $conectar = parent::conexion();
+            parent::set_names();
+            $sql = "SELECT ruta_firma FROM acta WHERE id_acta = ?";
+            $stmt = $conectar->prepare($sql);
+            $stmt->bindValue(1, $id_acta, PDO::PARAM_INT);
+            $stmt->execute();
+            $resultado = $stmt->fetch(PDO::FETCH_ASSOC);
+            return $resultado ? $resultado['ruta_firma'] : '';
+        } catch (Exception $e) {
+            return '';
+        }
+    }
     
 }

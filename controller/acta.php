@@ -54,7 +54,7 @@ switch ($_GET["op"]) {
                 }
             }
 
-            //Segunda columna del registro si se entrega un equipo
+
             if ($row["tipo_acta"] == 1) {
                 $sub_array[] = $row["col_nombre"];
             } else {
@@ -62,18 +62,27 @@ switch ($_GET["op"]) {
             }
 
 
-
-            // Botón para generar el acta
             $sub_array[] = '<button type="button" onClick="generar(' . $row["id_acta"] . ');" 
-            id="' . $row["id_acta"] . '" 
-            class="btn btn-inline btn-success btn-sm ladda-button">
-            <i class="fa fa-print"></i>
-        </button>
-        <button type="button" onClick="procesarArchivo(' . $row["id_acta"] . ');" 
-            id="' . $row["id_acta"] . '" 
-            class="btn btn-inline btn-info btn-sm ladda-button">
-            <i class="fa fa-upload"></i>
-        </button>';
+                    id="' . $row["id_acta"] . '" 
+                    class="btn btn-inline btn-success btn-sm ladda-button">
+                    <i class="fa fa-print"></i>
+                </button>
+                <button type="button" onClick="procesarArchivo(' . $row["id_acta"] . ');" 
+                    id="' . $row["id_acta"] . '" 
+                    class="btn btn-inline btn-warning btn-sm ladda-button">
+                    <i class="fa fa-image"></i>
+                </button>
+                
+                <button type="button" onClick="descargarComprobante(' . $row["id_acta"] . ');" 
+                    id="' . $row["id_acta"] . '" 
+                    class="btn btn-inline btn-danger btn-sm ladda-button">
+                    <i class="fa fa-download"></i>
+                </button
+                
+                ';
+
+
+
 
             // Asegúrate de que 'fecha_entrega' esté presente y sea válida
             if (!empty($row["fecha_entrega"])) {
@@ -81,6 +90,9 @@ switch ($_GET["op"]) {
             } else {
                 $sub_array[] = '<span class="label label-pill label-warning">Sin fecha</span>';
             }
+
+
+
             // Agregar fila al resultado final
 
             $data[] = $sub_array;
@@ -165,41 +177,86 @@ switch ($_GET["op"]) {
         exit();
         break;
 
+    case "subirArchivo":
+        header('Content-Type: application/json');
 
-        case "subirArchivo":
-            header('Content-Type: application/json'); // Respuesta en formato JSON
-        
-            if (isset($_FILES['archivo']) && isset($_POST['id_acta'])) {
-                $id_acta = intval($_POST['id_acta']); // Asegura que el ID sea un entero
-                $archivo = $_FILES['archivo'];
-        
-                $destino = "../public/actas/comprobantes/";
-                if (!file_exists($destino)) {
-                    mkdir($destino, 0777, true); 
-                }
-        
-                $nombreArchivo = uniqid() . "-" . basename($archivo['name']);
-                $rutaCompleta = $destino . $nombreArchivo;
-        
-                if (move_uploaded_file($archivo['tmp_name'], $rutaCompleta)) {
-                    $guardar = $acta->guardarRutaArchivo($id_acta, $rutaCompleta);
-        
-                    if ($guardar) {
-                        echo json_encode([
-                            'success' => true,
-                            'message' => 'Archivo cargado con éxito',
-                            'nombre_guardado' => $nombreArchivo,
-                            'ruta' => $rutaCompleta
-                        ]);
-                    } else {
-                        echo json_encode(['success' => false, 'message' => 'Error al guardar la ruta en la base de datos']);
-                    }
-                } else {
-                    echo json_encode(['success' => false, 'message' => 'Error al mover el archivo al destino']);
-                }
-            } else {
-                echo json_encode(['success' => false, 'message' => 'No se recibió el archivo o el ID del acta']);
+        if (!isset($_FILES['archivo']) || !isset($_POST['id_acta'])) {
+            echo json_encode(['success' => false, 'message' => 'No se recibió el archivo o el ID del acta']);
+            exit;
+        }
+
+        $id_acta = intval($_POST['id_acta']);
+        $archivo = $_FILES['archivo'];
+
+        if (empty($id_acta)) {
+            echo json_encode(['success' => false, 'message' => 'El ID del acta es inválido o está vacío']);
+            exit;
+        }
+
+        // Validar tipo de archivo
+        $tiposPermitidos = ['image/jpeg', 'image/png', 'application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+        if (!in_array($archivo['type'], $tiposPermitidos)) {
+            echo json_encode(['success' => false, 'message' => 'Tipo de archivo no permitido']);
+            exit;
+        }
+
+        // Validar tamaño (5MB máximo)
+        if ($archivo['size'] > 5 * 1024 * 1024) {
+            echo json_encode(['success' => false, 'message' => 'El archivo excede el tamaño máximo permitido (5MB)']);
+            exit;
+        }
+
+        $destino = "../public/actas/comprobantes/";
+        if (!file_exists($destino)) {
+            if (!mkdir($destino, 0777, true)) {
+                echo json_encode(['success' => false, 'message' => 'Error al crear el directorio de destino']);
+                exit;
             }
-            break;
+        }
+
+        $nombreArchivo = uniqid() . "-" . basename($archivo['name']);
+        $rutaRelativa = "public/actas/comprobantes/" . $nombreArchivo;
+        $rutaCompleta = "../" . $rutaRelativa;
+
+        if (move_uploaded_file($archivo['tmp_name'], $rutaCompleta)) {
+            $guardar = $acta->guardarRutaArchivo($id_acta, $rutaRelativa);
+
+            if ($guardar) {
+                echo json_encode([
+                    'success' => true,
+                    'message' => 'Archivo cargado con éxito',
+                    'nombre_guardado' => $nombreArchivo,
+                    'ruta' => $rutaRelativa
+                ]);
+            } else {
+                // Si falla el guardado en BD, eliminar el archivo
+                unlink($rutaCompleta);
+                echo json_encode(['success' => false, 'message' => 'Error al guardar la ruta en la base de datos']);
+            }
+        } else {
+            echo json_encode(['success' => false, 'message' => 'Error al mover el archivo al destino']);
+        }
+        break;
+
+    case "obtenerRutaArchivo":
+        $id_acta = isset($_POST['id_acta']) ? intval($_POST['id_acta']) : 0;
+        $ruta = $acta->obtenerRutaArchivo($id_acta);
+        echo json_encode(['success' => true, 'ruta' => $ruta]);
+        break;
+
+        // Caso para descargar el archivo
+        case "descargarArchivo":
+            $ruta = isset($_GET['ruta']) ? $_GET['ruta'] : '';
+            $rutaCompleta = "../" . $ruta;
         
+            if (file_exists($rutaCompleta)) {
+                header('Content-Type: application/octet-stream');
+                header('Content-Disposition: attachment; filename="' . basename($rutaCompleta) . '"');
+                header('Content-Length: ' . filesize($rutaCompleta));
+                readfile($rutaCompleta);
+                exit;
+            }
+            http_response_code(404);
+            exit;
+            break;
 }

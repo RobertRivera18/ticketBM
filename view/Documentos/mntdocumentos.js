@@ -243,6 +243,7 @@ function generar(id_acta) {
     });
 }
 
+
 var tipo_acta = $("#tipo_acta").val();
 $("#tipo_acta").on("change", function () {
     tipo_acta = $(this).val();
@@ -266,58 +267,106 @@ $(document).on("click", "#btnnuevo", function () {
 });
 
 function procesarArchivo(id_acta) {
-    $('#id_acta').val(id_acta);
     $('#cargarArchivo').modal('show');
-
-    // Escucha el cambio en el input de archivo
-    $('#archivo').on('change', function () {
-        var archivoInput = this.files[0];
-        console.log(archivoInput ? "Archivo seleccionado: " + archivoInput.name : "No se seleccionó ningún archivo.");
-    });
-
-    // Maneja el envío del formulario
-    $('#documento_form').off('submit').on('submit', function (e) {
+    
+    // Reset form on modal show
+    $('#archivo_form')[0].reset();
+    
+    $('#archivo_form').off('submit').on('submit', function(e) {
         e.preventDefault();
-
-        var archivoInput = $('#archivo')[0].files[0];
-        if (!archivoInput) {
-            alert("Por favor, selecciona un archivo antes de continuar.");
-            return;
+        
+        var formData = new FormData();
+        var fileInput = $('#archivo')[0].files[0];
+        
+        if (!fileInput) {
+            alert("Por favor, seleccione un archivo");
+            return false;
         }
-
-        var formData = new FormData(this);
-
+        
+        formData.append('archivo', fileInput);
+        formData.append('id_acta', id_acta);
+        
         $.ajax({
             url: '../../controller/acta.php?op=subirArchivo',
             type: 'POST',
             data: formData,
+            cache: false,
             contentType: false,
             processData: false,
-            success: function (response) {
+            beforeSend: function() {
+                $('#guardarArchivo').prop('disabled', true).text('Subiendo...');
+            },
+            success: function(response) {
+                console.log('Respuesta del servidor:', response);
                 try {
-                    var res = JSON.parse(response);
-                    if (res.success) {
-                        alert("Archivo cargado con éxito: " + res.nombre_guardado);
+                    var data = typeof response === 'string' ? JSON.parse(response) : response;
+                    if (data.success) {
+                        alert(data.message);
                         $('#cargarArchivo').modal('hide');
-                        // Opcional: Recarga datos en la tabla
                     } else {
-                        alert("Error: " + res.message);
+                        alert(data.message || 'Error al subir el archivo');
                     }
                 } catch (e) {
-                    console.error("Error en la respuesta del servidor:", e);
-                    alert("Ocurrió un error inesperado.");
+                    console.error('Error al procesar respuesta:', e);
+                    alert('Error al procesar la respuesta del servidor');
                 }
             },
-            error: function (xhr, status, error) {
-                console.error("Error en la solicitud AJAX:", error);
-                alert("Error al cargar el archivo. Intenta nuevamente.");
+            error: function(xhr, status, error) {
+                console.error('Error AJAX:', error);
+                console.log('Status:', status);
+                console.log('Response:', xhr.responseText);
+                alert('Error en la comunicación con el servidor');
+            },
+            complete: function() {
+                $('#guardarArchivo').prop('disabled', false).text('Guardar');
             }
         });
     });
 }
 
-
-
+function descargarComprobante(id_acta) {
+    $.ajax({
+        url: '../../controller/acta.php?op=obtenerRutaArchivo',
+        type: 'POST',
+        data: { id_acta: id_acta },
+        success: function(response) {
+            try {
+                var data = JSON.parse(response);
+                if (data.success && data.ruta) {
+                    var xhr = new XMLHttpRequest();
+                    xhr.open('GET', '../../controller/acta.php?op=descargarArchivo&ruta=' + encodeURIComponent(data.ruta));
+                    xhr.onload = function() {
+                        if (xhr.status === 404) {
+                            swal({
+                                title: "Error",
+                                text: "El archivo no existe o ha sido eliminado",
+                                icon: "error",
+                                button: "Aceptar"
+                            });
+                        } else {
+                            window.location.href = '../../controller/acta.php?op=descargarArchivo&ruta=' + encodeURIComponent(data.ruta);
+                        }
+                    };
+                    xhr.send();
+                } else {
+                    swal({
+                        title: "Error",
+                        text: "No se encontró información del archivo",
+                        icon: "error",
+                        button: "Aceptar"
+                    });
+                }
+            } catch (e) {
+                swal({
+                    title: "Error",
+                    text: "Error al procesar la respuesta",
+                    icon: "error",
+                    button: "Aceptar"
+                });
+            }
+        }
+    });
+}
 
 
 

@@ -40,7 +40,7 @@
 							<th style="width: 5%;">Tipo de Acta</th>
 							<th style="width: 5%;">Equipos Entregados en la Acta</th>
 							<th style="width: 5%;">Entregado a</th>
-							<th class="text-center" style="width: 5%;"></th>
+							<th  style="width: 8%;"></th>
 							<th style="width: 5%;">Fecha de entrega Acta</th>
 						</tr>
 					</thead>
