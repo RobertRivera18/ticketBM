@@ -47,7 +47,7 @@ switch ($_GET["op"]) {
                        </button>
                        
                        <button class="btn btn-inline btn-primary btn-sm ladda-button" 
-                            onclick="procesarArchivo(' . $row["usu_id"] . ')" 
+                            onclick="subirArchivo(' . $row["usu_id"] . ')" 
                             title="Procesar archivo">
                              <i class="fa fa-upload"></i>
                         </button>
@@ -68,6 +68,10 @@ switch ($_GET["op"]) {
         echo json_encode($results);
         break;
 
+
+
+
+        
     case "asignarEquipo":
         if (isset($_POST["usu_id"], $_POST["equipo_id"])) {
             $usu_id = intval($_POST["usu_id"]);
@@ -170,28 +174,5 @@ switch ($_GET["op"]) {
 
         exit();
 
-
-
-        case 'subirArchivo':
-            if (isset($_FILES['fileElem'])) {
-                $archivo = $_FILES['fileElem'];
-                $usu_id = $_POST['usu_id'];
-        
-                if ($archivo['error'] === UPLOAD_ERR_OK) {
-                    $nombreArchivo = basename($archivo['name']);
-                    $rutaDestino = "../../uploads/" . $nombreArchivo;
-        
-                    if (move_uploaded_file($archivo['tmp_name'], $rutaDestino)) {
-                        echo json_encode(['success' => true, 'message' => 'Archivo subido con éxito.']);
-                    } else {
-                        echo json_encode(['success' => false, 'message' => 'Error al mover el archivo.']);
-                    }
-                } else {
-                    echo json_encode(['success' => false, 'message' => 'Error al subir el archivo.']);
-                }
-            } else {
-                echo json_encode(['success' => false, 'message' => 'Archivo no recibido.']);
-            }
-            break;
         
 }

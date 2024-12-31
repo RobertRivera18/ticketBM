@@ -1,31 +1,45 @@
-<div id="modalmantenimiento" class="modal fade bd-example-modal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+<div id="cargarArchivo" class="modal fade bd-example-modal" tabindex="-1" role="dialog" aria-labelledby="mdltitulo" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
+            <!-- Encabezado del modal -->
             <div class="modal-header">
-                <button type="button" class="modal-close" data-dismiss="modal" aria-label="Close">
-                    <i class="font-icon-close-2"></i>
+                <h4 class="modal-title" id="mdltitulo">Cargar Comprobante</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar">
+                    <span aria-hidden="true">&times;</span>
                 </button>
-                <h4 class="modal-title" id="mdltitulo"></h4>
             </div>
-            <form method="post" id="cuadrilla_form">
+
+            <!-- Formulario -->
+            <form method="post" id="archivo_form" enctype="multipart/form-data">
                 <div class="modal-body">
-                    <div class="row">
-
-						<input type="hidden" id="usu_id" name="usu_id">
-
-						<div class="col-lg-6">
-							<fieldset class="form-group">
-								<label class="form-label semibold" for="exampleInput">Documento Firmado(Comprobante de Recepcion)</label>
-								<input type="file" name="fileElem" id="fileElem" class="form-control" multiple>
-							</fieldset>
-						</div>
-
-				</div>
-
+                    <!-- Campo oculto para el ID del acta -->
+                    <input type="hidden" id="id_acta" name="id_acta">
+                    
+                    <!-- Input para el archivo -->
+                    <div class="form-group">
+                        <label for="archivo" class="form-label">Comprobante a cargar</label>
+                        <input 
+                            type="file" 
+                            id="archivo" 
+                            name="archivo" 
+                            class="form-control" 
+                            accept=".pdf,.doc,.docx,.jpg,.png"
+                            required
+                        >
+                        <small class="form-text text-muted">Formatos permitidos: PDF, DOC, DOCX, JPG, PNG.</small>
+                    </div>
                 </div>
+
+       
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-rounded btn-default" data-dismiss="modal">Cerrar</button>
-                    <button type="submit" name="action" id="#" value="add" class="btn btn-rounded btn-primary">Guardar</button>
+                    <button type="button" class="btn btn-secondary btn-rounded" data-dismiss="modal">Cerrar</button>
+                    <button 
+                        type="submit" 
+                        id="guardarArchivo" 
+                        class="btn btn-primary btn-rounded"
+                    >
+                        Guardar
+                    </button>
                 </div>
             </form>
         </div>

@@ -77,8 +77,12 @@ switch ($_GET["op"]) {
                     id="' . $row["id_acta"] . '" 
                     class="btn btn-inline btn-danger btn-sm ladda-button">
                     <i class="fa fa-download"></i>
-                </button
-                
+                </button>
+                  <button type="button" onClick="eliminarActa(' . $row["id_acta"] . ');" 
+                    id="' . $row["id_acta"] . '" 
+                     class="btn btn-inline btn-danger btn-sm ladda-button">
+                    <i class="fa fa-trash"></i>
+                </button>
                 ';
 
 
@@ -109,7 +113,11 @@ switch ($_GET["op"]) {
         echo json_encode($results);
         break;
 
+    case "eliminarActa":
 
+        $acta->delete_acta($_POST["id_acta"]);
+
+        break;
 
     case "generar_word":
         $id_acta = isset($_GET['id_acta']) ? intval($_GET['id_acta']) : 0;
@@ -193,6 +201,14 @@ switch ($_GET["op"]) {
             exit;
         }
 
+        // Obtener el nombre del colaborador asociado al acta
+        $datos_acta = $acta->get_acta_by_id($id_acta); // Asegúrate de que este método exista y devuelva los datos correctos
+        if (!$datos_acta || empty($datos_acta['col_nombre'])) {
+            echo json_encode(['success' => false, 'message' => 'No se encontró el colaborador asociado al acta']);
+            exit;
+        }
+        $nombre_colaborador = preg_replace('/[^A-Za-z0-9_\-]/', '_', $datos_acta['col_nombre']); // Limpiar caracteres especiales
+
         // Validar tipo de archivo
         $tiposPermitidos = ['image/jpeg', 'image/png', 'application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
         if (!in_array($archivo['type'], $tiposPermitidos)) {
@@ -214,7 +230,9 @@ switch ($_GET["op"]) {
             }
         }
 
-        $nombreArchivo = uniqid() . "-" . basename($archivo['name']);
+        // Generar el nombre del archivo con el nombre del colaborador
+        $extension = pathinfo($archivo['name'], PATHINFO_EXTENSION);
+        $nombreArchivo = "comprobante_firma" . "-" . $nombre_colaborador . "." . $extension;
         $rutaRelativa = "public/actas/comprobantes/" . $nombreArchivo;
         $rutaCompleta = "../" . $rutaRelativa;
 
@@ -245,18 +263,18 @@ switch ($_GET["op"]) {
         break;
 
         // Caso para descargar el archivo
-        case "descargarArchivo":
-            $ruta = isset($_GET['ruta']) ? $_GET['ruta'] : '';
-            $rutaCompleta = "../" . $ruta;
-        
-            if (file_exists($rutaCompleta)) {
-                header('Content-Type: application/octet-stream');
-                header('Content-Disposition: attachment; filename="' . basename($rutaCompleta) . '"');
-                header('Content-Length: ' . filesize($rutaCompleta));
-                readfile($rutaCompleta);
-                exit;
-            }
-            http_response_code(404);
+    case "descargarArchivo":
+        $ruta = isset($_GET['ruta']) ? $_GET['ruta'] : '';
+        $rutaCompleta = "../" . $ruta;
+
+        if (file_exists($rutaCompleta)) {
+            header('Content-Type: application/octet-stream');
+            header('Content-Disposition: attachment; filename="' . basename($rutaCompleta) . '"');
+            header('Content-Length: ' . filesize($rutaCompleta));
+            readfile($rutaCompleta);
             exit;
-            break;
+        }
+        http_response_code(404);
+        exit;
+        break;
 }

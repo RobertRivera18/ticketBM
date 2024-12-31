@@ -180,6 +180,32 @@ function asignarEquipo(equipo_id) {
     });
 }
 
+function eliminarActa(id_acta) {
+    $('#documento_data').DataTable().ajax.reload();// Asegurarse de que la tabla esté inicializada
+    swal({
+        title: "HelpDesk",
+        text: "¿Está seguro de eliminar el registro?",
+        type: "error",
+        showCancelButton: true,
+        confirmButtonClass: "btn-danger",
+        confirmButtonText: "Sí",
+        cancelButtonText: "No",
+        closeOnConfirm: false
+    }, function (isConfirm) {
+        if (isConfirm) {
+            $.post("../../controller/acta.php?op=eliminarActa", { id_acta: id_acta }, function (data) {
+                tabla.ajax.reload();
+                swal({
+                    title: "HelpDesk!",
+                    text: "Registro Eliminado.",
+                    type: "success",
+                    confirmButtonClass: "btn-success"
+                });
+            });
+        }
+    });
+}
+
 
 
 $(document).ready(function () {

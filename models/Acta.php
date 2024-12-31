@@ -148,8 +148,28 @@ class Acta extends Conectar
         }
     }
 
-    //Para descargar el comprobante
 
+    public function delete_acta($id_acta)
+    {
+        $conectar = parent::conexion();
+        parent::set_names();
+        // Preparamos la sentencia DELETE
+        $sql = "DELETE FROM acta WHERE id_acta = ?";
+        $stmt = $conectar->prepare($sql);
+        // Enlazamos el valor del parámetro
+        $stmt->bindValue(1, $id_acta);
+        $result = $stmt->execute();
+        // Retornamos un valor booleano que indica si la eliminación fue exitosa
+        if ($result) {
+            return true;  // Eliminación exitosa
+        } else {
+            return false;  // Hubo un error al intentar eliminar
+        }
+    }
+
+
+
+    //Para descargar el comprobante
     public function obtenerRutaArchivo($id_acta) {
         try {
             $conectar = parent::conexion();
