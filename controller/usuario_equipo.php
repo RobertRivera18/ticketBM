@@ -40,17 +40,19 @@ switch ($_GET["op"]) {
             $sub_array[] = '<button type="button" onClick="generar(' . $row["usu_id"] . ');" 
             id="' . $row["usu_id"] . '"class="btn btn-inline btn-success btn-sm ladda-button">
             <i class="fa fa-print"></i>
-                       </button> <button type="button" onClick="generar(' . $row["usu_id"] . ')" 
+                       
+                       <button type="button" onClick="procesarArchivo();" 
+                    id="" 
+                    class="btn btn-inline btn-warning btn-sm ladda-button">
+                    <i class="fa fa-image"></i>
+                </button>
+
+                </button> <button type="button" onClick="generar(' . $row["usu_id"] . ')" 
                            id="' . $row["usu_id"] . '" 
                                 class="btn btn-inline btn-danger btn-sm ladda-button">
                                <i class="fa fa-download"></i>
                        </button>
-                       
-                       <button class="btn btn-inline btn-primary btn-sm ladda-button" 
-                            onclick="subirArchivo(' . $row["usu_id"] . ')" 
-                            title="Procesar archivo">
-                             <i class="fa fa-upload"></i>
-                        </button>
+                    
                        ';
 
             // Agregar fila al resultado final
@@ -70,7 +72,7 @@ switch ($_GET["op"]) {
 
 
 
-        
+
     case "asignarEquipo":
         if (isset($_POST["usu_id"], $_POST["equipo_id"])) {
             $usu_id = intval($_POST["usu_id"]);
@@ -172,6 +174,4 @@ switch ($_GET["op"]) {
         }
 
         exit();
-
-        
 }
