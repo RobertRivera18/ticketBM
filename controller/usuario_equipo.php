@@ -53,7 +53,6 @@ switch ($_GET["op"]) {
                         </button>
                        ';
 
-
             // Agregar fila al resultado final
             $data[] = $sub_array;
         }
@@ -129,7 +128,7 @@ switch ($_GET["op"]) {
         }
 
         //Verifica la cantidad de equipos por usuarios
-        while (count($equipos) < 5) {
+        while (count($equipos) < 7) {
             $equipos[] = [
                 'descripcion' => 'N/A',
                 'marca'       => 'N/A',

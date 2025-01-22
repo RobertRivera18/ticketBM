@@ -166,8 +166,8 @@ function generar(usu_id) {
     });
 }
 
-function procesarArchivo(){
-    $("#modalmantenimiento").modal('show');  
+function procesarArchivo() {
+    $("#modalmantenimiento").modal('show');
 }
 
 $("#cuadrilla_form").on("submit", function (e) {

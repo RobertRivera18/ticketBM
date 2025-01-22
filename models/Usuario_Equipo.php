@@ -24,9 +24,11 @@ class Usuario_Equipo extends Conectar
             $conectar = parent::conexion();
             parent::set_names();
             $sql = "SELECT eq.equipo_id, eq.nombre_equipo, eq.marca, eq.modelo, eq.serie
-                    FROM tm_usuario_equipo
-                    INNER JOIN tm_equipos eq ON tm_usuario_equipo.equipo_id = eq.equipo_id
-                    WHERE tm_usuario_equipo.usu_id = ?";
+        FROM tm_usuario_equipo
+        INNER JOIN tm_equipos eq ON tm_usuario_equipo.equipo_id = eq.equipo_id
+        WHERE tm_usuario_equipo.usu_id = ?
+        ORDER BY eq.equipo_id DESC";
+
             $stmt = $conectar->prepare($sql);
             $stmt->bindValue(1, $usu_id, PDO::PARAM_INT);
             $stmt->execute();
@@ -49,7 +51,8 @@ class Usuario_Equipo extends Conectar
     }
 
 
-    public function create_word($usu_id){
+    public function create_word($usu_id)
+    {
         try {
             $conectar = parent::conexion();
             parent::set_names();
@@ -86,14 +89,4 @@ class Usuario_Equipo extends Conectar
             return false;
         }
     }
-
-
-
-   
-    
-    
-
-
-
-
 }

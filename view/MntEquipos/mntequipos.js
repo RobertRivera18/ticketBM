@@ -90,6 +90,7 @@ function editar(equipo_id) {
         $('#marca').val(data.marca);
         $('#modelo').val(data.modelo);
         $('#serie').val(data.serie);
+        $('#datos').val(data.datos).trigger('change');
        
       
     });

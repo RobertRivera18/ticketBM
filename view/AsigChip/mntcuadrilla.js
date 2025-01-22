@@ -1,36 +1,13 @@
 var tabla;
 function init() {
     $("#cuadrilla_form").on("submit", function (e) {
-        guardar(e);
+
         listarColaboradores();
         listarEquipos();
     });
 }
 
-function guardar(e) {
-    e.preventDefault();
-    var formData = new FormData($("#cuadrilla_form")[0]);
-    $.ajax({
-        url: "../../controller/cuadrilla_asig.php?op=guardar",
-        type: "POST",
-        data: formData,
-        contentType: false,
-        processData: false,
-        success: function (datos) {
-            console.log(datos);
-            $('#cuadrilla_form')[0].reset();
-            $("#modalmantenimiento").modal('hide');
-            $('#cuadrilla_data').DataTable().ajax.reload();
 
-            swal({
-                title: "HelpDesk!",
-                text: "Completado.",
-                type: "success",
-                confirmButtonClass: "btn-success"
-            });
-        }
-    });
-}
 $(document).ready(function () {
 
     tabla = $('#cuadrilla_data').DataTable({
@@ -207,29 +184,48 @@ function agregarEquipo(cua_id) {
 }
 
 
+
+
 function asignar(col_id) {
     $.ajax({
         url: "../../controller/cuadrilla_asig.php?op=asignar",
         type: "POST",
         data: { cua_id: currentCuaId, col_id: col_id },
         success: function (response) {
-            console.log("Colaborador asignado:", response);
-
-            if (response) {
+            const res = JSON.parse(response);
+            if (res.status === "success") {
                 swal({
                     title: "HelpDesk!",
-                    text: "Colaborador asignado correctamente.",
+                    text: "Colaborador Asignado Correctamente",
                     type: "success",
                     confirmButtonClass: "btn-success"
                 });
-                $("#modalasignar").modal('hide');
-                $('#cuadrilla_data').DataTable().ajax.reload();
-            } else {
-                console.error("Error al asignar colaborador.");
+                $("#modalequipos").modal('hide');
+                // Actualiza la tabla sin recargar toda la página
+                $('#cuadrilla_data').DataTable().ajax.reload(null, false);
             }
-        },
-        error: function (error) {
-            console.error("Error en la asignación", error);
+        }
+    });
+}
+
+
+function eliminarItem(cua_id, col_id) {
+    // Llamada AJAX para eliminar el colaborador de la cuadrilla
+    $.ajax({
+        url: "../../controller/cuadrilla_asig.php?op=eliminarColaborador",
+        type: "POST",
+        data: { cua_id: cua_id, col_id: col_id },
+        success: function (response) {
+            if (response) {
+                swal({
+                    title: "HelpDesk!",
+                    text: "Colaborador eliminado correctamente.",
+                    type: "success",
+                    confirmButtonClass: "btn-success"
+                });
+                
+            }
+            $('#cuadrilla_data').DataTable().ajax.reload();
         }
     });
 }
@@ -333,6 +329,9 @@ function refresh() {
 $('#exportarRecargas').on('click', function() {
     window.location.href = '../../controller/cuadrilla_asig.php?op=exportarRecargas';
 });
+
+
+
 
 
 

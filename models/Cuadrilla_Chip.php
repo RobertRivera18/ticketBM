@@ -27,7 +27,7 @@ class Cuadrilla_Chip extends Conectar
         try {
             $conectar = parent::conexion();
             parent::set_names();
-            $sql = "SELECT * FROM tm_cuadrilla";
+            $sql = "SELECT * FROM tm_cuadrilla  ORDER BY cua_id DESC";
             // Preparar y ejecutar la consulta
             $stmt = $conectar->prepare($sql);
             $stmt->execute();
@@ -121,18 +121,20 @@ class Cuadrilla_Chip extends Conectar
     {
         $conectar = parent::conexion();
         parent::set_names();
-
-        // Consulta para obtener los colaboradores de una cuadrilla
-        $sql = "SELECT col.col_nombre
-        FROM tm_cuadrilla_colaborador
-        INNER JOIN tm_colaborador col ON tm_cuadrilla_colaborador.col_id = col.col_id
-        WHERE tm_cuadrilla_colaborador.cua_id = ?";
+    
+        // Incluye col.col_id en la consulta
+        $sql = "SELECT col.col_id, col.col_nombre
+                FROM tm_cuadrilla_colaborador
+                INNER JOIN tm_colaborador col ON tm_cuadrilla_colaborador.col_id = col.col_id
+                WHERE tm_cuadrilla_colaborador.cua_id = ?  
+                ORDER BY id DESC";
         $stmt = $conectar->prepare($sql);
-        $stmt->bindValue(1, $cua_id);
+        $stmt->bindValue(1, $cua_id, PDO::PARAM_INT);
         $stmt->execute();
-
-        return $stmt->fetchAll();
+    
+        return $stmt->fetchAll(PDO::FETCH_ASSOC); // Devuelve un arreglo asociativo
     }
+    
 
 
 
@@ -153,6 +155,36 @@ class Cuadrilla_Chip extends Conectar
 
         return $stmt->fetchAll();
     }
+
+    public function delete_cuadrilla_colaborador($cua_id, $col_id)
+    {
+        try {
+            $conectar = parent::conexion();
+            parent::set_names();
+            $sql = "DELETE FROM tm_cuadrilla_colaborador WHERE cua_id = ? AND col_id = ?";
+            $stmt = $conectar->prepare($sql);
+            $stmt->bindValue(1, $cua_id, PDO::PARAM_INT);
+            $stmt->bindValue(2, $col_id, PDO::PARAM_INT);
+
+            // Ejecutar la consulta
+            if ($stmt->execute()) {
+                if ($stmt->rowCount() > 0) {
+                    return true;
+                } else {
+                    return false;
+                }
+            } else {
+                return false;
+            }
+        } catch (Exception $e) {
+            return false;
+        }
+    }
+
+
+
+
+
 
     //Metodo usado para mostar los equipos otorgados a las cuadrillas
     public function get_empresa_cuadrilla($cua_id)

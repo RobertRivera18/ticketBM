@@ -34,6 +34,14 @@
                         
                     </div>
 
+                    <div class="form-group">
+                        <label class="form-label" for="rol_id">Es un chip?</label>
+                        <select class="select2" id="datos" name="datos">
+                            <option value="1">IMEI</option>
+                            <option value="2">Equipo Informatico</option>
+                        </select>
+                    </div>
+
                     
                 </div>
                 <div class="modal-footer">

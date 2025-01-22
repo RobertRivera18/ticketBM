@@ -2,16 +2,17 @@
 class Equipo extends Conectar
 {
 
-    public function insert_equipo($nombre_equipo, $marca, $modelo, $serie)
+    public function insert_equipo($nombre_equipo, $marca, $modelo, $serie,$datos)
     {
         $conectar = parent::conexion();
         parent::set_names();
-        $sql = "INSERT INTO tm_equipos (nombre_equipo,marca,modelo,serie) VALUES (?,?,?,?)";
+        $sql = "INSERT INTO tm_equipos (nombre_equipo,marca,modelo,serie,datos) VALUES (?,?,?,?,?)";
         $stmt = $conectar->prepare($sql);
         $stmt->bindValue(1, $nombre_equipo);
         $stmt->bindValue(2, $marca);
         $stmt->bindValue(3, $modelo);
         $stmt->bindValue(4, $serie);
+        $stmt->bindValue(5, $datos);
         $stmt->execute();
         if ($stmt->rowCount() > 0) {
             return $conectar->lastInsertId();
@@ -19,7 +20,7 @@ class Equipo extends Conectar
             return false;
         }
     }
-    public function update_equipo($equipo_id, $nombre_equipo, $marca, $modelo, $serie)
+    public function update_equipo($equipo_id, $nombre_equipo, $marca, $modelo, $serie,$datos)
     {
         $conectar = parent::conexion();
         parent::set_names();
@@ -28,6 +29,7 @@ class Equipo extends Conectar
               marca = ?, 
               modelo = ?,
               serie = ?,
+              datos = ?
                WHERE 
               equipo_id = ?";
         $stmt = $conectar->prepare($sql);
@@ -35,7 +37,8 @@ class Equipo extends Conectar
         $stmt->bindValue(2, $marca);
         $stmt->bindValue(3, $modelo);
         $stmt->bindValue(4, $serie);
-        $stmt->bindValue(5, $equipo_id);
+        $stmt->bindValue(5, $datos);
+        $stmt->bindValue(6, $equipo_id);
         $stmt->execute();
         return $resultado = $stmt->fetchAll();
     }
@@ -53,6 +56,7 @@ class Equipo extends Conectar
                     e.marca,
                     e.modelo,
                     e.serie,
+                    e.datos,
                     u.usu_nom AS nombre_usuario,
                     u.usu_ape
                 FROM 
@@ -75,7 +79,7 @@ class Equipo extends Conectar
     }
     
 
-    // Método para eliminar un colaborador
+    // Método para eliminar un 
     public function delete_equipo($equipo_id)
     {
         $conectar = parent::conexion();

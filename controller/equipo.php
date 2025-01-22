@@ -6,9 +6,9 @@ $equipo = new Equipo();
 switch ($_GET["op"]) {
     case "guardaryeditar":
         if (empty($_POST["equipo_id"])) {
-            $equipo->insert_equipo($_POST["nombre_equipo"], $_POST["marca"],$_POST["modelo"], $_POST["serie"]);
+            $equipo->insert_equipo($_POST["nombre_equipo"], $_POST["marca"],$_POST["modelo"], $_POST["serie"],$_POST["datos"]);
         } else {
-            $equipo->update_equipo($_POST["equipo_id"], $_POST["nombre_equipo"], $_POST["marca"],$_POST["modelo"], $_POST["serie"]);
+            $equipo->update_equipo($_POST["equipo_id"], $_POST["nombre_equipo"], $_POST["marca"],$_POST["modelo"], $_POST["serie"],$_POST["datos"]);
         }
         break;
 
@@ -21,8 +21,7 @@ switch ($_GET["op"]) {
             $sub_array[] = $row["marca"];
             $sub_array[] = $row["modelo"];
             $sub_array[] = $row["serie"];
-
-
+           
             if (!empty($row["nombre_usuario"])) {
                 
                 $sub_array[] = '<span class="label label-danger">'.'Equipo Asignado'.'</span>'.'<span class="label label-warning">' . $row["nombre_usuario"] . ' ' . $row["usu_ape"] . '</span>';
@@ -30,6 +29,11 @@ switch ($_GET["op"]) {
                 
             } else {
                 $sub_array[] =  '<span class="label label-success">Equipo Libre</span>';
+            }
+            if (isset($row["datos"]) && $row["datos"] == 1) {
+                $sub_array[] = '<span class="badge badge-danger">Si</span>';
+            } else {
+                $sub_array[] = '<span class="badge badge-danger">No</span>';
             }
 
             $sub_array[] = '<td class="text-center" colspan="2">
@@ -70,6 +74,7 @@ switch ($_GET["op"]) {
                 $output["marca"] = $row["marca"];
                 $output["modelo"] = $row["modelo"];
                 $output["serie"] = $row["serie"];
+                $output["datos"] = $row["datos"];
             }
             echo json_encode($output);
         } else {

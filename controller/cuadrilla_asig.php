@@ -13,6 +13,7 @@ require_once('../public/plugins/tbs_plugin_opentbs.php');
 
 //Plugins creacion de XML,Excel
 require_once __DIR__ . '/../vendor/autoload.php';
+
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
@@ -78,24 +79,31 @@ switch ($_GET["op"]) {
                 $sub_array[] = '<span>No definido</span><br><span>No definida</span>';
             }
 
-            // Manejo de colaboradores
-            $colaboradores = $cuadrilla->get_colaboradores_por_cuadrilla($row["cua_id"]);
+
+            $colaboradores = $cuadrilla->get_colaboradores_por_cuadrilla((int)$row["cua_id"]);
             $cantidad_colaboradores = is_array($colaboradores) ? count($colaboradores) : 0;
-
+            
             if ($cantidad_colaboradores > 0) {
-                $colaboradores_array = array_map(function ($colaborador) {
-                    return $colaborador["col_nombre"];
+                $colaboradores_array = array_map(function ($colaborador) use ($row) {
+                    return '<li class="fs-6 d-flex align-items-center">' .
+                        htmlspecialchars($colaborador["col_nombre"], ENT_QUOTES, 'UTF-8') .
+                        '<i class="fa fa-times text-danger ms-2 mt-1" style="cursor: pointer;" onClick="eliminarItem(' . 
+                        $row["cua_id"] . ', ' . $colaborador["col_id"] . ')"></i>' .
+                        '</li>';
                 }, $colaboradores);
-
-                $sub_array[] = implode("<br>", $colaboradores_array) .
-                    '<br><a onClick="agregar(' . $row["cua_id"] . ')"><span class="label label-primary">Agregar más</span></a>';
+            
+                $sub_array[] = '<ul class="mb-1">' . implode("", $colaboradores_array) . '</ul>' .
+                    '<a class="btn btn-sm btn-primary mt-1" onClick="agregar(' . (int)$row["cua_id"] . ')">Agregar más</a>';
             } else {
                 $sub_array[] = '
-                    <div style="display: flex; align-items: center; cursor: pointer;" onclick="agregar(' . htmlspecialchars($row["cua_id"], ENT_QUOTES, 'UTF-8') . ');">
-                        <i class="fa fa-exclamation-circle" style="color: #ffc107; margin-right: 5px;" title="Agregar equipo"></i>
-                        <span>Sin Asignar</span>
+                    <div style="display: flex; align-items: center; cursor: pointer;" onclick="agregar(' . 
+                    htmlspecialchars($row["cua_id"], ENT_QUOTES, 'UTF-8') . ');">
+                        <i class="fa fa-exclamation-circle" style="color: #ffc107; margin-right: 5px;" title="Agregar colaborador"></i>
+                        <span>No tiene colaboradores asignados</span>
                     </div>';
             }
+            
+
 
             // Manejo de equipos
             $equipos = $cuadrilla->get_equipos_por_cuadrilla($row["cua_id"]);
@@ -140,6 +148,14 @@ switch ($_GET["op"]) {
         );
         echo json_encode($results);
         break;
+
+
+
+        case "eliminarColaborador":
+            $cuadrilla->delete_cuadrilla_colaborador($_POST["cua_id"], $_POST["col_id"]);
+            break;
+
+
 
 
     case "generar_word":
@@ -220,14 +236,14 @@ switch ($_GET["op"]) {
         }
         break;
 
-        case "desmarcarTodas":
-            $result = $cuadrilla_creacion->desmarcarTodas();
-            echo json_encode([
-                "status" => $result > 0 ? "success" : "error",
-                "message" => $result > 0 ? "Recargas desmarcadas correctamente" : "No se realizaron cambios"
-            ]);
-            break;
-        
+    case "desmarcarTodas":
+        $result = $cuadrilla_creacion->desmarcarTodas();
+        echo json_encode([
+            "status" => $result > 0 ? "success" : "error",
+            "message" => $result > 0 ? "Recargas desmarcadas correctamente" : "No se realizaron cambios"
+        ]);
+        break;
+
 
 
     case "asignarEquipo":
@@ -259,44 +275,41 @@ switch ($_GET["op"]) {
         break;
 
 
-        case 'exportarRecargas':
-            $cuadrillas = $cuadrilla_creacion->obtenerRecargasTrue();
-        
-            if (!empty($cuadrillas)) {
-                // Cargar la plantilla Excel
-                $inputFileName = '../public/templates/formatoListadoRecargas.xlsx'; 
-                $spreadsheet = IOFactory::load($inputFileName);
-                $sheet = $spreadsheet->getActiveSheet();
-        
-                // Configurar las celdas con los datos obtenidos
-                $fila = 9;  // Comienza en la fila 2 porque la 1 es para encabezados
-                foreach ($cuadrillas as $cuadrilla) {
-                    $sheet->setCellValue('C' . $fila, $cuadrilla['cua_id']);
-                    $sheet->setCellValue('D' . $fila, $cuadrilla['ciudad_nombre']);  // Nombre de la ciudad
-                    $sheet->setCellValue('E' . $fila, $cuadrilla['serie']);
-                    $sheet->setCellValue('F' . $fila, $cuadrilla['cua_nombre']);
-                    $sheet->setCellValue('G' . $fila, 10.50);
-                    $sheet->setCellValue('H' . $fila, $cuadrilla['recargas']);
-                    $fila++;
-                }
-        
-                // Guardar el archivo generado
-                $fActual = new DateTime();
-                $writer = new Xlsx($spreadsheet);
-                $fileName = 'reporteRecagas'. $fActual->format('Y-m-d') . '.xlsx';
-                $temp_file = tempnam(sys_get_temp_dir(), $fileName);
-                $writer->save($temp_file);
-        
-                // Descargar archivo
-                header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-                header('Content-Disposition: attachment; filename="' . $fileName . '"');
-                readfile($temp_file);
-                unlink($temp_file); // Eliminar archivo temporal
-            } else {
-                echo json_encode(['status' => 'error', 'message' => 'No hay cuadrillas con recargas en true']);
-            }
-            break;
-        
-       
-}
+    case 'exportarRecargas':
+        $cuadrillas = $cuadrilla_creacion->obtenerRecargasTrue();
 
+        if (!empty($cuadrillas)) {
+            // Cargar la plantilla Excel
+            $inputFileName = '../public/templates/formatoListadoRecargas.xlsx';
+            $spreadsheet = IOFactory::load($inputFileName);
+            $sheet = $spreadsheet->getActiveSheet();
+
+            // Configurar las celdas con los datos obtenidos
+            $fila = 9;  // Comienza en la fila 2 porque la 1 es para encabezados
+            foreach ($cuadrillas as $cuadrilla) {
+                $sheet->setCellValue('C' . $fila, $cuadrilla['cua_id']);
+                $sheet->setCellValue('D' . $fila, $cuadrilla['ciudad_nombre']);  // Nombre de la ciudad
+                $sheet->setCellValue('E' . $fila, $cuadrilla['serie']);
+                $sheet->setCellValue('F' . $fila, $cuadrilla['cua_nombre']);
+                $sheet->setCellValue('G' . $fila, 10.50);
+                $sheet->setCellValue('H' . $fila, $cuadrilla['recargas']);
+                $fila++;
+            }
+
+            // Guardar el archivo generado
+            $fActual = new DateTime();
+            $writer = new Xlsx($spreadsheet);
+            $fileName = 'reporteRecagas' . $fActual->format('Y-m-d') . '.xlsx';
+            $temp_file = tempnam(sys_get_temp_dir(), $fileName);
+            $writer->save($temp_file);
+
+            // Descargar archivo
+            header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+            header('Content-Disposition: attachment; filename="' . $fileName . '"');
+            readfile($temp_file);
+            unlink($temp_file); // Eliminar archivo temporal
+        } else {
+            echo json_encode(['status' => 'error', 'message' => 'No hay cuadrillas con recargas en true']);
+        }
+        break;
+}

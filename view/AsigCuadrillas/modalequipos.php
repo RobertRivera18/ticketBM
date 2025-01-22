@@ -13,6 +13,7 @@
                                 <th>Opciones</th>
                                 <th>Nombre Equipo</th>
                                 <th>Marca</th>
+                                <th>Modelo</th>
                                 <th>Serie</th>
                             </tr>
                         </thead>
@@ -24,6 +25,7 @@
                                 <th>Opciones</th>
                                 <th>Nombre Equipo</th>
                                 <th>Marca</th>
+                                <th>Modelo</th>
                                 <th>Serie</th>
                             </tr>
                         </tfoot>

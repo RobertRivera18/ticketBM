@@ -94,12 +94,7 @@ if ($_SESSION["rol_id"] == 1 || $_SESSION["rol_id"] == 3) {
                             <span class="lbl">Creacion de Cuadrillas</span>
                         </a>
                     </li>
-                    <li class="blue-dirty">
-                        <a href="..\AsigCuadrillas\">
-                            <span class="lbl">Asignacion Cuadrillas-Colaboradores-Generacion Actas Chip</span>
-                        </a>
-                    </li>
-
+                   
 
                     <li class="blue-dirty">
                         <a href="..\MntColaboradores\">
