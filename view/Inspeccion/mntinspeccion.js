@@ -61,40 +61,27 @@ function guardaryeditar(e) {
             });
             return;
         }
-
-        // Recoger los datos del formulario
         var formData = new FormData($("#inspeccion_form")[0]);
-
         $.ajax({
             url: "../../controller/inspeccion.php?op=guardaryeditar",
             type: "POST",
             data: formData,
             contentType: false,
             processData: false,
-            dataType: "json", // Asegúrate de que el servidor envíe JSON
-            success: function (response) {
-                if (response.status === "success") {
-                    $('#inspeccion_form')[0].reset(); // Reinicia el formulario
+            success: function (datos) {
+                console.log(datos);
+                $('#inspeccion_form')[0].reset();
 
-                    // Actualiza la tabla sin refrescar
-                    tabla.ajax.reload(null, false); // Recarga la tabla sin reiniciar la paginación
+                tabla.ajax.reload();
+                swal({
+                    title: "HelpDesk!",
+                    text: "Completado.",
+                    type: "success",
+                    confirmButtonClass: "btn-success"
+                });
 
-                    swal({
-                        title: "HelpDesk!",
-                        text: response.message,
-                        type: "success",
-                        confirmButtonClass: "btn-success"
-                    });
-
-                    $('#modalmantenimiento').modal('hide'); // Cierra el modal
-                } else {
-                    swal({
-                        title: "Error",
-                        text: response.message || "Ocurrió un problema al guardar los datos.",
-                        type: "error",
-                        confirmButtonClass: "btn-danger"
-                    });
-                }
+                $('#modalmantenimiento').modal('hide');
+                $('#inspeccion_data').DataTable().ajax.reload();
             },
             error: function () {
                 swal({
@@ -107,6 +94,7 @@ function guardaryeditar(e) {
         });
     }
 }
+
 
 
 
