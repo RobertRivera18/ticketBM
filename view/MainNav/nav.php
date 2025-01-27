@@ -118,6 +118,15 @@ if ($_SESSION["rol_id"] == 1 || $_SESSION["rol_id"] == 3) {
                 </a>
             </li>
 
+
+
+            <li class="blue-dirty">
+                <a href="..\Inspeccion\">
+                    <span class="glyphicon glyphicon-alert"></span>
+                    <span class="lbl">Generar Permiso Trabajos Especiales</span>
+                </a>
+            </li>
+
         </ul>
     </nav>
 <?php

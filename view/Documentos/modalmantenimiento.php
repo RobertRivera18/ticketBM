@@ -39,7 +39,7 @@
                                     <th>Opciones</th>
                                     <th>Nombre de Cuadrilla</th>
                                     <th>Ciudad</th>
-                                    <th>Compañia</th>
+                                    <th>Empresa</th>
                                 </tr>
                             </tfoot>
                         </table>
