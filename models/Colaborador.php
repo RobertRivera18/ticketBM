@@ -36,10 +36,8 @@ class Colaborador extends Conectar
         return $resultado=$stmt->fetchAll();
     }
 
-    public function get_colaborador()
-    {
+    public function get_colaborador(){
         try {
-            // Conexión a la base de datos
             $conectar = parent::conexion();
             parent::set_names();
             $sql = "SELECT * FROM tm_colaborador";
@@ -49,30 +47,24 @@ class Colaborador extends Conectar
 
             return $stmt->fetchAll();
         } catch (PDOException $e) {
-            // Manejo de errores si la consulta falla
             echo "Error en la consulta: " . $e->getMessage();
             return false;
         }
     }
 
     // Método para eliminar un colaborador
-    public function delete_colaborador($col_id)
-    {
+    public function delete_colaborador($col_id){
         $conectar = parent::conexion();
         parent::set_names();
-
-        // Preparamos la sentencia DELETE
         $sql = "DELETE FROM tm_colaborador WHERE col_id = ?";
         $stmt = $conectar->prepare($sql);
-        // Enlazamos el valor del parámetro
         $stmt->bindValue(1, $col_id);
-        // Ejecutamos la consulta
         $result = $stmt->execute();
-        // Retornamos un valor booleano que indica si la eliminación fue exitosa
+       
         if ($result) {
-            return true;  // Eliminación exitosa
+            return true; 
         } else {
-            return false;  // Hubo un error al intentar eliminar
+            return false; 
         }
     }
 
@@ -101,4 +93,17 @@ class Colaborador extends Conectar
         $sql->execute();
         return $resultado = $sql->fetchAll();
     }
+
+
+      //Muestra los colaboradores que pertenecen a claro
+      public function get_colaboradoresClaro(){
+          $conectar = parent::conexion();
+          parent::set_names();
+          $sql = "SELECT *
+               FROM tm_colaborador c
+               WHERE empresa_id =2";
+          $sql = $conectar->prepare($sql);
+          $sql->execute();
+          return $resultado = $sql->fetchAll();
+      }
 }

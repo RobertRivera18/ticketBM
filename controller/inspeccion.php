@@ -6,9 +6,39 @@ $inspeccion = new Inspeccion();
 switch ($_GET["op"]) {
     case "guardaryeditar":
         if (empty($_POST["inspeccion_id"])) {
-            $inspeccion->insert_inspeccion($_POST["trabajo"], $_POST["ubicacion"], $_POST["numero_orden"], $_POST["col_id"]);
+            // Primero insertamos la inspección principal y obtenemos su ID
+            $inspeccion_id = $inspeccion->insert_inspeccion(
+                $_POST["trabajo"],
+                $_POST["ubicacion"],
+                $_POST["numero_orden"],
+                $_POST["col_id"],
+                $_POST["zona_resbaladiza"],
+                $_POST["zona_con_desnivel"],
+                $_POST["hueco_piso_danado"],
+                $_POST["instalacion_mal_estado"],
+                $_POST["desconectados_expuestos"],
+                $_POST["escalera_buen_estado"],
+                $_POST["senaletica_instalada"]
+            );
+
+            // Si la inserción de la inspección fue exitosa, insertamos los equipos
+            if ($inspeccion_id) {
+                // Preparamos los datos de equipos de seguridad
+                $equipos_data = array(
+                    'inspeccion_id' => $inspeccion_id,
+                    'botas' => isset($_POST['botas']) ? 'SI' : 'N/A',
+                    'chaleco' => isset($_POST['chaleco']) ? 'SI' : 'N/A',
+                    'proteccion_auditiva' => isset($_POST['proteccion_auditiva']) ? 'SI' : 'N/A',
+                    'proteccion_visual' => isset($_POST['proteccion_visual']) ? 'SI' : 'N/A',
+                    'linea_vida' => isset($_POST['linea_vida']) ? 'SI' : 'N/A',
+                    'arnes' => isset($_POST['arnes']) ? 'SI' : 'N/A',
+                    'otros_equipos' => $_POST['otros_equipos'] ?? null
+                );
+
+            }
         }
         break;
+
 
 
     case "listar":
@@ -30,10 +60,11 @@ switch ($_GET["op"]) {
                     $sub_array[] = '<span class="label label-default">Trabajo No Especificado</span>';
                     break;
             }
-            
-            $sub_array[] = $row["ubicacion"];
             $sub_array[] = $row["numero_orden"];
-            $sub_array[] = $row["fecha"];
+            $sub_array[] = $row["ubicacion"];
+
+            $sub_array[] = date("d/m/Y H:i:s", strtotime($row["fecha"]));
+
             $sub_array[] = $row["col_nombre"];
 
 

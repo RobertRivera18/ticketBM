@@ -39,14 +39,14 @@ if (isset($_SESSION["usu_id"])) {
 					<table id="inspeccion_data" class="table table-bordered table-striped table-vcenter js-dataTable-full">
 						<thead>
 							<tr>
-								
+
 								<th style="width: 10%;">Trabajo a Realizar</th>
-								<th style="width: 10%;">Ubicacion</th>
-								<th style="width: 10%;">Numero de Orden</th>
-								<th style="width: 10%;">Fecha</th>
+								<th style="width: 5%;">Numero de Orden</th>
+								<th class="d-none d-sm-table-cell">Ubicacion</th>
+								<th class="d-none d-sm-table-cell">Fecha</th>
 								<th style="width: 10%;">Tecnico Solicitante</th>
 								<th class="text-center" style="width: 5%;"></th>
-								
+
 							</tr>
 						</thead>
 						<tbody>

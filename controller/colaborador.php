@@ -95,4 +95,29 @@ switch ($_GET["op"]) {
         );
         echo json_encode($results);
         break;
+
+
+        case "comboOperadores":
+            $datos = $colaborador->get_colaboradoresClaro();
+            $data = array();
+            if (is_array($datos) && count($datos) > 0) {
+                foreach ($datos as $row) {
+                    $empresa = $row['empresa_id'] == 1 ? '<span class="label label-pill label-info">CNEL</span>' : ($row['empresa_id'] == 2 ? '<span class="label label-pill label-danger">CLARO</span>' : "Otro");
+    
+                    $data[] = array(
+                        "0" => '<button class="btn btn-warning" onclick="asignar(' . $row['col_id'] . ')"><span class="fa fa-plus"></span></button>',
+                        "1" => $row['col_nombre'],
+                        "2" => $row['col_cedula'],
+                        "3" => $empresa,
+                    );
+                }
+            }
+            $results = array(
+                "sEcho" => 1,
+                "iTotalRecords" => count($data),
+                "iTotalDisplayRecords" => count($data),
+                "aaData" => $data
+            );
+            echo json_encode($results);
+            break;
 }

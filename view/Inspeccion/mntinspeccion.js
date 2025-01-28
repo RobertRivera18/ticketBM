@@ -17,7 +17,7 @@ function listarColaboradores() {
             ],
             "ajax":
             {
-                url: '../../controller/colaborador.php?op=combo',
+                url: '../../controller/colaborador.php?op=comboOperadores',
                 type: "get",
                 dataType: "json",
                 error: function (e) {
@@ -49,9 +49,10 @@ function listarColaboradores() {
 
 function guardaryeditar(e) {
     e.preventDefault();
+
     if ($(e.originalEvent.submitter).attr("id") === "guardarBtn") {
 
-        var colaboradorSeleccionado = $("#col_id").val();
+        var colaboradorSeleccionado = $("#col_id").val().trim();
         if (!colaboradorSeleccionado) {
             swal({
                 title: "Error",
@@ -61,7 +62,9 @@ function guardaryeditar(e) {
             });
             return;
         }
+
         var formData = new FormData($("#inspeccion_form")[0]);
+
         $.ajax({
             url: "../../controller/inspeccion.php?op=guardaryeditar",
             type: "POST",
@@ -70,17 +73,20 @@ function guardaryeditar(e) {
             processData: false,
             success: function (datos) {
                 console.log(datos);
-                $('#inspeccion_form')[0].reset();
 
-                tabla.ajax.reload();
+                $('#inspeccion_form')[0].reset(); // Limpiar el formulario
+                $("#col_id").val(""); // Restablecer col_id a vacío
+
+                tabla.ajax.reload(); // Recargar tabla
+
                 swal({
                     title: "HelpDesk!",
-                    text: "Completado.",
+                    text: "Solicitud Registrada.",
                     type: "success",
                     confirmButtonClass: "btn-success"
                 });
 
-                $('#modalmantenimiento').modal('hide');
+                $('#modalmantenimiento').modal('hide'); // Cerrar modal
                 $('#inspeccion_data').DataTable().ajax.reload();
             },
             error: function () {
@@ -94,6 +100,19 @@ function guardaryeditar(e) {
         });
     }
 }
+
+function asignar(col_id) {
+    $("#col_id").val(col_id);
+    swal({
+        title: "HelpDesk!",
+        text: "Se ha asignado Correctamente.",
+        type: "success"
+    });
+    $('#modalmantenimiento').on('hidden.bs.modal', function () {
+        $("#col_id").val("");
+    });
+}
+
 
 
 
@@ -151,6 +170,10 @@ $(document).ready(function () {
 
 
 
+
+
+
+
 function eliminar(equipo_id) {
     var table = $('#colaborador_data').DataTable(); // Asegurarse de que la tabla esté inicializada
     swal({
@@ -175,11 +198,6 @@ function eliminar(equipo_id) {
             });
         }
     });
-}
-
-function asignar(col_id) {
-    $("#col_id").val(col_id);
-    alert('Se asigno el colaborador')
 }
 
 $(document).on("click", "#btnnuevo", function () {
