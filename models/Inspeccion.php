@@ -177,13 +177,35 @@ class Inspeccion extends Conectar
         }
     }
 
-    public function get_equipo_x_id($equipo_id)
+    public function get_inspeccion_x_id($inspeccion_id)
     {
         $conectar = parent::conexion();
         parent::set_names();
-        $sql = "SELECT * FROM tm_equipos WHERE equipo_id = ?";
+        $sql = "SELECT 
+    tm_inspeccion.inspeccion_id,
+    tm_inspeccion.trabajo,
+    tm_inspeccion.ubicacion,
+    tm_inspeccion.numero_orden,
+    tm_inspeccion.fecha,
+    tm_colaborador.col_nombre,
+    tm_equipos_seguridad.botas, 
+    tm_equipos_seguridad.chaleco,
+     tm_equipos_seguridad.proteccion_auditiva,
+     tm_equipos_seguridad.proteccion_visual,
+      tm_equipos_seguridad.linea_vida,
+       tm_equipos_seguridad.arnes,
+        tm_equipos_seguridad.otros_equipos
+FROM 
+    tm_inspeccion
+INNER JOIN 
+    tm_colaborador 
+    ON tm_inspeccion.solicitante_id = tm_colaborador.col_id
+LEFT JOIN 
+    tm_equipos_seguridad 
+    ON tm_inspeccion.inspeccion_id = tm_equipos_seguridad.inspeccion_id;
+WHERE inspeccion_id = ?";
         $sql = $conectar->prepare($sql);
-        $sql->bindValue(1, $equipo_id);
+        $sql->bindValue(1, $inspeccion_id);
         $sql->execute();
         return $resultado = $sql->fetchAll();
     }

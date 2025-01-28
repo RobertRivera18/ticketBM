@@ -70,8 +70,8 @@ switch ($_GET["op"]) {
 
             $sub_array[] = '<td class="text-center" colspan="2">
             <div style="display: flex; justify-content: center; gap: 5px;">
-                <button type="button" onClick="editar(' . $row["inspeccion_id"] . ');" id="' . $row["inspeccion_id"] . '" class="btn btn-inline btn-warning btn-sm ladda-button">
-                    <i class="fa fa-edit"></i>
+                <button type="button" onClick="ver(' . $row["inspeccion_id"] . ');" id="' . $row["inspeccion_id"] . '" class="btn btn-inline btn-warning btn-sm ladda-button">
+                    <i class="fa fa-eye"></i>
                 </button>
                 <button type="button" onClick="eliminar(' . $row["inspeccion_id"] . ');" id="' . $row["inspeccion_id"] . '" class="btn btn-inline btn-danger btn-sm ladda-button">
                     <i class="fa fa-trash"></i>
@@ -96,22 +96,29 @@ switch ($_GET["op"]) {
         break;
 
     case "mostrar":
-        $datos = $equipo->get_equipo_x_id($_POST["equipo_id"]);
+        $datos = $inspeccion->get_inspeccion_x_id($_POST["inspeccion_id"]);
 
         if (is_array($datos) && count($datos) > 0) {
             $output = array();
             foreach ($datos as $row) {
-                $output["equipo_id"] = $row["equipo_id"];
-                $output["nombre_equipo"] = $row["nombre_equipo"];
-                $output["marca"] = $row["marca"];
-                $output["modelo"] = $row["modelo"];
-                $output["serie"] = $row["serie"];
-                $output["datos"] = $row["datos"];
+                $output["inspeccion_id"] = $row["inspeccion_id"];
+                $output["trabajo"] = $row["trabajo"];
+                $output["ubicacion"] = $row["ubicacion"];
+                $output["numero_orden"] = $row["numero_orden"];
+                $output["fecha"] = $row["fecha"];
+                $output["col_nombre"] = $row["col_nombre"];
+                $output["botas"] = $row["botas"];
+                $output["chaleco"] = $row["chaleco"];
+                $output["proteccion_auditiva"] = $row["proteccion_auditiva"];
+                $output["proteccion_visual"] = $row["proteccion_visual"];
+                $output["linea_vida"] = $row["linea_vida"];
+                $output["arnes"] = $row["arnes"];
+                $output["otros_equipos"] = $row["otros_equipos"];
+           
+
             }
             echo json_encode($output);
-        } else {
-            echo json_encode(['status' => 'error', 'message' => 'Colaborador no encontrado']);
-        }
+        } 
         break;
 
 

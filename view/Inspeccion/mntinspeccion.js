@@ -169,7 +169,9 @@ $(document).ready(function () {
 });
 
 
-
+function ver(inspeccion_id){
+    window.open('http://localhost/soporte/view/DetalleInspeccion/?ID='+ inspeccion_id +'');
+}
 
 
 
