@@ -157,83 +157,69 @@ class Inspeccion extends Conectar
         return $stmt->execute();
     }
 
-    // Método para eliminar un 
-    public function delete_equipo($equipo_id)
+    //Método para eliminar una inspeccion
+    public function delete_inspeccion($inspeccion_id)
     {
         $conectar = parent::conexion();
         parent::set_names();
 
-        // Preparamos la sentencia DELETE
-        $sql = "DELETE FROM tm_equipos WHERE equipo_id = ?";
+        $sql = "DELETE FROM tm_inspeccion WHERE inspeccion_id = ?";
         $stmt = $conectar->prepare($sql);
-        // Enlazamos el valor del parámetro
-        $stmt->bindValue(1, $equipo_id);
+        $stmt->bindValue(1, $inspeccion_id);
         $result = $stmt->execute();
-        // Retornamos un valor booleano que indica si la eliminación fue exitosa
+
         if ($result) {
-            return true;  // Eliminación exitosa
+            return true;
         } else {
-            return false;  // Hubo un error al intentar eliminar
+            return false;
         }
     }
 
+
+
+    //Funcion para obtener todos los datos de la inspeccion
     public function get_inspeccion_x_id($inspeccion_id)
-    {
-        $conectar = parent::conexion();
-        parent::set_names();
-        $sql = "SELECT 
-    tm_inspeccion.inspeccion_id,
-    tm_inspeccion.trabajo,
-    tm_inspeccion.ubicacion,
-    tm_inspeccion.numero_orden,
-    tm_inspeccion.fecha,
-    tm_colaborador.col_nombre,
-    tm_equipos_seguridad.botas, 
-    tm_equipos_seguridad.chaleco,
-     tm_equipos_seguridad.proteccion_auditiva,
-     tm_equipos_seguridad.proteccion_visual,
-      tm_equipos_seguridad.linea_vida,
-       tm_equipos_seguridad.arnes,
+{
+    $conectar = parent::conexion();
+    parent::set_names();
+    $sql = "SELECT 
+        tm_inspeccion.inspeccion_id,
+        tm_inspeccion.trabajo,
+        tm_inspeccion.ubicacion,
+        tm_inspeccion.numero_orden,
+        tm_inspeccion.fecha,
+        tm_colaborador.col_nombre,
+        tm_inspeccion.zona_resbaladiza,
+        tm_inspeccion.zona_con_desnivel,
+        tm_inspeccion.hueco_piso_danado,
+        tm_inspeccion.instalacion_mal_estado,
+        tm_inspeccion.cables_desconectados_expuestos,
+        tm_inspeccion.escalera_buen_estado,
+        tm_inspeccion.senaletica_instalada,
+        tm_equipos_seguridad.botas, 
+        tm_equipos_seguridad.chaleco,
+        tm_equipos_seguridad.proteccion_auditiva,
+        tm_equipos_seguridad.proteccion_visual,
+        tm_equipos_seguridad.linea_vida,
+        tm_equipos_seguridad.arnes,
         tm_equipos_seguridad.otros_equipos
-FROM 
-    tm_inspeccion
-INNER JOIN 
-    tm_colaborador 
-    ON tm_inspeccion.solicitante_id = tm_colaborador.col_id
-LEFT JOIN 
-    tm_equipos_seguridad 
-    ON tm_inspeccion.inspeccion_id = tm_equipos_seguridad.inspeccion_id;
-WHERE inspeccion_id = ?";
-        $sql = $conectar->prepare($sql);
-        $sql->bindValue(1, $inspeccion_id);
-        $sql->execute();
-        return $resultado = $sql->fetchAll();
-    }
+    FROM 
+        tm_inspeccion
+    INNER JOIN 
+        tm_colaborador 
+        ON tm_inspeccion.solicitante_id = tm_colaborador.col_id
+    LEFT JOIN 
+        tm_equipos_seguridad 
+        ON tm_inspeccion.inspeccion_id = tm_equipos_seguridad.inspeccion_id
+    WHERE 
+        tm_inspeccion.inspeccion_id = ?
+    GROUP BY 
+        tm_inspeccion.inspeccion_id";
 
-    public function get_equipos_disponibles()
-    {
-        $conectar = parent::conexion();
-        parent::set_names();
-        $sql = "SELECT e.*
-             FROM tm_equipos e
-             LEFT JOIN tm_cuadrilla_equipo cc ON e.equipo_id = cc.equipo_id
-             WHERE cc.equipo_id IS NULL AND e.datos=0";
-        $sql = $conectar->prepare($sql);
-        $sql->execute();
-        return $resultado = $sql->fetchAll();
-    }
+    $sql = $conectar->prepare($sql);
+    $sql->bindValue(1, $inspeccion_id, PDO::PARAM_INT);
+    $sql->execute();
+    return $sql->fetch(PDO::FETCH_ASSOC); 
+}
 
-
-    public function get_equipos_disponibles_usuarios()
-    {
-        $conectar = parent::conexion();
-        parent::set_names();
-        $sql = "SELECT e.*
-             FROM tm_equipos e
-             LEFT JOIN tm_usuario_equipo ue ON e.equipo_id = ue.equipo_id
-             WHERE ue.equipo_id IS NULL AND e.datos=0";
-        $sql = $conectar->prepare($sql);
-        $sql->execute();
-        return $resultado = $sql->fetchAll();
-    }
 }

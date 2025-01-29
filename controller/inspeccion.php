@@ -92,83 +92,22 @@ switch ($_GET["op"]) {
         break;
 
     case "eliminar":
-        $equipo->delete_equipo($_POST["equipo_id"]);
+        $inspeccion->delete_inspeccion($_POST["inspeccion_id"]);
         break;
 
-    case "mostrar":
-        $datos = $inspeccion->get_inspeccion_x_id($_POST["inspeccion_id"]);
-
-        if (is_array($datos) && count($datos) > 0) {
-            $output = array();
-            foreach ($datos as $row) {
-                $output["inspeccion_id"] = $row["inspeccion_id"];
-                $output["trabajo"] = $row["trabajo"];
-                $output["ubicacion"] = $row["ubicacion"];
-                $output["numero_orden"] = $row["numero_orden"];
-                $output["fecha"] = $row["fecha"];
-                $output["col_nombre"] = $row["col_nombre"];
-                $output["botas"] = $row["botas"];
-                $output["chaleco"] = $row["chaleco"];
-                $output["proteccion_auditiva"] = $row["proteccion_auditiva"];
-                $output["proteccion_visual"] = $row["proteccion_visual"];
-                $output["linea_vida"] = $row["linea_vida"];
-                $output["arnes"] = $row["arnes"];
-                $output["otros_equipos"] = $row["otros_equipos"];
-           
-
+        case "mostrar":
+            $inspeccion_id = isset($_POST["inspeccion_id"]) ? intval($_POST["inspeccion_id"]) : 0;
+            $datos = $inspeccion->get_inspeccion_x_id($inspeccion_id);
+            
+            if ($datos) {
+                echo json_encode($datos);
+            } else {
+                echo json_encode(["error" => "No se encontraron datos para la inspección ID $inspeccion_id"]);
             }
-            echo json_encode($output);
-        } 
-        break;
+            break;
+        
+        
 
 
-    case "combo":
-        $datos = $equipo->get_equipos_disponibles();
-        $data = array();
-        if (is_array($datos) && count($datos) > 0) {
-            foreach ($datos as $row) {
-                $data[] = array(
-                    "0" => '<button class="btn btn-warning" onclick="asignarEquipo(' . $row['equipo_id'] . ')"><span class="fa fa-plus"></span></button>',
-                    "1" => $row['nombre_equipo'],
-                    "2" => $row['marca'],
-                    "3" => $row['modelo'],
-                    "4" => $row['serie'],
-
-                );
-            }
-        }
-        $results = array(
-            "sEcho" => 1,
-            "iTotalRecords" => count($data),
-            "iTotalDisplayRecords" => count($data),
-            "aaData" => $data
-        );
-        echo json_encode($results);
-        break;
-
-        //Combo para equipos disponibles para usuarios(Administrativos)
-
-    case "comboEquipos":
-        $datos = $equipo->get_equipos_disponibles_usuarios();
-        $data = array();
-        if (is_array($datos) && count($datos) > 0) {
-            foreach ($datos as $row) {
-                $data[] = array(
-                    "0" => '<button class="btn btn-warning" onclick="asignarEquipo(' . $row['equipo_id'] . ')"><span class="fa fa-plus"></span></button>',
-                    "1" => $row['nombre_equipo'],
-                    "2" => $row['marca'],
-                    "3" => $row['modelo'],
-                    "4" => $row['serie'],
-
-                );
-            }
-        }
-        $results = array(
-            "sEcho" => 1,
-            "iTotalRecords" => count($data),
-            "iTotalDisplayRecords" => count($data),
-            "aaData" => $data
-        );
-        echo json_encode($results);
-        break;
+   
 }

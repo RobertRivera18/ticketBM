@@ -7,7 +7,7 @@
                 </button>
                 <h4 class="modal-title" id="mdltitulo"></h4>
             </div>
-            <form method="post" id="inspeccion_form">
+            <form method="post" id="inspeccion_form" enctype="multipart/form-data">
                 <div class="modal-body">
                     <input type="hidden" id="inspeccion_id" name="inspeccion_id">
                     <input type="hidden" id="col_id" name="col_id">
@@ -153,6 +153,13 @@
                         </tfoot>
                     </table>
                 </div>
+
+                <!-- Input file para imagen -->
+                <div class="form-group flex">
+                    <label for="imagen">Cargar Imagen</label>
+                    <input type="file" id="imagen" name="imagen" accept="image/*" class="form-control">
+                </div>
+
 
                 <div class="modal-footer">
                     <button type="button" class="btn btn-rounded btn-default" data-dismiss="modal">Cerrar</button>

@@ -177,7 +177,7 @@ function ver(inspeccion_id){
 
 
 function eliminar(equipo_id) {
-    var table = $('#colaborador_data').DataTable(); // Asegurarse de que la tabla esté inicializada
+    var table = $('#inspeccion_data').DataTable(); 
     swal({
         title: "HelpDesk",
         text: "¿Está seguro de eliminar el registro?",
@@ -189,7 +189,7 @@ function eliminar(equipo_id) {
         closeOnConfirm: false
     }, function (isConfirm) {
         if (isConfirm) {
-            $.post("../../controller/equipo.php?op=eliminar", { equipo_id: equipo_id }, function (data) {
+            $.post("../../controller/inspeccion.php?op=eliminar", { inspeccion_id: inspeccion_id }, function (data) {
                 table.ajax.reload(); // Recargar la tabla
                 swal({
                     title: "HelpDesk!",
