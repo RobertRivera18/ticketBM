@@ -13,7 +13,8 @@ class Inspeccion extends Conectar
         $instalacion_mal_estado,
         $desconectados_expuestos,
         $escalera_buen_estado,
-        $senaletica_instalada
+        $senaletica_instalada,
+
     ) {
         $conectar = parent::conexion();
         parent::set_names();
@@ -79,22 +80,16 @@ class Inspeccion extends Conectar
         }
     }
 
-    // Método para obtener los equipos de seguridad de una inspección
-    public function get_equipos_seguridad($inspeccion_id)
+
+    public function guardar_imagen_inspeccion($inspeccion_id, $ruta_imagen)
     {
         $conectar = parent::conexion();
-        parent::set_names();
-
-        $sql = "SELECT * FROM tm_equipos_seguridad WHERE inspeccion_id = ?";
-
+        $sql = "UPDATE tm_inspeccion SET imagen = ? WHERE inspeccion_id = ?";
         $stmt = $conectar->prepare($sql);
-        $stmt->bindValue(1, $inspeccion_id);
+        $stmt->bindValue(1, $ruta_imagen);
+        $stmt->bindValue(2, $inspeccion_id);
         $stmt->execute();
-
-        return $stmt->fetch(PDO::FETCH_ASSOC);
     }
-
-
 
     public function get_inspecciones()
     {
@@ -163,26 +158,42 @@ class Inspeccion extends Conectar
         $conectar = parent::conexion();
         parent::set_names();
 
-        $sql = "DELETE FROM tm_inspeccion WHERE inspeccion_id = ?";
-        $stmt = $conectar->prepare($sql);
-        $stmt->bindValue(1, $inspeccion_id);
-        $result = $stmt->execute();
+        try {
+            // Iniciar transacción
+            $conectar->beginTransaction();
 
-        if ($result) {
-            return true;
-        } else {
+            // Eliminar equipos de seguridad relacionados con la inspección
+            $sql_equipos = "DELETE FROM tm_equipos_seguridad WHERE inspeccion_id = ?";
+            $stmt_equipos = $conectar->prepare($sql_equipos);
+            $stmt_equipos->bindValue(1, $inspeccion_id);
+            $stmt_equipos->execute();
+
+            // Eliminar la inspección
+            $sql = "DELETE FROM tm_inspeccion WHERE inspeccion_id = ?";
+            $stmt = $conectar->prepare($sql);
+            $stmt->bindValue(1, $inspeccion_id);
+            $result = $stmt->execute();
+
+            // Confirmar transacción
+            $conectar->commit();
+
+            return $result ? true : false;
+        } catch (Exception $e) {
+            // Revertir transacción en caso de error
+            $conectar->rollBack();
             return false;
         }
     }
 
 
 
+
     //Funcion para obtener todos los datos de la inspeccion
     public function get_inspeccion_x_id($inspeccion_id)
-{
-    $conectar = parent::conexion();
-    parent::set_names();
-    $sql = "SELECT 
+    {
+        $conectar = parent::conexion();
+        parent::set_names();
+        $sql = "SELECT 
         tm_inspeccion.inspeccion_id,
         tm_inspeccion.trabajo,
         tm_inspeccion.ubicacion,
@@ -196,6 +207,7 @@ class Inspeccion extends Conectar
         tm_inspeccion.cables_desconectados_expuestos,
         tm_inspeccion.escalera_buen_estado,
         tm_inspeccion.senaletica_instalada,
+        tm_inspeccion.imagen,
         tm_equipos_seguridad.botas, 
         tm_equipos_seguridad.chaleco,
         tm_equipos_seguridad.proteccion_auditiva,
@@ -216,10 +228,9 @@ class Inspeccion extends Conectar
     GROUP BY 
         tm_inspeccion.inspeccion_id";
 
-    $sql = $conectar->prepare($sql);
-    $sql->bindValue(1, $inspeccion_id, PDO::PARAM_INT);
-    $sql->execute();
-    return $sql->fetch(PDO::FETCH_ASSOC); 
-}
-
+        $sql = $conectar->prepare($sql);
+        $sql->bindValue(1, $inspeccion_id, PDO::PARAM_INT);
+        $sql->execute();
+        return $sql->fetch(PDO::FETCH_ASSOC);
+    }
 }

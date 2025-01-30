@@ -1,5 +1,5 @@
-function init(){
-   
+function init() {
+
 }
 
 
@@ -17,7 +17,7 @@ var getUrlParameter = function getUrlParameter(sParam) {
         }
     }
 };
-$(document).ready(function(){
+$(document).ready(function () {
     var inspeccion_id = getUrlParameter('ID');
     console.log("ID obtenido de la URL:", inspeccion_id); // Verifica el ID en consola
     listardetalle(inspeccion_id);
@@ -49,7 +49,7 @@ function listardetalle(inspeccion_id) {
             $('#spinner').hide();
 
             if (typeof data === "string") {
-                data = JSON.parse(data);
+                data = JSON.parse(data); // Parseo de la respuesta en caso de que sea una cadena
             }
 
             $('#lblidinspeccion').html("Detalle Inspección - " + data.inspeccion_id);
@@ -58,6 +58,7 @@ function listardetalle(inspeccion_id) {
             $('#ubicacion').val(data.ubicacion);
             $('#numero_orden').val(data.numero_orden);
             $('#fecha').val(data.fecha);
+
             $('#zona_resbaladiza').prop('checked', data.zona_resbaladiza === 'SI').prop('disabled', data.zona_resbaladiza !== 'SI');
             $('#zona_con_desnivel').prop('checked', data.zona_con_desnivel === 'SI').prop('disabled', data.zona_con_desnivel !== 'SI');
             $('#hueco_piso_danado').prop('checked', data.hueco_piso_danado === 'SI').prop('disabled', data.hueco_piso_danado !== 'SI');
@@ -65,7 +66,7 @@ function listardetalle(inspeccion_id) {
             $('#cables_desconectados_expuestos').prop('checked', data.cables_desconectados_expuestos === 'SI').prop('disabled', data.cables_desconectados_expuestos !== 'SI');
             $('#escalera_buen_estado').prop('checked', data.escalera_buen_estado === 'SI').prop('disabled', data.escalera_buen_estado !== 'SI');
             $('#senaletica_instalada').prop('checked', data.senaletica_instalada === 'SI').prop('disabled', data.senaletica_instalada !== 'SI');
-            
+
             $('#botas').prop('checked', data.botas === 'SI').prop('disabled', data.botas !== 'SI');
             $('#chaleco').prop('checked', data.chaleco === 'SI').prop('disabled', data.chaleco !== 'SI');
             $('#proteccion_auditiva').prop('checked', data.proteccion_auditiva === 'SI').prop('disabled', data.proteccion_auditiva !== 'SI');
@@ -74,12 +75,37 @@ function listardetalle(inspeccion_id) {
             $('#arnes').prop('checked', data.arnes === 'SI').prop('disabled', data.arnes !== 'SI');
             $('#otros_equipos').val(data.otros_equipos);
 
+            // Modificación en la función listardetalle
+            if (data.imagen) {
+                // Asumiendo que las imágenes se guardan en una carpeta 'uploads' en tu servidor
+                let imagenURL = '../../public/uploads/' + data.imagen;  // Ajusta esta ruta según tu estructura de carpetas
+                console.log("URL de la imagen:", imagenURL);
+
+                // Verificar si la imagen existe antes de mostrarla
+                let img = new Image();
+                img.onload = function () {
+                    $('#imagen_inspeccion').attr('src', imagenURL).show();
+                };
+                img.onerror = function () {
+                    console.error("Error al cargar la imagen");
+                    $('#imagen_inspeccion').hide();
+                    // Opcional: Mostrar una imagen por defecto
+                    // $('#imagen_inspeccion').attr('src', '../../assets/img/no-image.png').show();
+                };
+                img.src = imagenURL;
+            } else {
+                $('#imagen_inspeccion').hide();
+            }
+
+            console.log("Datos recibidos:", data); // Imprime todos los datos recibidos
+
         } catch (error) {
             console.error("Error al parsear JSON:", error);
             alert("Hubo un error al obtener los datos.");
         }
     });
 }
+
 
 
 

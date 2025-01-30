@@ -176,7 +176,7 @@ function ver(inspeccion_id){
 
 
 
-function eliminar(equipo_id) {
+function eliminar(inspeccion_id) {
     var table = $('#inspeccion_data').DataTable(); 
     swal({
         title: "HelpDesk",
@@ -190,7 +190,7 @@ function eliminar(equipo_id) {
     }, function (isConfirm) {
         if (isConfirm) {
             $.post("../../controller/inspeccion.php?op=eliminar", { inspeccion_id: inspeccion_id }, function (data) {
-                table.ajax.reload(); // Recargar la tabla
+                table.ajax.reload();
                 swal({
                     title: "HelpDesk!",
                     text: "Registro Eliminado.",

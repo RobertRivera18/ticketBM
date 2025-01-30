@@ -35,22 +35,22 @@ if (isset($_SESSION["usu_id"])) {
     <div class="page-content">
       <div class="container-fluid">
 
-       
-          <header class="section-header">
-        <div class="tbl">
-          <div class="tbl-row">
-            <div class="tbl-cell">
-              <h3 id="lblidinspeccion">Detalle Inspeccion - 1</h3>
-              <div id="lblestado"></div>
-              <span class="label label-pill label-primary" id="lblnomusuario"></span>
-              <span class="label label-pill label-default" id="lblfechcrea"></span>
-              <ol class="breadcrumb breadcrumb-simple">
-                <li><a href="">Inspecciones</a></li>
-                <li class="active">Detalle Inspeccion</li>
-              </ol>
+
+        <header class="section-header">
+          <div class="tbl">
+            <div class="tbl-row">
+              <div class="tbl-cell">
+                <h3 id="lblidinspeccion">Detalle Inspeccion - 1</h3>
+                <div id="lblestado"></div>
+                <span class="label label-pill label-primary" id="lblnomusuario"></span>
+                <span class="label label-pill label-default" id="lblfechcrea"></span>
+                <ol class="breadcrumb breadcrumb-simple">
+                  <li><a href="">Inspecciones</a></li>
+                  <li class="active">Detalle Inspeccion</li>
+                </ol>
+              </div>
             </div>
           </div>
-        </div>
         </header>
 
         <div class="box-typical box-typical-padding">
@@ -173,6 +173,23 @@ if (isset($_SESSION["usu_id"])) {
               </fieldset>
             </div>
           </div>
+
+          <div class="row">
+    <div class="col-lg-6">
+        <fieldset class="form-group">
+            <label class="form-label semibold">Imagen de la Inspección</label>
+            <br>
+            <div class="image-container" style="border: 1px solid #ddd; padding: 10px; text-align: center;">
+                <img id="imagen_inspeccion" src="" alt="Imagen de Inspección" 
+                     style="max-width: 100%; height: auto; display: none;">
+                <div id="no-image-message" style="display: none;">
+                    No hay imagen disponible
+                </div>
+            </div>
+        </fieldset>
+    </div>
+</div>
+
 
 
 

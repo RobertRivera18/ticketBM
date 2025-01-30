@@ -7,6 +7,8 @@
                 </button>
                 <h4 class="modal-title" id="mdltitulo"></h4>
             </div>
+
+            <!----Formulario envio------>
             <form method="post" id="inspeccion_form" enctype="multipart/form-data">
                 <div class="modal-body">
                     <input type="hidden" id="inspeccion_id" name="inspeccion_id">

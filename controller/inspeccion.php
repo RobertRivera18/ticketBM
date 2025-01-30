@@ -21,8 +21,29 @@ switch ($_GET["op"]) {
                 $_POST["senaletica_instalada"]
             );
 
-            // Si la inserción de la inspección fue exitosa, insertamos los equipos
+            // Si la inserción de la inspección fue exitosa
             if ($inspeccion_id) {
+                // Manejo de la imagen
+                $ruta_imagen = null;
+                if (!empty($_FILES['imagen']['name'])) {
+                    $directorio = "public/uploads/inspecciones/";
+                    if (!is_dir($directorio)) {
+                        mkdir($directorio, 0777, true);
+                    }
+
+                    $extension = pathinfo($_FILES['imagen']['name'], PATHINFO_EXTENSION);
+                    $nombre_archivo = "inspeccion_" . $inspeccion_id . "." . $extension;
+                    $ruta_imagen = $directorio . $nombre_archivo;
+
+                    // Mover el archivo a la carpeta destino
+                    if (!move_uploaded_file($_FILES['imagen']['tmp_name'], $ruta_imagen)) {
+                        $ruta_imagen = null; 
+                    }
+                }
+
+                // Guardar la ruta de la imagen en la base de datos
+                $inspeccion->guardar_imagen_inspeccion($inspeccion_id, $ruta_imagen);
+
                 // Preparamos los datos de equipos de seguridad
                 $equipos_data = array(
                     'inspeccion_id' => $inspeccion_id,
@@ -34,10 +55,10 @@ switch ($_GET["op"]) {
                     'arnes' => isset($_POST['arnes']) ? 'SI' : 'N/A',
                     'otros_equipos' => $_POST['otros_equipos'] ?? null
                 );
-
             }
         }
         break;
+
 
 
 
@@ -95,19 +116,14 @@ switch ($_GET["op"]) {
         $inspeccion->delete_inspeccion($_POST["inspeccion_id"]);
         break;
 
-        case "mostrar":
-            $inspeccion_id = isset($_POST["inspeccion_id"]) ? intval($_POST["inspeccion_id"]) : 0;
-            $datos = $inspeccion->get_inspeccion_x_id($inspeccion_id);
-            
-            if ($datos) {
-                echo json_encode($datos);
-            } else {
-                echo json_encode(["error" => "No se encontraron datos para la inspección ID $inspeccion_id"]);
-            }
-            break;
-        
-        
+    case "mostrar":
+        $inspeccion_id = isset($_POST["inspeccion_id"]) ? intval($_POST["inspeccion_id"]) : 0;
+        $datos = $inspeccion->get_inspeccion_x_id($inspeccion_id);
 
-
-   
+        if ($datos) {
+            echo json_encode($datos);
+        } else {
+            echo json_encode(["error" => "No se encontraron datos para la inspección ID $inspeccion_id"]);
+        }
+        break;
 }
