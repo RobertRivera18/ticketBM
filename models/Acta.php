@@ -48,7 +48,9 @@ class Acta extends Conectar
             parent::set_names();
             $sql = "SELECT a.id_acta, a.tipo_acta, a.col_id, c.col_nombre, c.col_cedula, a.fecha_entrega
         FROM acta a
-        LEFT JOIN tm_colaborador c ON a.col_id = c.col_id";
+        LEFT JOIN tm_colaborador c ON a.col_id = c.col_id
+        ORDER BY a.id_acta DESC
+        ";
             $stmt = $conectar->prepare($sql);
             $stmt->execute();
 

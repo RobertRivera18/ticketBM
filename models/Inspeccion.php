@@ -13,21 +13,19 @@ class Inspeccion extends Conectar
         $instalacion_mal_estado,
         $desconectados_expuestos,
         $escalera_buen_estado,
-        $senaletica_instalada,
-
+        $senaletica_instalada
     ) {
         $conectar = parent::conexion();
         parent::set_names();
 
         try {
-            // Iniciar transacción
             $conectar->beginTransaction();
 
-            // Insertar la inspección principal
-            $sql = "INSERT INTO tm_inspeccion (trabajo, ubicacion, numero_orden, fecha, solicitante_id, 
-                zona_resbaladiza, zona_con_desnivel, hueco_piso_danado, instalacion_mal_estado, 
-                cables_desconectados_expuestos, escalera_buen_estado, senaletica_instalada) 
-                VALUES (?, ?, ?, NOW(), ?, ?, ?, ?, ?, ?, ?, ?)";
+            $sql = "INSERT INTO tm_inspeccion (
+                trabajo, ubicacion, numero_orden, fecha, solicitante_id,
+                zona_resbaladiza, zona_con_desnivel, hueco_piso_danado, instalacion_mal_estado,
+                cables_desconectados_expuestos, escalera_buen_estado, senaletica_instalada, aprobacion
+            ) VALUES (?, ?, ?, NOW(), ?, ?, ?, ?, ?, ?, ?, ?, 'pendiente')";
 
             $stmt = $conectar->prepare($sql);
             $stmt->bindValue(1, $trabajo);
@@ -45,7 +43,6 @@ class Inspeccion extends Conectar
             $stmt->execute();
             $inspeccion_id = $conectar->lastInsertId();
 
-            // Insertar los equipos de seguridad
             $sql_equipos = "INSERT INTO tm_equipos_seguridad (
                 inspeccion_id, 
                 botas,
@@ -68,13 +65,9 @@ class Inspeccion extends Conectar
             $stmt_equipos->bindValue(8, $_POST['otros_equipos'] ?? null);
 
             $stmt_equipos->execute();
-
-            // Confirmar transacción
             $conectar->commit();
-
             return $inspeccion_id;
         } catch (Exception $e) {
-            // Revertir transacción en caso de error
             $conectar->rollBack();
             return false;
         }
@@ -103,13 +96,15 @@ class Inspeccion extends Conectar
                  i.ubicacion,
                  i.numero_orden,
                  i.fecha,
-                 c.col_nombre
+                 c.col_nombre,
+                 i.aprobacion
            FROM 
                tm_inspeccion AS i
            INNER JOIN 
                tm_colaborador AS c
            ON 
                i.solicitante_id = c.col_id
+            ORDER BY i.inspeccion_id DESC
             ";
 
             $stmt = $conectar->prepare($sql);
@@ -194,43 +189,78 @@ class Inspeccion extends Conectar
         $conectar = parent::conexion();
         parent::set_names();
         $sql = "SELECT 
-        tm_inspeccion.inspeccion_id,
-        tm_inspeccion.trabajo,
-        tm_inspeccion.ubicacion,
-        tm_inspeccion.numero_orden,
-        tm_inspeccion.fecha,
-        tm_colaborador.col_nombre,
-        tm_inspeccion.zona_resbaladiza,
-        tm_inspeccion.zona_con_desnivel,
-        tm_inspeccion.hueco_piso_danado,
-        tm_inspeccion.instalacion_mal_estado,
-        tm_inspeccion.cables_desconectados_expuestos,
-        tm_inspeccion.escalera_buen_estado,
-        tm_inspeccion.senaletica_instalada,
-        tm_inspeccion.imagen,
-        tm_equipos_seguridad.botas, 
-        tm_equipos_seguridad.chaleco,
-        tm_equipos_seguridad.proteccion_auditiva,
-        tm_equipos_seguridad.proteccion_visual,
-        tm_equipos_seguridad.linea_vida,
-        tm_equipos_seguridad.arnes,
-        tm_equipos_seguridad.otros_equipos
-    FROM 
-        tm_inspeccion
-    INNER JOIN 
-        tm_colaborador 
-        ON tm_inspeccion.solicitante_id = tm_colaborador.col_id
-    LEFT JOIN 
-        tm_equipos_seguridad 
-        ON tm_inspeccion.inspeccion_id = tm_equipos_seguridad.inspeccion_id
-    WHERE 
-        tm_inspeccion.inspeccion_id = ?
-    GROUP BY 
-        tm_inspeccion.inspeccion_id";
-
+                    tm_inspeccion.inspeccion_id,
+                    tm_inspeccion.trabajo,
+                    tm_inspeccion.ubicacion,
+                    tm_inspeccion.numero_orden,
+                    tm_inspeccion.fecha,
+                    tm_colaborador.col_nombre,
+                    tm_inspeccion.zona_resbaladiza,
+                    tm_inspeccion.zona_con_desnivel,
+                    tm_inspeccion.hueco_piso_danado,
+                    tm_inspeccion.instalacion_mal_estado,
+                    tm_inspeccion.cables_desconectados_expuestos,
+                    tm_inspeccion.escalera_buen_estado,
+                    tm_inspeccion.senaletica_instalada,
+                    tm_inspeccion.imagen,
+                    tm_equipos_seguridad.botas, 
+                    tm_equipos_seguridad.chaleco,
+                    tm_equipos_seguridad.proteccion_auditiva,
+                    tm_equipos_seguridad.proteccion_visual,
+                    tm_equipos_seguridad.linea_vida,
+                    tm_equipos_seguridad.arnes,
+                    tm_equipos_seguridad.otros_equipos,
+                    tm_inspeccion.aprobacion,
+                    tm_inspeccion.motivo_rechazo
+                FROM 
+                    tm_inspeccion
+                INNER JOIN 
+                    tm_colaborador 
+                    ON tm_inspeccion.solicitante_id = tm_colaborador.col_id
+                LEFT JOIN 
+                    tm_equipos_seguridad 
+                    ON tm_inspeccion.inspeccion_id = tm_equipos_seguridad.inspeccion_id
+                WHERE 
+                    tm_inspeccion.inspeccion_id = ?
+                GROUP BY 
+                    tm_inspeccion.inspeccion_id";
+    
         $sql = $conectar->prepare($sql);
         $sql->bindValue(1, $inspeccion_id, PDO::PARAM_INT);
         $sql->execute();
         return $sql->fetch(PDO::FETCH_ASSOC);
+    }
+
+    public function update_inspeccion_status($inspeccion_id, $status)
+    {
+        $conectar = parent::conexion();
+        parent::set_names();
+
+        try {
+            $sql = "UPDATE tm_inspeccion SET aprobacion = 'aprobado' WHERE inspeccion_id = ?";
+            $stmt = $conectar->prepare($sql);
+            $stmt->bindValue(1, $inspeccion_id);
+            $result = $stmt->execute();
+            return $result;
+        } catch (Exception $e) {
+            return false;
+        }
+    }
+
+    public function reject_inspeccion($inspeccion_id, $motivo_rechazo)
+    {
+        $conectar = parent::conexion();
+        parent::set_names();
+
+        try {
+            $sql = "UPDATE tm_inspeccion SET aprobacion = 'rechazado', motivo_rechazo = ? WHERE inspeccion_id = ?";
+            $stmt = $conectar->prepare($sql);
+            $stmt->bindValue(1, $motivo_rechazo);
+            $stmt->bindValue(2, $inspeccion_id);
+            $result = $stmt->execute();
+            return $result;
+        } catch (Exception $e) {
+            return false;
+        }
     }
 }

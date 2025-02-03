@@ -37,7 +37,7 @@ switch ($_GET["op"]) {
 
                     // Mover el archivo a la carpeta destino
                     if (!move_uploaded_file($_FILES['imagen']['tmp_name'], $ruta_imagen)) {
-                        $ruta_imagen = null; 
+                        $ruta_imagen = null;
                     }
                 }
 
@@ -72,14 +72,12 @@ switch ($_GET["op"]) {
                     $sub_array[] = '<span class="label label-success">Trabajo de Instalación</span>';
                     break;
                 case 2:
-                    $sub_array[] = '<span class="label label-info">Trabajo de Mantenimiento</span>';
+                    $sub_array[] = '<span class="label label-info">Trabajo de Garantia</span>';
                     break;
                 case 3:
-                    $sub_array[] = '<span class="label label-warning">Trabajo de Reparación</span>';
+                    $sub_array[] = '<span class="label label-warning">Trabajo de Mantenimiento</span>';
                     break;
                 default:
-                    $sub_array[] = '<span class="label label-default">Trabajo No Especificado</span>';
-                    break;
             }
             $sub_array[] = $row["numero_orden"];
             $sub_array[] = $row["ubicacion"];
@@ -87,6 +85,7 @@ switch ($_GET["op"]) {
             $sub_array[] = date("d/m/Y H:i:s", strtotime($row["fecha"]));
 
             $sub_array[] = $row["col_nombre"];
+            $sub_array[] = $row["aprobacion"];
 
 
             $sub_array[] = '<td class="text-center" colspan="2">
@@ -116,14 +115,24 @@ switch ($_GET["op"]) {
         $inspeccion->delete_inspeccion($_POST["inspeccion_id"]);
         break;
 
-    case "mostrar":
-        $inspeccion_id = isset($_POST["inspeccion_id"]) ? intval($_POST["inspeccion_id"]) : 0;
-        $datos = $inspeccion->get_inspeccion_x_id($inspeccion_id);
+        case 'mostrar':
+            $inspeccion_id = $_POST['inspeccion_id'];
+            $inspeccion = new Inspeccion();
+            $data = $inspeccion->get_inspeccion_x_id($inspeccion_id);
+            echo json_encode($data);
+            break;
 
-        if ($datos) {
-            echo json_encode($datos);
-        } else {
-            echo json_encode(["error" => "No se encontraron datos para la inspección ID $inspeccion_id"]);
-        }
+
+    case "aprobar":
+        $inspeccion_id = isset($_POST["inspeccion_id"]) ? intval($_POST["inspeccion_id"]) : 0;
+        $result = $inspeccion->update_inspeccion_status($inspeccion_id, 'aprobado');
+        echo json_encode(['success' => $result]);
+        break;
+
+    case 'rechazar':
+        $inspeccion_id = $_POST['inspeccion_id'];
+        $motivo_rechazo = $_POST['motivo_rechazo'];
+        $result = $inspeccion->reject_inspeccion($inspeccion_id, $motivo_rechazo);
+        echo json_encode(['success' => $result]);
         break;
 }

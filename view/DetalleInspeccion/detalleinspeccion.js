@@ -74,6 +74,25 @@ function listardetalle(inspeccion_id) {
             $('#linea_vida').prop('checked', data.linea_vida === 'SI').prop('disabled', data.linea_vida !== 'SI');
             $('#arnes').prop('checked', data.arnes === 'SI').prop('disabled', data.arnes !== 'SI');
             $('#otros_equipos').val(data.otros_equipos);
+            $('#estado_inspeccion').val(data.aprobacion);
+
+            if (data.aprobacion === 'rechazado') {
+                $('#btn-rechazar').hide();
+                $('#btn-aprobar').hide();
+                
+            } else if (data.aprobacion === 'aprobado') {
+                $('#btn-aprobar').hide();
+                $('#btn-rechazar').hide();
+                $('#container-rechazo').hide();
+            } else {
+                $('#btn-aprobar').show();
+                $('#btn-rechazar').show();
+                $('#container-rechazo').hide();
+            }
+
+
+            $('#motivo_rechazo').val(data.motivo_rechazo);
+
 
             // Modificación en la función listardetalle
             if (data.imagen) {
@@ -97,7 +116,7 @@ function listardetalle(inspeccion_id) {
                 $('#imagen_inspeccion').hide();
             }
 
-            console.log("Datos recibidos:", data); // Imprime todos los datos recibidos
+            console.log("Datos recibidos:", data);
 
         } catch (error) {
             console.error("Error al parsear JSON:", error);
@@ -105,6 +124,64 @@ function listardetalle(inspeccion_id) {
         }
     });
 }
+//Aprobar una inspeccion
+$('#btn-aprobar').click(function () {
+    var inspeccionId = $('#lblidinspeccion').text().split('-')[1].trim();
+    $.ajax({
+        type: 'POST',
+        url: "../../controller/inspeccion.php?op=aprobar",
+        data: {
+            inspeccion_id: inspeccionId
+        },
+        success: function (response) {
+            var data = JSON.parse(response);
+            if (data.success) {
+                $('#estado_inspeccion').val('Aprobado');
+            } else {
+
+                alert('Error al aprobar la inspección');
+            }
+        },
+        error: function () {
+            alert('Error al comunicarse con el servidor');
+        }
+    });
+});
+
+$('#btn-rechazar').click(function () {
+    $('#motivo-rechazo-container').show();
+});
+$('#btn-confirmar-rechazo').click(function () {
+    var inspeccionId = $('#lblidinspeccion').text().split('-')[1].trim();
+    var motivoRechazo = $('#motivo-rechazo').val();
+
+    if (motivoRechazo.trim() === "") {
+        alert("Por favor, ingrese el motivo del rechazo.");
+        return;
+    }
+
+    $.ajax({
+        type: 'POST',
+        url: "../../controller/inspeccion.php?op=rechazar",
+        data: {
+            inspeccion_id: inspeccionId,
+            motivo_rechazo: motivoRechazo
+        },
+        success: function (response) {
+            var data = JSON.parse(response);
+            if (data.success) {
+                $('#estado_inspeccion').val('Rechazado');
+                $('#motivo-rechazo-container').hide();
+                $('#motivo-rechazo').val(''); // Limpiar el input
+            } else {
+                alert('Error al rechazar la inspección');
+            }
+        },
+        error: function () {
+            alert('Error al comunicarse con el servidor');
+        }
+    });
+});
 
 
 

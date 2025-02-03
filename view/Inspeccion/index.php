@@ -2,6 +2,8 @@
 require_once("../../config/conexion.php");
 if (isset($_SESSION["usu_id"])) {
 ?>
+
+
 	<!DOCTYPE html>
 	<html>
 	<?php require_once("../MainHead/head.php"); ?>
@@ -45,7 +47,13 @@ if (isset($_SESSION["usu_id"])) {
 								<th class="d-none d-sm-table-cell">Ubicacion</th>
 								<th class="d-none d-sm-table-cell">Fecha</th>
 								<th style="width: 10%;">Tecnico Solicitante</th>
-								<th class="text-center" style="width: 5%;"></th>
+								<th style="width: 10%;">Estado Inspeccion</th>
+								<?php
+								// Verificar si el usuario tiene rol 1 o 3 antes de mostrar la columna
+								if ($_SESSION["rol_id"] == 2 || $_SESSION["rol_id"] == 4) {
+								?>
+									<th class="text-center" style="width: 5%;"></th>
+								<?php } ?>
 
 							</tr>
 						</thead>

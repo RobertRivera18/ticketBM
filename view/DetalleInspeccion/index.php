@@ -175,27 +175,53 @@ if (isset($_SESSION["usu_id"])) {
           </div>
 
           <div class="row">
-    <div class="col-lg-6">
-        <fieldset class="form-group">
-            <label class="form-label semibold">Imagen de la Inspección</label>
-            <br>
-            <div class="image-container" style="border: 1px solid #ddd; padding: 10px; text-align: center;">
-                <img id="imagen_inspeccion" src="" alt="Imagen de Inspección" 
-                     style="max-width: 100%; height: auto; display: none;">
-                <div id="no-image-message" style="display: none;">
+            <div class="col-lg-6">
+              <fieldset class="form-group">
+                <label class="form-label semibold">Imagen de la Inspección</label>
+                <br>
+                <div class="image-container" style="border: 1px solid #ddd; padding: 10px; text-align: center;">
+                  <img id="imagen_inspeccion" src="" alt="Imagen de Inspección"
+                    style="max-width: 100%; height: auto; display: none;">
+                  <div id="no-image-message" style="display: none;">
                     No hay imagen disponible
+                  </div>
                 </div>
+              </fieldset>
             </div>
-        </fieldset>
-    </div>
-</div>
+          </div>
 
 
 
 
         </div>
 
+        <div class="col-lg-6">
+          <fieldset class="form-group">
+            <label class="form-label semibold" for="estado_inspeccion">Estado de Inspeccion</label>
+            <input type="text" class="form-control" id="estado_inspeccion" name="estado_inspeccion" readonly>
+          </fieldset>
+        </div>
 
+
+
+        <div class="col-lg-6">
+          <button class="btn btn-primary" id="btn-aprobar">Aprobar</button>
+          <button class="btn btn-danger" id="btn-rechazar">Rechazar</button>
+          <div id="motivo-rechazo-container" style="display: none; margin-top: 10px;">
+            <input class="form-control" type="text" id="motivo-rechazo" placeholder="Ingrese el motivo del rechazo">
+            <button class="btn btn-secondary" id="btn-confirmar-rechazo">Confirmar Rechazo</button>
+          </div>
+        </div>
+
+
+        <div class="row" id="container-rechazo">
+            <div class="col-lg-12">
+              <fieldset class="form-group">
+                <label class="form-label semibold" for="motivo_rechazo">Motivo de Rechazo</label>
+                <textarea class="form-control" id="motivo_rechazo" name="motivo_rechazo" rows="3" readonly></textarea>
+              </fieldset>
+            </div>
+          </div>
 
 
 

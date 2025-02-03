@@ -1,5 +1,5 @@
 <?php
-if ($_SESSION["rol_id"] == 1 || $_SESSION["rol_id"] == 3) {
+if ($_SESSION["rol_id"] == 1) {
 ?>
     <nav class="side-menu">
         <ul class="side-menu-list">
@@ -24,11 +24,20 @@ if ($_SESSION["rol_id"] == 1 || $_SESSION["rol_id"] == 3) {
                 </a>
             </li>
 
+            <li class="blue-dirty">
+                <a href="..\Inspeccion\">
+                    <span class="glyphicon glyphicon-alert"></span>
+                    <span class="lbl">Generar Permiso Trabajos Especiales</span>
+                </a>
+            </li>
+
 
         </ul>
     </nav>
 <?php
-} else {
+} 
+
+if ($_SESSION["rol_id"] == 2) {
 ?>
     <nav class="side-menu">
         <ul class="side-menu-list">
@@ -132,3 +141,21 @@ if ($_SESSION["rol_id"] == 1 || $_SESSION["rol_id"] == 3) {
 <?php
 }
 ?>
+
+<?php
+if ($_SESSION["rol_id"] == 3 || $_SESSION["rol_id"] == 4) {
+?>
+     <nav class="side-menu">
+        <ul class="side-menu-list">
+            <li class="blue-dirty">
+                <a href="..\Inspeccion\">
+                    <span class="glyphicon glyphicon-alert"></span>
+                    <span class="lbl">Generar Permiso Trabajos Especiales</span>
+                </a>
+            </li>
+
+
+        </ul>
+    </nav>
+<?php
+} 
