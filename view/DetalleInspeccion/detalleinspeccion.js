@@ -94,7 +94,6 @@ function listardetalle(inspeccion_id) {
             $('#motivo_rechazo').val(data.motivo_rechazo);
 
 
-            // Modificación en la función listardetalle
             if (data.imagen) {
                 // Asumiendo que las imágenes se guardan en una carpeta 'uploads' en tu servidor
                 let imagenURL = '../../public/uploads/' + data.imagen;  // Ajusta esta ruta según tu estructura de carpetas
@@ -137,10 +136,10 @@ $('#btn-aprobar').click(function () {
         success: function (response) {
             var data = JSON.parse(response);
             if (data.success) {
-                $('#estado_inspeccion').val('Aprobado'); // Actualizar el estado en la vista
+                $('#estado_inspeccion').val('Aprobado');
                 setTimeout(function () {
                     location.reload();
-                }, 1000); 
+                }, 500); 
             } else {
                 alert('Error al aprobar la inspección');
             }
@@ -153,13 +152,14 @@ $('#btn-aprobar').click(function () {
 
 
 $('#btn-rechazar').click(function () {
-    $('#motivo-rechazo-container').show();
+    $('#motivo-rechazo-container').show(); // Mostrar el contenedor del motivo
 });
 
 $('#btn-confirmar-rechazo').click(function () {
     var inspeccionId = $('#lblidinspeccion').text().split('-')[1].trim();
     var motivoRechazo = $('#motivo-rechazo').val();
 
+    // Validar que el motivo no esté vacío
     if (motivoRechazo.trim() === "") {
         alert("Por favor, ingrese el motivo del rechazo.");
         return;
@@ -175,20 +175,13 @@ $('#btn-confirmar-rechazo').click(function () {
         success: function (response) {
             var data = JSON.parse(response);
             if (data.success) {
-                // Actualizar el estado de la inspección
-                $('#estado_inspeccion').val('Rechazado');
-
-                // Ocultar el contenedor del motivo y limpiar el input
-                $('#motivo-rechazo-container').hide();
-                $('#motivo-rechazo').val('');
-
-                // Ocultar los botones "Aprobar" y "Rechazar"
-                $('#btn-aprobar').hide();
-                $('#btn-rechazar').hide();
-
-                // Mostrar el motivo del rechazo (si es necesario)
-                $('#motivo-rechazo-container').show();
-                $('#motivo_rechazo').val(motivoRechazo);
+                swal({
+                    title: "Error",
+                    text: "Se rehazo la inspeccion de forma correcta.",
+                    type: "error",
+                    confirmButtonClass: "btn-danger"
+                });
+                location.reload();
             } else {
                 alert('Error al rechazar la inspección');
             }
@@ -198,7 +191,6 @@ $('#btn-confirmar-rechazo').click(function () {
         }
     });
 });
-
 
 
 init();

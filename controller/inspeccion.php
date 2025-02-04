@@ -1,6 +1,8 @@
 <?php
 require_once("../config/conexion.php");
 require_once("../models/Inspeccion.php");
+require_once('../public/tbs_class.php');
+require_once('../public/plugins/tbs_plugin_opentbs.php');
 $inspeccion = new Inspeccion();
 
 switch ($_GET["op"]) {
@@ -86,6 +88,11 @@ switch ($_GET["op"]) {
 
             $sub_array[] = $row["col_nombre"];
             $sub_array[] = $row["aprobacion"];
+            $sub_array[] = '<button type="button" onClick="generar(' . $row["inspeccion_id"] . ');" 
+            id="' . $row["inspeccion_id"] . '" 
+            class="btn btn-inline btn-success btn-sm ladda-button">
+            <i class="fa fa-print"></i>
+        </button>';
 
 
             $sub_array[] = '<td class="text-center" colspan="2">
@@ -115,12 +122,12 @@ switch ($_GET["op"]) {
         $inspeccion->delete_inspeccion($_POST["inspeccion_id"]);
         break;
 
-        case 'mostrar':
-            $inspeccion_id = $_POST['inspeccion_id'];
-            $inspeccion = new Inspeccion();
-            $data = $inspeccion->get_inspeccion_x_id($inspeccion_id);
-            echo json_encode($data);
-            break;
+    case 'mostrar':
+        $inspeccion_id = $_POST['inspeccion_id'];
+        $inspeccion = new Inspeccion();
+        $data = $inspeccion->get_inspeccion_x_id($inspeccion_id);
+        echo json_encode($data);
+        break;
 
 
     case "aprobar":
@@ -134,5 +141,68 @@ switch ($_GET["op"]) {
         $motivo_rechazo = $_POST['motivo_rechazo'];
         $result = $inspeccion->reject_inspeccion($inspeccion_id, $motivo_rechazo);
         echo json_encode(['success' => $result]);
+        break;
+
+
+    case "generar_word":
+        if (isset($_GET["inspeccion_id"])) {
+            $inspeccion_id = $_GET["inspeccion_id"];
+            $datos = $inspeccion->generarWordInspeccion($inspeccion_id);
+
+            if ($datos) {
+                $TBS = new clsTinyButStrong;
+                $TBS->Plugin(TBS_INSTALL, OPENTBS_PLUGIN);
+
+                $template = '../public/templates/plantilla_inspeccion.docx';
+                $TBS->LoadTemplate($template, OPENTBS_ALREADY_UTF8);
+
+                // Asignar datos al template
+                $tipo_trabajo = '';
+                switch ($datos['trabajo']) {
+                    case 1:
+                        $tipo_trabajo = 'Instalación';
+                        break;
+                    case 2:
+                        $tipo_trabajo = 'Garantía';
+                        break;
+                    case 3:
+                        $tipo_trabajo = 'Mantenimiento';
+                        break;
+                    default:
+                        $tipo_trabajo = 'Otro';
+                        break;
+                }
+
+                $TBS->MergeField('trabajo', $tipo_trabajo);
+                $TBS->MergeField('trabajo', $datos['trabajo']);
+                $TBS->MergeField('ubicacion', $datos['ubicacion']);
+                $TBS->MergeField('numero_orden', $datos['numero_orden']);
+                $TBS->MergeField('fecha', $datos['fecha']);
+                $TBS->MergeField('solicitante', $datos['solicitante']);
+                $TBS->MergeField('zona_resbaladiza', $datos['zona_resbaladiza']);
+                $TBS->MergeField('zona_con_desnivel', $datos['zona_con_desnivel']);
+                $TBS->MergeField('hueco_piso_danado', $datos['hueco_piso_danado']);
+                $TBS->MergeField('instalacion_mal_estado', $datos['instalacion_mal_estado']);
+                $TBS->MergeField('cables_desconectados_expuestos', $datos['cables_desconectados_expuestos']);
+                $TBS->MergeField('escalera_buen_estado', $datos['escalera_buen_estado']);
+                $TBS->MergeField('senaletica_instalada', $datos['senaletica_instalada']);
+                $TBS->MergeField('aprobacion', $datos['aprobacion']);
+                $TBS->MergeField('botas', $datos['botas']);
+                $TBS->MergeField('chaleco', $datos['chaleco']);
+                $TBS->MergeField('proteccion_auditiva', $datos['proteccion_auditiva']);
+                $TBS->MergeField('proteccion_visual', $datos['proteccion_visual']);
+                $TBS->MergeField('linea_vida', $datos['linea_vida']);
+                $TBS->MergeField('arnes', $datos['arnes']);
+                $TBS->MergeField('otros_equipos', $datos['otros_equipos']);
+
+                // Nombre del archivo de salida
+                $output_file_name = 'Inspeccion_' . $inspeccion_id . '.docx';
+
+                // Descargar el archivo
+                $TBS->Show(OPENTBS_DOWNLOAD, $output_file_name);
+            } else {
+                echo "No se encontraron datos para la inspección.";
+            }
+        }
         break;
 }

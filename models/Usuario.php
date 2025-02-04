@@ -185,5 +185,44 @@
         }
 
 
+
+        public function guardarRutaArchivo($usu_id, $ruta) {
+            try {
+                $conectar = parent::conexion();
+                if (!$conectar) {
+                    throw new Exception("No se pudo establecer la conexión a la base de datos");
+                }
+                parent::set_names();
+                $sql = "UPDATE tm_usuario SET ruta_comprobante = ? WHERE usu_id = ?";
+                $stmt = $conectar->prepare($sql);
+                $stmt->bindValue(1, $ruta, PDO::PARAM_STR);
+                $stmt->bindValue(2, $usu_id, PDO::PARAM_INT);
+                if (!$stmt->execute()) {
+                    error_log("Error al ejecutar la consulta: " . implode(", ", $stmt->errorInfo()));
+                    return false;
+                }
+                return true;
+            } catch (PDOException $e) {
+                error_log("Error en guardarRutaArchivo: " . $e->getMessage());
+                return false;
+            }
+        }
+
+          //Para descargar el comprobante
+    public function obtenerRutaArchivo($usu_id) {
+        try {
+            $conectar = parent::conexion();
+            parent::set_names();
+            $sql = "SELECT ruta_comprobante FROM tm_usuario WHERE usu_id = ? LIMIT 1";
+            $stmt = $conectar->prepare($sql);
+            $stmt->bindValue(1, $usu_id, PDO::PARAM_INT);
+            $stmt->execute();
+            $resultado = $stmt->fetch(PDO::FETCH_ASSOC);
+            return $resultado ? $resultado['ruta_comprobante'] : '';
+        } catch (Exception $e) {
+            return '';
+        }
     }
+    }
+    
 ?>

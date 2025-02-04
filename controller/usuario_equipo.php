@@ -41,13 +41,13 @@ switch ($_GET["op"]) {
             id="' . $row["usu_id"] . '"class="btn btn-inline btn-success btn-sm ladda-button">
             <i class="fa fa-print"></i>
                        
-                       <button type="button" onClick="procesarArchivo();" 
-                    id="" 
+                       <button type="button" onClick="procesarArchivo(' . $row["usu_id"] . ');" 
+                    id="' . $row["usu_id"] . '" 
                     class="btn btn-inline btn-warning btn-sm ladda-button">
                     <i class="fa fa-image"></i>
                 </button>
 
-                </button> <button type="button" onClick="generar(' . $row["usu_id"] . ')" 
+                </button> <button type="button" onClick="descargarComprobante(' . $row["usu_id"] . ')" 
                            id="' . $row["usu_id"] . '" 
                                 class="btn btn-inline btn-danger btn-sm ladda-button">
                                <i class="fa fa-download"></i>
@@ -174,4 +174,90 @@ switch ($_GET["op"]) {
         }
 
         exit();
+
+    case "subirArchivo":
+        header('Content-Type: application/json');
+
+        if (!isset($_FILES['archivo']) || !isset($_POST['usu_id'])) {
+            echo json_encode(['success' => false, 'message' => 'No se recibió el archivo o el ID del acta']);
+            exit;
+        }
+
+        $usu_id = intval($_POST['usu_id']);
+        $archivo = $_FILES['archivo'];
+
+        if (empty($usu_id)) {
+            echo json_encode(['success' => false, 'message' => 'El ID del acta es inválido o está vacío']);
+            exit;
+        }
+
+        // Validar tipo de archivo
+        $tiposPermitidos = ['image/jpeg', 'image/png', 'application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+        if (!in_array($archivo['type'], $tiposPermitidos)) {
+            echo json_encode(['success' => false, 'message' => 'Tipo de archivo no permitido']);
+            exit;
+        }
+
+        // Validar tamaño (5MB máximo)
+        if ($archivo['size'] > 5 * 1024 * 1024) {
+            echo json_encode(['success' => false, 'message' => 'El archivo excede el tamaño máximo permitido (5MB)']);
+            exit;
+        }
+
+        $destino = "../public/actas/comprobantes/";
+        if (!file_exists($destino)) {
+            if (!mkdir($destino, 0777, true)) {
+                echo json_encode(['success' => false, 'message' => 'Error al crear el directorio de destino']);
+                exit;
+            }
+        }
+
+        // Generar el nombre del archivo con el nombre del colaborador
+        $extension = pathinfo($archivo['name'], PATHINFO_EXTENSION);
+        $nombreArchivo = "comprobante_firma"  . "." . $extension;
+        $rutaRelativa = "public/actas/comprobantes/entrega_equiposUsuarios/comprobantesRecepcion" . $nombreArchivo;
+        $rutaCompleta = "../" . $rutaRelativa;
+
+        if (move_uploaded_file($archivo['tmp_name'], $rutaCompleta)) {
+            $guardar = $usuario->guardarRutaArchivo($usu_id, $rutaRelativa);
+
+            if ($guardar) {
+                echo json_encode([
+                    'success' => true,
+                    'message' => 'Archivo cargado con éxito',
+                    'nombre_guardado' => $nombreArchivo,
+                    'ruta' => $rutaRelativa
+                ]);
+            } else {
+                // Si falla el guardado en BD, eliminar el archivo
+                unlink($rutaCompleta);
+                echo json_encode(['success' => false, 'message' => 'Error al guardar la ruta en la base de datos']);
+            }
+        } else {
+            echo json_encode(['success' => false, 'message' => 'Error al mover el archivo al destino']);
+        }
+        break;
+
+
+    case "obtenerRutaArchivo":
+        $usu_id = isset($_POST['usu_id']) ? intval($_POST['usu_id']) : 0;
+        $ruta = $usuario->obtenerRutaArchivo($usu_id);
+        echo json_encode(['success' => true, 'ruta' => $ruta]);
+        break;
+
+        // Caso para descargar el archivo
+    case "descargarArchivo":
+        $ruta = isset($_GET['ruta']) ? $_GET['ruta'] : '';
+        $rutaCompleta = "../" . $ruta;
+
+        if (file_exists($rutaCompleta)) {
+            header('Content-Type: application/octet-stream');
+            header('Content-Disposition: attachment; filename="' . basename($rutaCompleta) . '"');
+            header('Content-Length: ' . filesize($rutaCompleta));
+            readfile($rutaCompleta);
+            exit;
+        }
+        http_response_code(404);
+        exit;
+        break;
 }

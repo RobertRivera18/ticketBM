@@ -263,4 +263,46 @@ class Inspeccion extends Conectar
             return false;
         }
     }
+
+
+    public function generarWordInspeccion($inspeccion_id)
+{
+    $conectar = parent::conexion();
+    parent::set_names();
+    
+    $sql = "SELECT 
+                i.inspeccion_id,
+                i.trabajo,
+                i.ubicacion,
+                i.numero_orden,
+                i.fecha,
+                c.col_nombre AS solicitante,
+                i.zona_resbaladiza,
+                i.zona_con_desnivel,
+                i.hueco_piso_danado,
+                i.instalacion_mal_estado,
+                i.cables_desconectados_expuestos,
+                i.escalera_buen_estado,
+                i.senaletica_instalada,
+                i.aprobacion,
+                e.botas,
+                e.chaleco,
+                e.proteccion_auditiva,
+                e.proteccion_visual,
+                e.linea_vida,
+                e.arnes,
+                e.otros_equipos
+            FROM tm_inspeccion i
+            INNER JOIN tm_colaborador c ON i.solicitante_id = c.col_id
+            LEFT JOIN tm_equipos_seguridad e ON i.inspeccion_id = e.inspeccion_id
+            WHERE i.inspeccion_id = ?";
+    
+    $stmt = $conectar->prepare($sql);
+    $stmt->bindValue(1, $inspeccion_id, PDO::PARAM_INT);
+    $stmt->execute();
+    $datos = $stmt->fetch(PDO::FETCH_ASSOC);
+    
+    return $datos ? $datos : false;
+}
+
 }

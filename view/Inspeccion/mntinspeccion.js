@@ -174,7 +174,15 @@ function ver(inspeccion_id){
 }
 
 
-
+function generar(inspeccion_id) {
+    window.location.href = '../../controller/inspeccion.php?op=generar_word&inspeccion_id=' + inspeccion_id;
+    swal({
+        title: "HelpDesk!",
+        text: "Completado.",
+        type: "success",
+        confirmButtonClass: "btn-success"
+    });
+}
 
 function eliminar(inspeccion_id) {
     var table = $('#inspeccion_data').DataTable(); 

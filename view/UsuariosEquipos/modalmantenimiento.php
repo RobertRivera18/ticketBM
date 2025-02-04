@@ -13,7 +13,7 @@
             <form method="post" id="archivo_form" enctype="multipart/form-data">
                 <div class="modal-body">
                     <!-- Campo oculto para el ID del acta -->
-                    <input type="hidden" id="id_acta" name="id_acta">
+                    <input type="hidden" id="usu_id" name="usu_id">
                     
                     <!-- Input para el archivo -->
                     <div class="form-group">

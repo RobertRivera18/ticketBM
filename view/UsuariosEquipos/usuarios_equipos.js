@@ -166,10 +166,107 @@ function generar(usu_id) {
     });
 }
 
-function procesarArchivo() {
-    $("#modalmantenimiento").modal('show');
+function procesarArchivo(usu_id) {
+    $("#cargarArchivo").modal('show');
+     // Reset form on modal show
+     $('#archivo_form')[0].reset();
+    
+     $('#archivo_form').off('submit').on('submit', function(e) {
+         e.preventDefault();
+         
+         var formData = new FormData();
+         var fileInput = $('#archivo')[0].files[0];
+         
+         if (!fileInput) {
+             alert("Por favor, seleccione un archivo");
+             return false;
+         }
+         
+         formData.append('archivo', fileInput);
+         formData.append('usu_id', usu_id);
+         
+         $.ajax({
+             url: '../../controller/usuario_equipo.php?op=subirArchivo',
+             type: 'POST',
+             data: formData,
+             cache: false,
+             contentType: false,
+             processData: false,
+             beforeSend: function() {
+                 $('#guardarArchivo').prop('disabled', true).text('Subiendo...');
+             },
+             success: function(response) {
+                 console.log('Respuesta del servidor:', response);
+                 try {
+                     var data = typeof response === 'string' ? JSON.parse(response) : response;
+                     if (data.success) {
+                         alert(data.message);
+                         $('#cargarArchivo').modal('hide');
+                     } else {
+                         alert(data.message || 'Error al subir el archivo');
+                     }
+                 } catch (e) {
+                     console.error('Error al procesar respuesta:', e);
+                     alert('Error al procesar la respuesta del servidor');
+                 }
+             },
+             error: function(xhr, status, error) {
+                 console.error('Error AJAX:', error);
+                 console.log('Status:', status);
+                 console.log('Response:', xhr.responseText);
+                 alert('Error en la comunicación con el servidor');
+             },
+             complete: function() {
+                 $('#guardarArchivo').prop('disabled', false).text('Guardar');
+             }
+         });
+     });
 }
 
+
+function descargarComprobante(usu_id) {
+    $.ajax({
+        url: '../../controller/usuario_equipo.php?op=obtenerRutaArchivo',
+        type: 'POST',
+        data: { usu_id: usu_id },
+        success: function(response) {
+            try {
+                var data = JSON.parse(response);
+                if (data.success && data.ruta) {
+                    var xhr = new XMLHttpRequest();
+                    xhr.open('GET', '../../controller/usuario_equipo.php?op=descargarArchivo&ruta=' + encodeURIComponent(data.ruta));
+                    xhr.onload = function() {
+                        if (xhr.status === 404) {
+                            swal({
+                                title: "Error",
+                                text: "El archivo no existe o ha sido eliminado",
+                                icon: "error",
+                                button: "Aceptar"
+                            });
+                        } else {
+                            window.location.href = '../../controller/usuario_equipo.php?op=descargarArchivo&ruta=' + encodeURIComponent(data.ruta);
+                        }
+                    };
+                    xhr.send();
+                } else {
+                    swal({
+                        title: "Error",
+                        text: "No se encontró información del archivo",
+                        icon: "error",
+                        button: "Aceptar"
+                    });
+                }
+            } catch (e) {
+                swal({
+                    title: "Error",
+                    text: "Error al procesar la respuesta",
+                    icon: "error",
+                    button: "Aceptar"
+                });
+            }
+        }
+    });
+}
 $("#cuadrilla_form").on("submit", function (e) {
     e.preventDefault();
 
