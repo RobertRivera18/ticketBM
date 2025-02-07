@@ -12,13 +12,8 @@ $(document).ready(function () {
         "lengthMenu": [5, 10, 25, 75, 100],
         "aProcessing": true,
         "aServerSide": true,
+        "order": [],  // Desactiva ordenamiento automático
         dom: '<Bl<f>rtip>',
-        buttons: [
-            'copyHtml5',
-            'excelHtml5',
-            'csvHtml5',
-            'pdf'
-        ],
         buttons: [
             'copyHtml5',
             'excelHtml5',
@@ -56,6 +51,7 @@ $(document).ready(function () {
         }
     });
 });
+
 
 function listarEquipos() {
     tabla = $('#tblequipos').dataTable({

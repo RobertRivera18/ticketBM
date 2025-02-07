@@ -2,7 +2,7 @@
 class Equipo extends Conectar
 {
 
-    public function insert_equipo($nombre_equipo, $marca, $modelo, $serie,$datos)
+    public function insert_equipo($nombre_equipo, $marca, $modelo, $serie, $datos)
     {
         $conectar = parent::conexion();
         parent::set_names();
@@ -20,7 +20,7 @@ class Equipo extends Conectar
             return false;
         }
     }
-    public function update_equipo($equipo_id, $nombre_equipo, $marca, $modelo, $serie,$datos)
+    public function update_equipo($equipo_id, $nombre_equipo, $marca, $modelo, $serie, $datos)
     {
         $conectar = parent::conexion();
         parent::set_names();
@@ -57,6 +57,7 @@ class Equipo extends Conectar
                     e.modelo,
                     e.serie,
                     e.datos,
+                    e.qr_codigo,
                     u.usu_nom AS nombre_usuario,
                     u.usu_ape
                 FROM 
@@ -64,12 +65,13 @@ class Equipo extends Conectar
                 LEFT JOIN 
                     tm_usuario_equipo ue ON e.equipo_id = ue.equipo_id
                 LEFT JOIN 
-                    tm_usuario u ON ue.usu_id = u.usu_id;
+                    tm_usuario u ON ue.usu_id = u.usu_id
+                GROUP BY e.equipo_id DESC;
             ";
-    
+
             $stmt = $conectar->prepare($sql);
             $stmt->execute();
-    
+
             return $stmt->fetchAll();
         } catch (PDOException $e) {
             // Manejo de errores si la consulta falla
@@ -77,7 +79,7 @@ class Equipo extends Conectar
             return false;
         }
     }
-    
+
 
     // Método para eliminar un 
     public function delete_equipo($equipo_id)
@@ -135,5 +137,37 @@ class Equipo extends Conectar
         $sql = $conectar->prepare($sql);
         $sql->execute();
         return $resultado = $sql->fetchAll();
+    }
+
+    public function update_qr_equipo($equipo_id, $qr_codigo)
+    {
+        $conectar = parent::conexion();
+        parent::set_names();
+
+        if (!$conectar) {
+            throw new Exception("Error en la conexión a la base de datos");
+        }
+
+        $sql = "UPDATE tm_equipos SET qr_codigo = ? WHERE equipo_id = ?";
+        $stmt = $conectar->prepare($sql);
+        $stmt->bindValue(1, $qr_codigo, PDO::PARAM_STR);
+        $stmt->bindValue(2, $equipo_id, PDO::PARAM_INT);
+        return $stmt->execute();
+    }
+
+
+
+    //Obtener el Qr de equipo
+    public function get_qr_equipo($equipo_id)
+    {
+        $conectar = parent::conexion();
+        parent::set_names();
+
+        $sql = "SELECT qr_codigo FROM tm_equipos WHERE equipo_id = ?";
+        $stmt = $conectar->prepare($sql);
+        $stmt->bindValue(1, $equipo_id, PDO::PARAM_INT);
+        $stmt->execute();
+
+        return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 }
