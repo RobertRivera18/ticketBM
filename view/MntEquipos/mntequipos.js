@@ -137,6 +137,7 @@ function generarqr(equipo_id) {
                     icon: "success",
                     button: "OK"
                 });
+                tabla.ajax.reload();
             } else {
                 swal("Error", data.message, "error");
             }
@@ -161,7 +162,7 @@ function verqr(equipo_id) {
         success: function (response) {
             console.log("Respuesta del servidor:", response); // Imprimir la respuesta en consola
             if (response.status === "success") {
-                // Aquí concatenamos la ruta "../" con la ruta del QR que viene de la respuesta
+
                 var qrPath = "../" + response.qr_codigo;
 
                 // Asignamos la ruta concatenada al atributo src de la imagen

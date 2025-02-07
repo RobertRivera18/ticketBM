@@ -37,7 +37,7 @@
 				<table id="colaborador_data" class="table table-bordered table-striped table-vcenter js-dataTable-full">
 					<thead>
 						<tr>
-						<img src="../../public/qrcodes/qr_147.svg" alt="Código QR">
+						
 							<th style="width: 10%;">Nombre del Equipo</th>
 							<th style="width: 10%;">Marca</th>
 							<th class="d-none d-sm-table-cell" style="width: 5%;">Modelo Equipo</th>

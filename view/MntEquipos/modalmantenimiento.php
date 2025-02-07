@@ -66,7 +66,7 @@
                 <input type="hidden" id="equipo_id" name="equipo_id">
                 <div id="qrContainer">
                     <p>Aquí se mostrará el QR generado.</p>
-                    <img src="../../public/qrcodes/qr_147.svg" alt="Código QR" id="imagen_qr">
+                    <img src="" alt="Código QR" id="imagen_qr">
 
                 </div>
             </div>
