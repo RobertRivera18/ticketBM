@@ -4,6 +4,7 @@ require_once("../models/Usuario.php");
 require_once("../models/Usuario_Equipo.php");
 require_once('../public/tbs_class.php');
 require_once('../public/plugins/tbs_plugin_opentbs.php');
+require_once("../public/barcode/barcode.php");
 $usuario = new Usuario();
 $usuario_equipo = new Usuario_Equipo();
 
@@ -52,8 +53,19 @@ switch ($_GET["op"]) {
                                 class="btn btn-inline btn-danger btn-sm ladda-button">
                                <i class="fa fa-download"></i>
                        </button>
+
                     
                        ';
+                       if ($row['qr_codigo'] == '' || $row['qr_codigo'] == null) {
+
+                        $sub_array[] = '<button type="button" onClick="generarqr(' . $row["usu_id"] . ');" id="' . $row["usu_id"] . '" class="btn btn-inline btn-danger btn-sm ladda-button">
+                    <i class="fa fa-qrcode"></i>
+                </button>';
+                    }else{
+                        $sub_array[] = '<button type="button" onClick="verqr(' . $row["usu_id"] . ');" id="' . $row["usu_id"] . '" class="btn btn-inline btn-danger btn-sm ladda-button">
+                        <i class="fa fa-eye"></i>
+                    </button>';
+                    }
 
             // Agregar fila al resultado final
             $data[] = $sub_array;
@@ -260,4 +272,59 @@ switch ($_GET["op"]) {
         http_response_code(404);
         exit;
         break;
+
+    case "generar_qr":
+        if (!empty($_POST["usu_id"])) {
+            $usu_id = $_POST["usu_id"];
+
+            $datos = $usuario->get_usuario_id_qr($usu_id);
+            if (is_array($datos) && count($datos) > 0) {
+                $equipo_info = $datos[0];
+
+                $url_qr = "http://localhost/soporte/view/MntEquipos/equipo_info.php?usu_id=" . $usu_id;
+                $generator = new barcode_generator();
+                $svg = $generator->render_svg("qr", $url_qr, "");
+
+                $qr_filename = "qr_" . $usu_id . ".svg";
+                $qr_filepath = "../public/qrcodes/" . $qr_filename;
+
+                if (!file_exists("../public/qrcodes/")) {
+                    mkdir("../public/qrcodes/", 0777, true);
+                }
+
+                file_put_contents($qr_filepath, $svg);
+
+                if ($usuario->update_qr_usuario($usu_id, $qr_filepath)) {
+                    echo json_encode(["status" => "success", "message" => "QR generado correctamente", "qr_path" => $qr_filepath]);
+                } else {
+                    echo json_encode(["status" => "error", "message" => "Error al actualizar en la base de datos"]);
+                }
+            } else {
+                echo json_encode(["status" => "error", "message" => "Equipo no encontrado"]);
+            }
+        } else {
+            echo json_encode(["status" => "error", "message" => "Falta el ID del equipo"]);
+        }
+        break;
+
+
+        
+        case "get_qr":
+            if (isset($_POST["usu_id"])) {
+                $usu_id = intval($_POST["usu_id"]);
+                $qr = $usuario->get_qr_usuario_equipo($usu_id);
+        
+                // Verificar si el array está bien estructurado
+                if ($qr && isset($qr["qr_codigo"]) && !empty($qr["qr_codigo"])) {
+                    // Devolver solo el JSON sin advertencias
+                    echo json_encode(["status" => "success", "qr_codigo" => trim($qr["qr_codigo"])]);
+                } else {
+                    echo json_encode(["status" => "error", "message" => "No se encontró un código QR para este equipo."]);
+                }
+            } else {
+                echo json_encode(["status" => "error", "message" => "ID de equipo no proporcionado."]);
+            }
+            exit; // Asegúrate de que no haya más salida después del JSON
+            
+           
 }

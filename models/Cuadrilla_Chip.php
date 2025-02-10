@@ -121,8 +121,6 @@ class Cuadrilla_Chip extends Conectar
     {
         $conectar = parent::conexion();
         parent::set_names();
-    
-        // Incluye col.col_id en la consulta
         $sql = "SELECT col.col_id, col.col_nombre
                 FROM tm_cuadrilla_colaborador
                 INNER JOIN tm_colaborador col ON tm_cuadrilla_colaborador.col_id = col.col_id
@@ -132,7 +130,7 @@ class Cuadrilla_Chip extends Conectar
         $stmt->bindValue(1, $cua_id, PDO::PARAM_INT);
         $stmt->execute();
     
-        return $stmt->fetchAll(PDO::FETCH_ASSOC); // Devuelve un arreglo asociativo
+        return $stmt->fetchAll(PDO::FETCH_ASSOC); 
     }
     
 
@@ -143,8 +141,6 @@ class Cuadrilla_Chip extends Conectar
     {
         $conectar = parent::conexion();
         parent::set_names();
-
-        // Consulta para obtener los colaboradores de una cuadrilla
         $sql = "SELECT eq.nombre_equipo,eq.marca,eq.serie
         FROM tm_cuadrilla_equipo
         INNER JOIN tm_equipos eq ON tm_cuadrilla_equipo.equipo_id = eq.equipo_id
@@ -180,11 +176,6 @@ class Cuadrilla_Chip extends Conectar
             return false;
         }
     }
-
-
-
-
-
 
     //Metodo usado para mostar los equipos otorgados a las cuadrillas
     public function get_empresa_cuadrilla($cua_id)

@@ -50,23 +50,41 @@ class Equipo extends Conectar
             $conectar = parent::conexion();
             parent::set_names();
             $sql = "
-                SELECT 
-                    e.equipo_id,
-                    e.nombre_equipo,
-                    e.marca,
-                    e.modelo,
-                    e.serie,
-                    e.datos,
-                    e.qr_codigo,
-                    u.usu_nom AS nombre_usuario,
-                    u.usu_ape
-                FROM 
-                    tm_equipos e
-                LEFT JOIN 
-                    tm_usuario_equipo ue ON e.equipo_id = ue.equipo_id
-                LEFT JOIN 
-                    tm_usuario u ON ue.usu_id = u.usu_id
-                GROUP BY e.equipo_id DESC;
+              SELECT 
+    e.equipo_id,
+    e.nombre_equipo,
+    e.marca,
+    e.modelo,
+    e.serie,
+    e.datos,
+  
+    CASE 
+        WHEN e.datos = 2 THEN CONCAT(u.usu_nom, ' ', u.usu_ape)
+        ELSE NULL 
+    END AS nombre_usuario,
+   
+    CASE 
+        WHEN e.datos = 1 THEN cua.cua_nombre
+        ELSE NULL 
+    END AS cuadrilla_asignada
+FROM 
+    tm_equipos e
+
+LEFT JOIN 
+    tm_usuario_equipo ue ON e.equipo_id = ue.equipo_id
+LEFT JOIN 
+    tm_usuario u ON ue.usu_id = u.usu_id
+
+LEFT JOIN 
+    tm_cuadrilla_equipo cue ON e.equipo_id = cue.equipo_id
+LEFT JOIN 
+    tm_cuadrilla cua ON cue.cua_id = cua.cua_id
+WHERE 
+    e.datos IN (1, 2) 
+ORDER BY 
+    e.equipo_id DESC;
+;
+
             ";
 
             $stmt = $conectar->prepare($sql);
@@ -119,7 +137,7 @@ class Equipo extends Conectar
         $sql = "SELECT e.*
              FROM tm_equipos e
              LEFT JOIN tm_cuadrilla_equipo cc ON e.equipo_id = cc.equipo_id
-             WHERE cc.equipo_id IS NULL AND e.datos=0";
+             WHERE cc.equipo_id IS NULL AND e.datos=2";
         $sql = $conectar->prepare($sql);
         $sql->execute();
         return $resultado = $sql->fetchAll();
@@ -133,41 +151,11 @@ class Equipo extends Conectar
         $sql = "SELECT e.*
              FROM tm_equipos e
              LEFT JOIN tm_usuario_equipo ue ON e.equipo_id = ue.equipo_id
-             WHERE ue.equipo_id IS NULL AND e.datos=0";
+             WHERE ue.equipo_id IS NULL AND e.datos=2";
         $sql = $conectar->prepare($sql);
         $sql->execute();
         return $resultado = $sql->fetchAll();
     }
 
-    public function update_qr_equipo($equipo_id, $qr_codigo)
-    {
-        $conectar = parent::conexion();
-        parent::set_names();
-
-        if (!$conectar) {
-            throw new Exception("Error en la conexión a la base de datos");
-        }
-
-        $sql = "UPDATE tm_equipos SET qr_codigo = ? WHERE equipo_id = ?";
-        $stmt = $conectar->prepare($sql);
-        $stmt->bindValue(1, $qr_codigo, PDO::PARAM_STR);
-        $stmt->bindValue(2, $equipo_id, PDO::PARAM_INT);
-        return $stmt->execute();
-    }
-
-
-
-    //Obtener el Qr de equipo
-    public function get_qr_equipo($equipo_id)
-    {
-        $conectar = parent::conexion();
-        parent::set_names();
-
-        $sql = "SELECT qr_codigo FROM tm_equipos WHERE equipo_id = ?";
-        $stmt = $conectar->prepare($sql);
-        $stmt->bindValue(1, $equipo_id, PDO::PARAM_INT);
-        $stmt->execute();
-
-        return $stmt->fetch(PDO::FETCH_ASSOC);
-    }
+   
 }

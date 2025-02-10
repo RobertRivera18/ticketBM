@@ -93,27 +93,24 @@ function listardetalle(inspeccion_id) {
 
             $('#motivo_rechazo').val(data.motivo_rechazo);
 
-
             if (data.imagen) {
-                // Asumiendo que las imágenes se guardan en una carpeta 'uploads' en tu servidor
-                let imagenURL = '../../public/uploads/' + data.imagen;  // Ajusta esta ruta según tu estructura de carpetas
-                console.log("URL de la imagen:", imagenURL);
+                var qrPath = "../" + data.imagen;
+                $('#imagen_inspeccion').attr("src", qrPath);
+                console.log("URL de la imagen:", qrPath);
 
-                // Verificar si la imagen existe antes de mostrarla
-                let img = new Image();
-                img.onload = function () {
-                    $('#imagen_inspeccion').attr('src', imagenURL).show();
-                };
+                var img = new Image(); // Crear una nueva instancia de Image
                 img.onerror = function () {
                     console.error("Error al cargar la imagen");
                     $('#imagen_inspeccion').hide();
                     // Opcional: Mostrar una imagen por defecto
                     // $('#imagen_inspeccion').attr('src', '../../assets/img/no-image.png').show();
                 };
-                img.src = imagenURL;
+                img.src = qrPath;
             } else {
                 $('#imagen_inspeccion').hide();
             }
+
+            console.log("Datos recibidos:", data);
 
             console.log("Datos recibidos:", data);
 
@@ -139,7 +136,7 @@ $('#btn-aprobar').click(function () {
                 $('#estado_inspeccion').val('Aprobado');
                 setTimeout(function () {
                     location.reload();
-                }, 500); 
+                }, 500);
             } else {
                 alert('Error al aprobar la inspección');
             }

@@ -45,3 +45,24 @@
         </div>
     </div>
 </div>
+
+<div id="modalmantenimiento1" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="mdltitulo" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="mdltitulo">Código QR</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body text-center">
+                <input type="hidden" id="equipo_id" name="equipo_id">
+                <div id="qrContainer">
+                    <p>Aquí se mostrará el QR generado.</p>
+                    <img src="" alt="Código QR" id="imagen_qr">
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

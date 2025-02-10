@@ -28,7 +28,7 @@ switch ($_GET["op"]) {
                 // Manejo de la imagen
                 $ruta_imagen = null;
                 if (!empty($_FILES['imagen']['name'])) {
-                    $directorio = "public/uploads/inspecciones/";
+                    $directorio = "../public/uploads/inspecciones/";
                     if (!is_dir($directorio)) {
                         mkdir($directorio, 0777, true);
                     }

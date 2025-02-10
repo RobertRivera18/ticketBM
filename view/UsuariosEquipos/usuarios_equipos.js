@@ -263,6 +263,68 @@ function descargarComprobante(usu_id) {
         }
     });
 }
+
+
+function generarqr(usu_id) {
+    $.ajax({
+        url: "../../controller/usuario_equipo.php?op=generar_qr",
+        type: "POST",
+        data: { usu_id: usu_id },
+        dataType: "json",
+        success: function (data) {
+            if (data.status === "success") {
+                swal({
+                    title: "Código QR Generado!",
+                    text: "El código QR se ha guardado correctamente en la base de datos.",
+                    icon: "success",
+                    button: "OK"
+                });
+                tabla.ajax.reload();
+            } else {
+                swal("Error", data.message, "error");
+            }
+        },
+        error: function (xhr, status, error) {
+            console.error("Error en la solicitud:", xhr.responseText);
+            swal("Error", "Hubo un problema en la solicitud AJAX.", "error");
+        }
+    });
+}
+
+
+
+function verqr(usu_id) {
+    console.log("Equipo ID recibido:", usu_id); // Verificar el ID antes de la solicitud
+
+    $.ajax({
+        url: "../../controller/usuario_equipo.php?op=get_qr",
+        type: "post",
+        data: { action: "get_qr", usu_id: usu_id },
+        dataType: "json",
+        success: function (response) {
+            console.log("Respuesta del servidor:", response); // Imprimir la respuesta en consola
+            if (response.status === "success") {
+
+                var qrPath = "../" + response.qr_codigo;
+
+                // Asignamos la ruta concatenada al atributo src de la imagen
+                $("#imagen_qr").attr("src", qrPath);
+                // Mostramos el modal
+                $("#modalmantenimiento1").modal("show")
+            } else {
+                $("#qrContainer").html('<p>' + response.message + '</p>');
+            }
+            $("#modalmantenimiento1").modal("show");
+        },
+        error: function (jqXHR, textStatus, errorThrown) {
+            console.log("Error en AJAX:", textStatus, errorThrown); // Imprimir error en consola
+            console.log("Respuesta del servidor:", jqXHR.responseText); // Ver respuesta en caso de error
+
+            $("#qrContainer").html('<p>Error al obtener el código QR.</p>');
+            $("#modalmantenimiento1").modal("show");
+        }
+    });
+}
 $("#cuadrilla_form").on("submit", function (e) {
     e.preventDefault();
 

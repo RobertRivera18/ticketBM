@@ -45,7 +45,7 @@
 							<th class="d-none d-sm-table-cell" style="width: 5%;">Asignado</th>
 							<th class="d-none d-sm-table-cell" style="width: 5%;">Datos</th>
 							<th class="text-center" style="width: 5%;"></th>
-							<th class="text-center" style="width: 5%;"></th>
+							
 						</tr>
 					</thead>
 					<tbody>

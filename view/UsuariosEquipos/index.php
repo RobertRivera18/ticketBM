@@ -40,7 +40,8 @@ if (isset($_SESSION["usu_id"])) {
 							<tr>
 								<th class="text-center text-nowrap px-2">Usuarios</th>
 								<th class="text-center text-nowrap px-2">Equipos Entregados</th>
-								<th class="text-center px-2">Generar Actas Entrega/Descarga</th>
+								<th class="text-center px-2" style="width: 5%;">Generar Actas Entrega/Descarga</th>
+								<th class="text-center" style="width: 5%;"></th>
 							</tr>
 						</thead>
 						<tbody>

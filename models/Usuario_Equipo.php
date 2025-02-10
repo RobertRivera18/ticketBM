@@ -23,11 +23,20 @@ class Usuario_Equipo extends Conectar
         try {
             $conectar = parent::conexion();
             parent::set_names();
-            $sql = "SELECT eq.equipo_id, eq.nombre_equipo, eq.marca, eq.modelo, eq.serie
-        FROM tm_usuario_equipo
-        INNER JOIN tm_equipos eq ON tm_usuario_equipo.equipo_id = eq.equipo_id
-        WHERE tm_usuario_equipo.usu_id = ?
-        ORDER BY eq.equipo_id DESC";
+            $sql = "SELECT 
+    eq.equipo_id, 
+    eq.nombre_equipo, 
+    eq.marca, 
+    eq.modelo, 
+    eq.serie, 
+    u.usu_nom, 
+    u.usu_ape
+FROM tm_usuario_equipo
+INNER JOIN tm_equipos eq ON tm_usuario_equipo.equipo_id = eq.equipo_id
+INNER JOIN tm_usuario u ON tm_usuario_equipo.usu_id = u.usu_id
+WHERE tm_usuario_equipo.usu_id = ?
+ORDER BY eq.equipo_id DESC;
+";
 
             $stmt = $conectar->prepare($sql);
             $stmt->bindValue(1, $usu_id, PDO::PARAM_INT);
