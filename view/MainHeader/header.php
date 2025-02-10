@@ -1,7 +1,7 @@
 <header class="site-header">
     <div class="container-fluid">
 
-        <a href="#" class="site-logo">
+        <a href="http://localhost/soporte/view/Home/" class="site-logo">
             <img class="hidden-md-down" src="../../public/img/grupoBM.png" alt="">
             <img class="hidden-lg-up" src="../../public/img/grupoBM.png" alt="">
         </a>
