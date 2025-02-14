@@ -22,11 +22,12 @@
                     </div>
 
                     <div class="form-group">
-                        <label class="form-label" for="usu_correo">Correo Electronico</label>
+                        <label class="form-label" for="usu_correo">Correo Electrónico</label>
                         <input type="email" class="form-control" id="usu_correo" name="usu_correo" placeholder="test@test.com" required>
                     </div>
+
                     <div class="form-group">
-                        <label class="form-label" for="usu_cedula">Cedula de Identidad</label>
+                        <label class="form-label" for="usu_cedula">Cédula de Identidad</label>
                         <input type="text" class="form-control" id="usu_cedula" name="usu_cedula" required>
                     </div>
 
@@ -37,7 +38,7 @@
 
                     <div class="form-group">
                         <label class="form-label" for="rol_id">Rol</label>
-                        <select class="select2" id="rol_id" name="rol_id">
+                        <select class="select2 form-control" id="rol_id" name="rol_id">
                             <option value="1">Usuario</option>
                             <option value="2">Soporte</option>
                             <option value="3">Operador</option>
@@ -45,21 +46,30 @@
                         </select>
                     </div>
 
-                    
                     <div class="form-group">
                         <label class="form-label" for="empresa_id">Empresa</label>
-                        <select class="select2" id="empresa_id" name="empresa_id">
+                        <select class="select2 form-control" id="empresa_id" name="empresa_id">
                             <option value="1">Claro</option>
                             <option value="2">CNEL</option>
                             <option value="3">Administrativo</option>
-                        
                         </select>
+                    </div>
+
+                    <!-- Campos agregados para IP y MAC -->
+                    <div class="form-group">
+                        <label class="form-label" for="ip">Dirección IP (Opcional)</label>
+                        <input type="text" class="form-control" id="ip" name="ip" placeholder="Ejemplo: 192.168.1.1">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="mac">Dirección MAC (Opcional)</label>
+                        <input type="text" class="form-control" id="mac" name="mac" placeholder="Ejemplo: AA:BB:CC:DD:EE:FF">
                     </div>
 
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-rounded btn-default" data-dismiss="modal">Cerrar</button>
-                    <button type="submit" name="action" id="#" value="add" class="btn btn-rounded btn-primary">Guardar</button>
+                    <button type="submit" name="action" value="add" class="btn btn-rounded btn-primary">Guardar</button>
                 </div>
             </form>
         </div>

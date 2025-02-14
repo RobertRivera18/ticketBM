@@ -36,13 +36,15 @@ class Usuario extends Conectar
         }
     }
 
-    public function insert_usuario($usu_nom, $usu_ape, $usu_cedula, $usu_correo, $usu_pass, $rol_id, $empresa_id)
+    public function insert_usuario($usu_nom, $usu_ape, $usu_cedula, $usu_correo, $usu_pass, $rol_id, $empresa_id, $ip = null, $mac = null)
     {
         $conectar = parent::conexion();
         parent::set_names();
         $hashed_pass = MD5($usu_pass);
-        $sql = "INSERT INTO tm_usuario (usu_id, usu_nom, usu_ape, usu_cedula, usu_correo, usu_pass, rol_id, empresa_id, fech_crea, fech_modi, fech_elim, est) 
-                    VALUES (NULL, ?, ?, ?, ?, ?, ?, ?, NOW(), NULL, NULL, '1')";
+
+        $sql = "INSERT INTO tm_usuario (usu_id, usu_nom, usu_ape, usu_cedula, usu_correo, usu_pass, rol_id, empresa_id, ip, mac, fech_crea, fech_modi, fech_elim, est) 
+            VALUES (NULL, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NULL, NULL, '1')";
+
         $sql = $conectar->prepare($sql);
         $sql->bindValue(1, $usu_nom);
         $sql->bindValue(2, $usu_ape);
@@ -51,7 +53,22 @@ class Usuario extends Conectar
         $sql->bindValue(5, $hashed_pass);
         $sql->bindValue(6, $rol_id);
         $sql->bindValue(7, $empresa_id);
+
+        // Manejo de valores nulos para ip y mac
+        if ($ip !== null) {
+            $sql->bindValue(8, $ip);
+        } else {
+            $sql->bindValue(8, null, PDO::PARAM_NULL);
+        }
+
+        if ($mac !== null) {
+            $sql->bindValue(9, $mac);
+        } else {
+            $sql->bindValue(9, null, PDO::PARAM_NULL);
+        }
+
         $sql->execute();
+
         if ($sql->rowCount() > 0) {
             return $conectar->lastInsertId();
         } else {
@@ -60,20 +77,24 @@ class Usuario extends Conectar
     }
 
 
-    public function update_usuario($usu_id, $usu_nom, $usu_ape, $usu_cedula, $usu_correo, $usu_pass, $rol_id, $empresa_id)
+
+    public function update_usuario($usu_id, $usu_nom, $usu_ape, $usu_cedula, $usu_correo, $usu_pass, $rol_id, $empresa_id, $ip = null, $mac = null)
     {
         $conectar = parent::conexion();
         parent::set_names();
-        $sql = "UPDATE tm_usuario set
+
+        $sql = "UPDATE tm_usuario SET
                 usu_nom = ?,
                 usu_ape = ?,
                 usu_cedula = ?,
                 usu_correo = ?,
                 usu_pass = ?,
                 rol_id = ?,
-                empresa_id=?
-                WHERE
-                usu_id = ?";
+                empresa_id = ?,
+                ip = ?,
+                mac = ?
+            WHERE usu_id = ?";
+
         $sql = $conectar->prepare($sql);
         $sql->bindValue(1, $usu_nom);
         $sql->bindValue(2, $usu_ape);
@@ -82,10 +103,27 @@ class Usuario extends Conectar
         $sql->bindValue(5, $usu_pass);
         $sql->bindValue(6, $rol_id);
         $sql->bindValue(7, $empresa_id);
-        $sql->bindValue(8, $usu_id);
+
+        // Manejo de valores nulos para ip y mac
+        if ($ip !== null) {
+            $sql->bindValue(8, $ip);
+        } else {
+            $sql->bindValue(8, null, PDO::PARAM_NULL);
+        }
+
+        if ($mac !== null) {
+            $sql->bindValue(9, $mac);
+        } else {
+            $sql->bindValue(9, null, PDO::PARAM_NULL);
+        }
+
+        $sql->bindValue(10, $usu_id);
+
         $sql->execute();
-        return $resultado = $sql->fetchAll();
+
+        return $sql->rowCount(); // Devuelve el número de filas afectadas
     }
+
 
     public function delete_usuario($usu_id)
     {
@@ -252,7 +290,7 @@ class Usuario extends Conectar
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
-   
+
 
 
     public function get_usuario_id_qr($usu_id)
@@ -282,6 +320,21 @@ class Usuario extends Conectar
         $stmt = $conectar->prepare($sql);
         $stmt->bindValue(1, $qr_codigo, PDO::PARAM_STR);
         $stmt->bindValue(2, $usu_id, PDO::PARAM_INT);
+        return $stmt->execute();
+    }
+
+    public function get_ip_address($usu_id)
+    {
+        $conectar = parent::conexion();
+        parent::set_names();
+
+        if (!$conectar) {
+            throw new Exception("Error en la conexión a la base de datos");
+        }
+
+        $sql = "SELECT tm_usuario ip, mac  WHERE usu_id = ?";
+        $stmt = $conectar->prepare($sql);
+        $stmt->bindValue(1, $usu_id, PDO::PARAM_INT);
         return $stmt->execute();
     }
 }

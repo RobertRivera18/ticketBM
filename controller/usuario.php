@@ -5,16 +5,42 @@ $usuario = new Usuario();
 
 switch ($_GET["op"]) {
     case "guardaryeditar":
+        $ip = isset($_POST["ip"]) ? $_POST["ip"] : null;
+        $mac = isset($_POST["mac"]) ? $_POST["mac"] : null;
+
         if (empty($_POST["usu_id"])) {
-            $usuario->insert_usuario($_POST["usu_nom"], $_POST["usu_ape"], $_POST["usu_cedula"], $_POST["usu_correo"], $_POST["usu_pass"], $_POST["rol_id"], $_POST["empresa_id"]);
+            $usuario->insert_usuario(
+                $_POST["usu_nom"],
+                $_POST["usu_ape"],
+                $_POST["usu_cedula"],
+                $_POST["usu_correo"],
+                $_POST["usu_pass"],
+                $_POST["rol_id"],
+                $_POST["empresa_id"],
+                $ip,
+                $mac
+            );
         } else {
-            $usuario->update_usuario($_POST["usu_id"], $_POST["usu_nom"], $_POST["usu_ape"], $_POST["usu_cedula"], $_POST["usu_correo"], $_POST["usu_pass"], $_POST["rol_id"], $_POST["empresa_id"]);
+            $usuario->update_usuario(
+                $_POST["usu_id"],
+                $_POST["usu_nom"],
+                $_POST["usu_ape"],
+                $_POST["usu_cedula"],
+                $_POST["usu_correo"],
+                $_POST["usu_pass"],
+                $_POST["rol_id"],
+                $_POST["empresa_id"],
+                $ip,
+                $mac
+            );
         }
         break;
+
 
     case "listar":
         $datos = $usuario->get_usuario();
         $data = array();
+
         foreach ($datos as $row) {
             $sub_array = array();
             $sub_array[] = $row["usu_nom"];
@@ -22,6 +48,8 @@ switch ($_GET["op"]) {
             $sub_array[] = $row["usu_cedula"];
             $sub_array[] = $row["usu_correo"];
             $sub_array[] = $row["usu_pass"];
+
+
 
             $role_label = '';
             $empresa_label = '';
@@ -38,7 +66,6 @@ switch ($_GET["op"]) {
                     $role_label = '<span class="label label-pill label-warning">Operador</span>';
                     break;
                 default:
-                    // Si el rol no está en los valores esperados, no asignamos ninguna etiqueta
                     $role_label = '';
                     break;
             }
@@ -69,9 +96,13 @@ switch ($_GET["op"]) {
             // Agregamos las etiquetas al array final
             $sub_array[] = $role_label;
             $sub_array[] = $empresa_label;
+            // Verificación y asignación de valores para ip y mac
+            $sub_array[] = !empty($row["ip"]) ? $row["ip"] : '<span class="label label-pill label-danger">Sin asignación de red</span>';
+            $sub_array[] = !empty($row["mac"]) ? $row["mac"] : '<span class="label label-pill label-danger">Sin asignación de red</span>';
 
             $sub_array[] = '<button type="button" onClick="editar(' . $row["usu_id"] . ');"  id="' . $row["usu_id"] . '" class="btn btn-inline btn-warning btn-sm ladda-button"><i class="fa fa-edit"></i></button>';
             $sub_array[] = '<button type="button" onClick="eliminar(' . $row["usu_id"] . ');"  id="' . $row["usu_id"] . '" class="btn btn-inline btn-danger btn-sm ladda-button"><i class="fa fa-trash"></i></button>';
+
             $data[] = $sub_array;
         }
 
@@ -83,6 +114,7 @@ switch ($_GET["op"]) {
         );
         echo json_encode($results);
         break;
+
 
     case "eliminar":
         $usuario->delete_usuario($_POST["usu_id"]);
@@ -100,10 +132,15 @@ switch ($_GET["op"]) {
                 $output["usu_pass"] = $row["usu_pass"];
                 $output["rol_id"] = $row["rol_id"];
                 $output["empresa_id"] = $row["empresa_id"];
+
+                // Validación para ip y mac
+                $output["ip"] = !empty($row["ip"]) ? $row["ip"] : "Sin asignación de red";
+                $output["mac"] = !empty($row["mac"]) ? $row["mac"] : "Sin asignación de red";
             }
             echo json_encode($output);
         }
         break;
+
 
     case "total";
         $datos = $usuario->get_usuario_total_x_id($_POST["usu_id"]);

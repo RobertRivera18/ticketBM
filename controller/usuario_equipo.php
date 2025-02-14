@@ -14,7 +14,7 @@ switch ($_GET["op"]) {
         $data = array();
         foreach ($datos as $row) {
             $sub_array = array();
-            // Nombre de la cuadrilla
+
             $sub_array[] = $row["usu_nom"] . ' ' . $row["usu_ape"] . ' ' . '<span class="label label-info">' . $row["usu_correo"] . '</span>';
 
             // Manejo de equipos
@@ -38,6 +38,19 @@ switch ($_GET["op"]) {
 </div>';
             }
 
+
+
+            $ip_mac = (empty($row["ip"]) && empty($row["mac"])) ? '  <i class="fa fa-exclamation-circle" style="color: #ffc107; margin-right: 5px;" title="Sin asignacion"></i>'.'Sin Asignacion' : 
+            (!empty($row["ip"]) ? '<span class="label label-danger">' . $row["ip"] . '</span>' : '') .
+            (!empty($row["ip"]) && !empty($row["mac"]) ? '<br/>' : '') . 
+            (!empty($row["mac"]) ? '<span class="label label-info">' . $row["mac"] . '</span>' : '');
+  
+  $sub_array[] = $ip_mac;
+  
+
+
+
+
             $sub_array[] = '<button type="button" onClick="generar(' . $row["usu_id"] . ');" 
             id="' . $row["usu_id"] . '"class="btn btn-inline btn-success btn-sm ladda-button">
             <i class="fa fa-print"></i>
@@ -56,16 +69,16 @@ switch ($_GET["op"]) {
 
                     
                        ';
-                       if ($row['qr_codigo'] == '' || $row['qr_codigo'] == null) {
+            if ($row['qr_codigo'] == '' || $row['qr_codigo'] == null) {
 
-                        $sub_array[] = '<button type="button" onClick="generarqr(' . $row["usu_id"] . ');" id="' . $row["usu_id"] . '" class="btn btn-inline btn-danger btn-sm ladda-button">
+                $sub_array[] = '<button type="button" onClick="generarqr(' . $row["usu_id"] . ');" id="' . $row["usu_id"] . '" class="btn btn-inline btn-danger btn-sm ladda-button">
                     <i class="fa fa-qrcode"></i>
                 </button>';
-                    }else{
-                        $sub_array[] = '<button type="button" onClick="verqr(' . $row["usu_id"] . ');" id="' . $row["usu_id"] . '" class="btn btn-inline btn-danger btn-sm ladda-button">
+            } else {
+                $sub_array[] = '<button type="button" onClick="verqr(' . $row["usu_id"] . ');" id="' . $row["usu_id"] . '" class="btn btn-inline btn-danger btn-sm ladda-button">
                         <i class="fa fa-eye"></i>
                     </button>';
-                    }
+            }
 
             // Agregar fila al resultado final
             $data[] = $sub_array;
@@ -223,13 +236,24 @@ switch ($_GET["op"]) {
                 exit;
             }
         }
-
-        // Generar el nombre del archivo con el nombre del colaborador
+        //Generacion nombre de archivo
         $extension = pathinfo($archivo['name'], PATHINFO_EXTENSION);
-        $nombreArchivo = "comprobante_firma"  . "." . $extension;
-        $rutaRelativa = "public/actas/comprobantes/entrega_equiposUsuarios/comprobantesRecepcion" . $nombreArchivo;
+        $timestamp = time();
+        $random = rand(1000, 9999);
+        $nombreArchivo = "comprobante_firma_" . $timestamp . "_" . $random . "." . $extension;
+
+        // Definir rutas
+        $rutaRelativa = "public/actas/comprobantes/entrega_equiposUsuarios/comprobantesRecepcion/" . $nombreArchivo;
         $rutaCompleta = "../" . $rutaRelativa;
 
+
+        // Verificar si la carpeta existe, si no, crearla
+        $directorio = dirname($rutaCompleta);
+        if (!is_dir($directorio)) {
+            mkdir($directorio, 0777, true);
+        }
+
+        // Mover el archivo
         if (move_uploaded_file($archivo['tmp_name'], $rutaCompleta)) {
             $guardar = $usuario->guardarRutaArchivo($usu_id, $rutaRelativa);
 
@@ -240,15 +264,19 @@ switch ($_GET["op"]) {
                     'nombre_guardado' => $nombreArchivo,
                     'ruta' => $rutaRelativa
                 ]);
+                exit; // Finaliza el script después de enviar la respuesta
             } else {
                 // Si falla el guardado en BD, eliminar el archivo
                 unlink($rutaCompleta);
                 echo json_encode(['success' => false, 'message' => 'Error al guardar la ruta en la base de datos']);
+                exit;
             }
         } else {
             echo json_encode(['success' => false, 'message' => 'Error al mover el archivo al destino']);
+            exit;
         }
-        break;
+
+
 
 
     case "obtenerRutaArchivo":
@@ -260,18 +288,30 @@ switch ($_GET["op"]) {
         // Caso para descargar el archivo
     case "descargarArchivo":
         $ruta = isset($_GET['ruta']) ? $_GET['ruta'] : '';
-        $rutaCompleta = "../" . $ruta;
+        $ruta = str_replace(['../', '..\\'], '', $ruta); // Evita ataques de path traversal
+        $rutaCompleta = realpath("../" . $ruta); // Normaliza la ruta absoluta
 
-        if (file_exists($rutaCompleta)) {
-            header('Content-Type: application/octet-stream');
-            header('Content-Disposition: attachment; filename="' . basename($rutaCompleta) . '"');
+        if ($rutaCompleta && file_exists($rutaCompleta) && strpos($rutaCompleta, realpath("../public/actas/comprobantes")) === 0) {
+            // Detectar el tipo MIME real del archivo
+            $mimeType = mime_content_type($rutaCompleta) ?: 'application/octet-stream';
+
+            // Determinar si se muestra en una pestaña o se descarga
+            $disposition = in_array($mimeType, ['image/jpeg', 'image/png', 'image/gif', 'video/mp4'])
+                ? 'inline' // Se abre en una pestaña si es PDF, imagen o video
+                : 'attachment'; // Se descarga si es otro tipo de archivo
+
+            header('Content-Type: ' . $mimeType);
+            header('Content-Disposition: ' . $disposition . '; filename="' . basename($rutaCompleta) . '"');
             header('Content-Length: ' . filesize($rutaCompleta));
             readfile($rutaCompleta);
             exit;
         }
+
+        // Si el archivo no existe o hay intento de acceso indebido, devolver 404
         http_response_code(404);
+        echo json_encode(['success' => false, 'message' => 'Archivo no encontrado']);
         exit;
-        break;
+
 
     case "generar_qr":
         if (!empty($_POST["usu_id"])) {
@@ -308,23 +348,23 @@ switch ($_GET["op"]) {
         break;
 
 
-        
-        case "get_qr":
-            if (isset($_POST["usu_id"])) {
-                $usu_id = intval($_POST["usu_id"]);
-                $qr = $usuario->get_qr_usuario_equipo($usu_id);
-        
-                // Verificar si el array está bien estructurado
-                if ($qr && isset($qr["qr_codigo"]) && !empty($qr["qr_codigo"])) {
-                    // Devolver solo el JSON sin advertencias
-                    echo json_encode(["status" => "success", "qr_codigo" => trim($qr["qr_codigo"])]);
-                } else {
-                    echo json_encode(["status" => "error", "message" => "No se encontró un código QR para este equipo."]);
-                }
+
+    case "get_qr":
+        if (isset($_POST["usu_id"])) {
+            $usu_id = intval($_POST["usu_id"]);
+            $qr = $usuario->get_qr_usuario_equipo($usu_id);
+
+            // Verificar si el array está bien estructurado
+            if ($qr && isset($qr["qr_codigo"]) && !empty($qr["qr_codigo"])) {
+                // Devolver solo el JSON sin advertencias
+                echo json_encode(["status" => "success", "qr_codigo" => trim($qr["qr_codigo"])]);
             } else {
-                echo json_encode(["status" => "error", "message" => "ID de equipo no proporcionado."]);
+                echo json_encode(["status" => "error", "message" => "No se encontró un código QR para este equipo."]);
             }
-            exit; // Asegúrate de que no haya más salida después del JSON
-            
-           
+        } else {
+            echo json_encode(["status" => "error", "message" => "ID de equipo no proporcionado."]);
+        }
+        exit; // Asegúrate de que no haya más salida después del JSON
+
+
 }
