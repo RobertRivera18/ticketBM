@@ -40,13 +40,12 @@ switch ($_GET["op"]) {
 
 
 
-            $ip_mac = (empty($row["ip"]) && empty($row["mac"])) ? '  <i class="fa fa-exclamation-circle" style="color: #ffc107; margin-right: 5px;" title="Sin asignacion"></i>'.'Sin Asignacion' : 
-            (!empty($row["ip"]) ? '<span class="label label-danger">' . $row["ip"] . '</span>' : '') .
-            (!empty($row["ip"]) && !empty($row["mac"]) ? '<br/>' : '') . 
-            (!empty($row["mac"]) ? '<span class="label label-info">' . $row["mac"] . '</span>' : '');
-  
-  $sub_array[] = $ip_mac;
-  
+            $ip_mac = (empty($row["ip"]) && empty($row["mac"])) ? '  <i class="fa fa-exclamation-circle" style="color: #ffc107; margin-right: 5px;" title="Sin asignacion"></i>' . 'Sin Asignacion' : (!empty($row["ip"]) ? '<span class="label label-danger">' . $row["ip"] . '</span>' : '') .
+                (!empty($row["ip"]) && !empty($row["mac"]) ? '<br/>' : '') .
+                (!empty($row["mac"]) ? '<span class="label label-info">' . $row["mac"] . '</span>' : '');
+
+            $sub_array[] = $ip_mac;
+
 
 
 

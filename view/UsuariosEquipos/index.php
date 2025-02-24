@@ -6,6 +6,8 @@ if (isset($_SESSION["usu_id"])) {
 	<html>
 	<?php require_once("../MainHead/head.php"); ?>
 	<title>Admin Soporte Tecnico</>::Asignacion Equipos/Usuarios</title>
+	<meta charset="utf-8">
+
 	</head>
 
 	<body class="with-side-menu">
@@ -23,10 +25,10 @@ if (isset($_SESSION["usu_id"])) {
 					<div class="tbl">
 						<div class="tbl-row">
 							<div class="tbl-cell">
-								<h3>Asignación Equipos-Usuarios</h3>
+								<h3>Asignacion Equipos-Usuarios</h3>
 								<ol class="breadcrumb breadcrumb-simple">
 									<li><a href="#">Home</a></li>
-									<li class="active">Asignación de Equipos</li>
+									<li class="active">Asignacion de Equipos</li>
 								</ol>
 							</div>
 						</div>
@@ -40,7 +42,7 @@ if (isset($_SESSION["usu_id"])) {
 							<tr>
 								<th class="text-center text-nowrap px-2">Usuarios</th>
 								<th class="text-center text-nowrap px-2">Equipos Entregados</th>
-								<th class="text-center text-nowrap px-2">IP/MAC</th>
+								<!-- <th class="text-center text-nowrap px-2">IP/MAC</th> -->
 								<th class="text-center px-2" style="width: 5%;">Generar Actas Entrega/Descarga</th>
 								<th class="text-center" style="width: 5%;"></th>
 							</tr>

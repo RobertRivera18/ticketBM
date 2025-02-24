@@ -1,5 +1,152 @@
 var tabla;
 
+
+function init() {
+    $("#documento_form").on("submit", function (e) {
+        guardaryeditar(e);
+    });
+}
+
+
+
+$(document).ready(function () {
+    $("#tabla_cuadrillas, #tabla_equipos").hide();
+    $(document).on("click", "#btnnuevo", function () {
+        $('#modalmantenimiento').modal('show');
+        $("#tipo_acta").val(1).trigger('change');
+        $("#tabla_cuadrillas, #tabla_equipos").hide();
+    });
+
+
+    $("#tipo_acta").on("change", function () {
+        let tipo = $(this).val();
+        // Acta de Entrega Credencial
+        if (tipo == "2") {
+            $("#tabla_cuadrillas").show();
+            $("#tabla_equipos").hide();
+            listarColaboradores();
+            // Acta de Entrega Equipo
+        } else if (tipo == "3") {
+            $("#tabla_cuadrillas, #tabla_equipos").show();
+            listarColaboradores();
+            listarEquipos();
+        } else {
+            $("#tabla_cuadrillas, #tabla_equipos").hide();
+        }
+    });
+
+    // Cuando se cierra el modal, restablecer los valores
+    $('#modalmantenimiento').on('hidden.bs.modal', function () {
+        $("#tipo_acta").val("").trigger('change');
+        $("#tabla_cuadrillas, #tabla_equipos").hide();
+    });
+});
+
+function asignar(col_id, event) {
+    if (event) {
+        event.preventDefault();
+        event.stopPropagation();
+    }
+
+    $("#col_id").val(col_id);
+    swal({ 
+        title: "HelpDesk!",
+        text: "Colaborador seleccionado correctamente.",
+        icon: "info",
+        buttons: false, 
+        timer: 2000 
+    });
+    
+}
+
+
+
+
+
+
+function asignarEquipo(equipo_id, event) {
+    if (event) {
+        event.preventDefault();
+        event.stopPropagation();
+    }
+    $("#equipo_id").val(equipo_id);
+    swal({ 
+        title: "HelpDesk!",
+        text: "Equipo seleccionado correctamente.",
+        icon: "info",
+        buttons: false, 
+        timer: 2000 
+    });
+    
+}
+
+function guardaryeditar(e) {
+    e.preventDefault();
+
+    // Obtener los valores de los campos del formulario
+    let tipo_acta = $("#tipo_acta").val();
+    let col_id = $("#col_id").val();
+    let equipo_id = $("#equipo_id").val();
+
+    // Validar que col_id no esté vacío
+    if (!col_id || col_id.trim() === "") {
+        swal({
+            title: "Error",
+            text: "Por favor, selecciona un colaborador antes de guardar.",
+            icon: "error",
+            confirmButtonClass: "btn-danger"
+        });
+        return;
+    }
+
+   
+    let url = "../../controller/acta.php?op=asignar";  // Caso por defecto
+    let data = { tipo_acta, col_id };
+
+    // Si tipo_acta es igual a 3, cambiar la URL y agregar equipo_id a los datos
+    if (tipo_acta == 3) {
+        url = "../../controller/acta.php?op=asignarEquipo";
+        data.equipo_id = equipo_id;  // Añadir equipo_id solo si tipo_acta es 3
+    }
+
+    // Realizar la solicitud AJAX
+    $.ajax({
+        url: url,
+        type: "POST",
+        data: data,
+        success: function (datos) {
+            console.log(datos);
+            // Limpiar el formulario y actualizar la tabla después de la operación
+            $('#documento_form')[0].reset();
+            $("#col_id").val("");
+            tabla.ajax.reload();
+
+            // Mostrar un mensaje de éxito
+            swal({
+                title: "HelpDesk!",
+                text: "Acta  Registrada.",
+                icon: "success",
+                confirmButtonClass: "btn-success"
+            });
+
+            // Cerrar el modal y recargar la tabla de datos
+            $('#modalmantenimiento').modal('hide');
+            $('#documento_data').DataTable().ajax.reload();
+        
+        },
+        error: function () {
+            swal({
+                title: "Error",
+                text: "Ocurrió un problema al guardar los datos.",
+                icon: "error",
+                confirmButtonClass: "btn-danger"
+            });
+        }
+    });
+}
+
+
+
 function listarEquipos() {
     tabla = $('#tblequipos').dataTable(
         {
@@ -7,7 +154,6 @@ function listarEquipos() {
             "aServerSide": true,
             dom: 'Bfrtip',
             buttons: [
-
             ],
             "ajax":
             {
@@ -80,7 +226,10 @@ function listarColaboradores() {
         }).DataTable();
 
 }
-function asignar(col_id) {
+
+
+
+/* function asignar(col_id) {
     var tipo_acta = $("#tipo_acta").val();
     $.ajax({
         url: "../../controller/acta.php?op=asignar",
@@ -91,16 +240,15 @@ function asignar(col_id) {
         },
         success: function (response) {
             try {
-                // Intentamos parsear la respuesta JSON
                 var res = JSON.parse(response);
 
                 if (res.status === "success") {
                     swal({
-                        title: "¡Éxito!",
-                        text: "Colaborador asignado correctamente.",
-                        type: "success",
-                        confirmButtonClass: "btn-success"
+                        title: "HelpDesk!",
+                        text: "Se ha asignado Correctamente.",
+                        type: "success"
                     });
+
                     $('#documento_data').DataTable().ajax.reload();
                 } else {
                     swal({
@@ -119,69 +267,122 @@ function asignar(col_id) {
                     confirmButtonClass: "btn-danger"
                 });
             }
-        },
-        error: function (error) {
-            console.error("Error en la asignación:", error);
-            swal({
-                title: "Error",
-                text: "No se pudo completar la asignación del colaborador.",
-                type: "error",
-                confirmButtonClass: "btn-danger"
-            });
         }
     });
-}
+
+} */
+
+// Función para seleccionar el colaborador
+// function asignar(col_id, e) {
+//     e.preventDefault(); // Previene cualquier acción predeterminada (por si hay un evento de submit)
+//     $("#col_id").val(col_id); // Guarda el ID del colaborador seleccionado en el input
+
+// }
+
+// Función para seleccionar el equipo
 
 
-function asignarEquipo(equipo_id) {
-    var tipo_acta = $("#tipo_acta").val();
-    $.ajax({
-        url: "../../controller/acta.php?op=asignarEquipo",
-        type: "POST",
-        data: {
-            tipo_acta: tipo_acta,
-            equipo_id: equipo_id
-        },
-        success: function (response) {
-            try {
-                var res = JSON.parse(response);
+// Función para asignar colaborador y equipo
+// Función para seleccionar colaborador sin cerrar el modal
 
-                if (res.status === "success") {
-                    swal({
-                        title: "¡Éxito!",
-                        text: "Colaborador asignado correctamente.",
-                        type: "success",
-                        confirmButtonClass: "btn-success"
-                    });
 
-                    // Actualizamos la tabla para reflejar cambios
-                    $('#documento_data').DataTable().ajax.reload();
-                } else {
-                    swal({
-                        title: "Error",
-                        text: res.message || "Ocurrió un problema al asignar el colaborador.",
-                        type: "error",
-                        confirmButtonClass: "btn-danger"
-                    });
-                }
-            } catch (error) {
-                console.error("Error al procesar la respuesta:", error);
-            }
-        },
-        error: function (error) {
-            console.error("Error en la asignación:", error);
-            swal({
-                title: "Error",
-                text: "No se pudo completar la asignación del colaborador.",
-                type: "error",
-                confirmButtonClass: "btn-danger"
-            });
-        }
-    });
-}
+
+
+
+
+
+
+// // Función para asignar el equipo al colaborador y registrar el acta
+// function guardarActa(e) {
+//     e.preventDefault();
+//     if ($(e.originalEvent.submitter).attr("id") === "guardarBtn") {
+//         var tipo_acta = $("#tipo_acta").val();
+//         var col_id = $("#col_id").val();
+//         var equipo_id = $("#equipo_id").val();
+//         console.log(col_id);
+//         console.log(equipo_id)
+
+//         if (!col_id) {
+//             swal({
+//                 title: "Error",
+//                 text: "Debe seleccionar un colaborador antes de continuar.",
+//                 type: "warning",
+//                 confirmButtonClass: "btn-warning"
+//             });
+//             return;
+//         }
+
+//         if (!equipo_id) {
+//             swal({
+//                 title: "Error",
+//                 text: "Debe seleccionar un equipo antes de continuar.",
+//                 type: "warning",
+//                 confirmButtonClass: "btn-warning"
+//             });
+//             return;
+//         }
+
+//         // Enviar los datos al backend
+//         $.ajax({
+//             url: "../../controller/acta.php?op=asignarEquipo",
+//             type: "POST",
+//             data: {
+//                 tipo_acta: tipo_acta,
+//                 col_id: col_id,
+//                 equipo_id: equipo_id
+//             },
+//             success: function (response) {
+//                 try {
+//                     var res = JSON.parse(response);
+
+//                     if (res.status === "success") {
+//                         swal({
+//                             title: "¡Éxito!",
+//                             text: "Acta registrada correctamente.",
+//                             type: "success",
+//                             confirmButtonClass: "btn-success"
+//                         });
+
+//                         // Recargar las tablas sin cerrar el modal
+//                         $('#documento_data').DataTable().ajax.reload();
+//                         $('#tblcuadrillas').DataTable().ajax.reload();
+//                         $('#tblequipos').DataTable().ajax.reload();
+
+//                         // Limpiar los campos para una nueva asignación
+//                         $("#col_id").val('');
+//                         $("#equipo_id").val('');
+//                     } else {
+//                         swal({
+//                             title: "Error",
+//                             text: res.message || "Ocurrió un problema al registrar el acta.",
+//                             type: "error",
+//                             confirmButtonClass: "btn-danger"
+//                         });
+//                     }
+//                 } catch (error) {
+//                     console.error("Error al procesar la respuesta:", error);
+//                 }
+//             },
+//             error: function (error) {
+//                 console.error("Error en la asignación:", error);
+//                 swal({
+//                     title: "Error",
+//                     text: "No se pudo completar la asignación.",
+//                     type: "error",
+//                     confirmButtonClass: "btn-danger"
+//                 });
+//             }
+//         });
+//     }
+// }
+
+
+
+
+//Funcion para eliminar un acta 
 
 function eliminarActa(id_acta) {
-    $('#documento_data').DataTable().ajax.reload();// Asegurarse de que la tabla esté inicializada
+    var table = $('#documento_data').DataTable(); // Asegurarse de que la tabla esté inicializada$('#documento_data').DataTable().ajax.reload();// Asegurarse de que la tabla esté inicializada
     swal({
         title: "HelpDesk",
         text: "¿Está seguro de eliminar el registro?",
@@ -194,7 +395,7 @@ function eliminarActa(id_acta) {
     }, function (isConfirm) {
         if (isConfirm) {
             $.post("../../controller/acta.php?op=eliminarActa", { id_acta: id_acta }, function (data) {
-                tabla.ajax.reload();
+                table.ajax.reload(); // Recargar la tabla
                 swal({
                     title: "HelpDesk!",
                     text: "Registro Eliminado.",
@@ -206,8 +407,7 @@ function eliminarActa(id_acta) {
     });
 }
 
-
-
+//Lista las Actas
 $(document).ready(function () {
     tabla = $('#documento_data').DataTable({
         "lengthMenu": [5, 10, 25, 75, 100],//mostramos el menú de registros a revisar
@@ -269,49 +469,26 @@ function generar(id_acta) {
     });
 }
 
-
-var tipo_acta = $("#tipo_acta").val();
-$("#tipo_acta").on("change", function () {
-    tipo_acta = $(this).val();
-    if (tipo_acta == 1) {
-        $('#mdltitulo').html('Nuevo Registro - Listar Colaboradores');
-        $('#tablaequipos').hide();
-        listarColaboradores(); // Recarga los colaboradores
-    } else if (tipo_acta == 2) {
-        // Si el tipo de acta no es 1, actualizar solo el título
-        $('#mdltitulo').html('Nuevo Registro-Lista de Equipos');
-        $('#tabla_cuadrillas').hide();
-        listarEquipos();
-
-
-    }
-});
-
-$(document).on("click", "#btnnuevo", function () {
-    // Mostrar el modal al hacer clic en el botón de nuevo
-    $('#modalmantenimiento').modal('show');
-});
-
 function procesarArchivo(id_acta) {
     $('#cargarArchivo').modal('show');
-    
+
     // Reset form on modal show
     $('#archivo_form')[0].reset();
-    
-    $('#archivo_form').off('submit').on('submit', function(e) {
+
+    $('#archivo_form').off('submit').on('submit', function (e) {
         e.preventDefault();
-        
+
         var formData = new FormData();
         var fileInput = $('#archivo')[0].files[0];
-        
+
         if (!fileInput) {
             alert("Por favor, seleccione un archivo");
             return false;
         }
-        
+
         formData.append('archivo', fileInput);
         formData.append('id_acta', id_acta);
-        
+
         $.ajax({
             url: '../../controller/acta.php?op=subirArchivo',
             type: 'POST',
@@ -319,10 +496,10 @@ function procesarArchivo(id_acta) {
             cache: false,
             contentType: false,
             processData: false,
-            beforeSend: function() {
+            beforeSend: function () {
                 $('#guardarArchivo').prop('disabled', true).text('Subiendo...');
             },
-            success: function(response) {
+            success: function (response) {
                 console.log('Respuesta del servidor:', response);
                 try {
                     var data = typeof response === 'string' ? JSON.parse(response) : response;
@@ -337,13 +514,13 @@ function procesarArchivo(id_acta) {
                     alert('Error al procesar la respuesta del servidor');
                 }
             },
-            error: function(xhr, status, error) {
+            error: function (xhr, status, error) {
                 console.error('Error AJAX:', error);
                 console.log('Status:', status);
                 console.log('Response:', xhr.responseText);
                 alert('Error en la comunicación con el servidor');
             },
-            complete: function() {
+            complete: function () {
                 $('#guardarArchivo').prop('disabled', false).text('Guardar');
             }
         });
@@ -355,13 +532,13 @@ function descargarComprobante(id_acta) {
         url: '../../controller/acta.php?op=obtenerRutaArchivo',
         type: 'POST',
         data: { id_acta: id_acta },
-        success: function(response) {
+        success: function (response) {
             try {
                 var data = JSON.parse(response);
                 if (data.success && data.ruta) {
                     var xhr = new XMLHttpRequest();
                     xhr.open('GET', '../../controller/acta.php?op=descargarArchivo&ruta=' + encodeURIComponent(data.ruta));
-                    xhr.onload = function() {
+                    xhr.onload = function () {
                         if (xhr.status === 404) {
                             swal({
                                 title: "Error",
@@ -396,3 +573,4 @@ function descargarComprobante(id_acta) {
 
 
 
+init();

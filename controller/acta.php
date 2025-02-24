@@ -12,7 +12,7 @@ switch ($_GET["op"]) {
 
 
     case "asignarEquipo":
-        $acta->insert_actaEquipos($_POST["tipo_acta"], $_POST["equipo_id"]);
+        $acta->insert_actaEquipos($_POST["tipo_acta"], $_POST["col_id"], $_POST["equipo_id"]);
         break;
     case "listar":
         // Obtener los datos del acta
@@ -24,10 +24,10 @@ switch ($_GET["op"]) {
 
             // Asignar el tipo de acta
             switch ($row["tipo_acta"]) {
-                case 1:
+                case 2:
                     $sub_array[] = '<span class="label label-pill label-info">Acta de Entrega Credencial</span>';
                     break;
-                case 2:
+                case 3:
                     $sub_array[] = '<span class="label label-pill label-danger">Acta de Entrega de Equipos</span>';
                     break;
                 default:
@@ -35,7 +35,7 @@ switch ($_GET["op"]) {
             }
 
             // Validamos la prima columna del registro a listar
-            if ($row["tipo_acta"] == 1) {
+            if ($row["tipo_acta"] == 2) {
                 $sub_array[] = 'Se entrego credencial';
             } else {
                 // Manejo de equipos asignados
@@ -55,12 +55,8 @@ switch ($_GET["op"]) {
             }
 
 
-            if ($row["tipo_acta"] == 1) {
-                $sub_array[] = $row["col_nombre"];
-            } else {
-                $sub_array[] = '';
-            }
 
+            $sub_array[] = $row["col_nombre"];
 
             $sub_array[] = '<button type="button" onClick="generar(' . $row["id_acta"] . ');" 
                     id="' . $row["id_acta"] . '" 
@@ -119,71 +115,80 @@ switch ($_GET["op"]) {
 
         break;
 
-    case "generar_word":
-        $id_acta = isset($_GET['id_acta']) ? intval($_GET['id_acta']) : 0;
-        $datos = $acta->get_acta_by_id($id_acta);
 
-        if (!$datos) {
-            echo json_encode(["status" => "error", "message" => "No se encontró el acta."]);
+        case "generar_word":
+            $id_acta = isset($_GET['id_acta']) ? intval($_GET['id_acta']) : 0;
+            $tipo_acta = isset($_GET['tipo_acta']) ? intval($_GET['tipo_acta']) : 0;
+            $datos = $acta->get_acta_by_id($id_acta, $tipo_acta);
+         
+        
+            if (!$datos) {
+                echo json_encode(["status" => "error", "message" => "No se encontró el acta."]);
+                exit();
+            }
+        
+            $TBS = new clsTinyButStrong;
+            $TBS->Plugin(TBS_INSTALL, OPENTBS_PLUGIN);
+        
+            if ($datos['tipo_acta'] == 2) {
+                // Caso: Acta de entrega
+                $template = '../public/templates/acta.docx';
+                $TBS->LoadTemplate($template, OPENTBS_ALREADY_UTF8);
+        
+                $TBS->MergeField('pro.colaborador', $datos['col_nombre'] ?? 'Sin asignar');
+                $TBS->MergeField('pro.tipo', "Acta de Entrega");
+                $TBS->MergeField('pro.cedula', $datos['col_cedula']);
+                $TBS->MergeField('pro.fecha', date('d/m/Y'));
+        
+                $file_name = 'ACTA_ENTREGA_CREDENCIAL' . $datos['col_cedula'] . "_" . $datos['col_nombre'] . "_" . date('Y-m-d') . ".docx";
+            } elseif ($datos['tipo_acta'] == 3) {
+         
+                // Caso: Acta de descarga (equipo)
+                $template = '../public/templates/acta_entregaequipos_colaboradores.docx';
+                $TBS->LoadTemplate($template, OPENTBS_ALREADY_UTF8);
+        
+                // Campos del colaborador
+                $TBS->MergeField('pro.id', $datos['id_acta']);
+                $TBS->MergeField('fecha', date('d/m/Y'));
+                $TBS->MergeField('pro.cedula', $datos['col_cedula']);
+                $TBS->MergeField('pro.colaborador', $datos['col_nombre'] ?? 'Sin asignar');
+        
+              
+        
+                $TBS->MergeField('pro.nombre_equipo', $datos['nombre_equipo'] ?? 'Sin asignar');
+                $TBS->MergeField('pro.marca', $datos['marca'] ?? 'Sin asignar');
+                $TBS->MergeField('pro.modelo', $datos['modelo'] ?? 'Sin asignar');
+                $TBS->MergeField('pro.serie', $datos['serie'] ?? 'Sin asignar');
+        
+                $file_name = "acta_descarga_" . $datos['col_nombre'] . "-" . $datos['col_cedula'] . "_" . date('Y-m-d') . ".docx";
+            } else {
+                echo json_encode(["status" => "error", "message" => "El tipo de acta no es válido."]);
+                exit();
+            }
+        
+            $save_path = "../public/actas/credencialesCuadrillas/" . $file_name;
+            $TBS->Show(OPENTBS_FILE, $save_path);
+        
+            // Descargar el archivo
+            if (file_exists($save_path)) {
+                header('Content-Description: File Transfer');
+                header('Content-Type: application/octet-stream');
+                header('Content-Disposition: attachment; filename="' . basename($file_name) . '"');
+                header('Expires: 0');
+                header('Cache-Control: must-revalidate');
+                header('Pragma: public');
+                header('Content-Length: ' . filesize($save_path));
+                readfile($save_path);
+                exit;
+            } else {
+                echo "El archivo no se pudo generar correctamente.";
+            }
+        
+            header("Location:" . Conectar::ruta() . "/view/Documentos");
             exit();
-        }
+            break;
+        
 
-        $TBS = new clsTinyButStrong;
-        $TBS->Plugin(TBS_INSTALL, OPENTBS_PLUGIN);
-
-        // Validar el tipo de acta y realizar acciones
-        if ($datos['tipo_acta'] == 1) {
-            // Caso: Acta de entrega
-            $template = '../public/templates/acta.docx';
-            $TBS->LoadTemplate($template, OPENTBS_ALREADY_UTF8);
-
-            $TBS->MergeField('pro.colaborador', $datos['col_nombre'] ?? 'Sin asignar');
-            $TBS->MergeField('pro.tipo', "Acta de Entrega");
-            $TBS->MergeField('pro.cedula', $datos['col_cedula']);
-            $TBS->MergeField('pro.fecha', date('d/m/Y'));
-
-            //Guardo el nombre de la acta a generar
-            $file_name = 'ACTA_ENTREGA_CREDENCIAL' . $datos['col_cedula'] . "_" . $datos['col_nombre'] . "_" . date('Y-m-d') . ".docx";
-        } elseif ($datos['tipo_acta'] == 2) {
-            // Caso: Acta de descarga
-            $template = '../public/templates/acta_entregaequipo.docx';
-            $TBS->LoadTemplate($template, OPENTBS_ALREADY_UTF8);
-
-            $TBS->MergeField('pro.id', $datos['id_acta']);
-            $TBS->MergeField('pro.tipo', "ACTA DE ENTREGA");
-            $TBS->MergeField('pro.fecha', $datos['cua_nombre'] ?? 'Sin asignar');
-
-            $file_name = "acta_descarga_" . $datos['col_cedula'] . "_" . date('Y-m-d') . ".docx";
-        } else {
-            echo json_encode(["status" => "error", "message" => "El tipo de acta no es válido."]);
-            exit();
-        }
-
-        $save_path = "../public/actas/credencialesCuadrillas/" . $file_name;
-
-        // Guardar el archivo en el servidor
-        $TBS->Show(OPENTBS_FILE, $save_path);
-
-        // Descargar el archivo
-        if (file_exists($save_path)) {
-            header('Content-Description: File Transfer');
-            header('Content-Type: application/octet-stream');
-            header('Content-Disposition: attachment; filename="' . basename($file_name) . '"');
-            header('Expires: 0');
-            header('Cache-Control: must-revalidate');
-            header('Pragma: public');
-            header('Content-Length: ' . filesize($save_path));
-            readfile($save_path);
-            exit;
-        } else {
-            // Manejar error si el archivo no existe
-            echo "El archivo no se pudo generar correctamente.";
-        }
-
-
-        header("Location:" . Conectar::ruta() . "/view/Documentos");
-        exit();
-        break;
 
     case "subirArchivo":
         header('Content-Type: application/json');

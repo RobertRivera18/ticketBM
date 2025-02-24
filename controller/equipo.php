@@ -108,7 +108,7 @@ switch ($_GET["op"]) {
         if (is_array($datos) && count($datos) > 0) {
             foreach ($datos as $row) {
                 $data[] = array(
-                    "0" => '<button class="btn btn-warning" onclick="asignarEquipo(' . $row['equipo_id'] . ')"><span class="fa fa-plus"></span></button>',
+                    "0" => '<button class="btn btn-warning" onclick="asignarEquipo(' . $row['equipo_id'] . ', event)"><span class="fa fa-plus"></span></button>',
                     "1" => $row['nombre_equipo'],
                     "2" => $row['marca'],
                     "3" => $row['modelo'],

@@ -80,7 +80,7 @@ switch ($_GET["op"]) {
                 $empresa = $row['empresa_id'] == 1 ? '<span class="label label-pill label-info">CNEL</span>' : ($row['empresa_id'] == 2 ? '<span class="label label-pill label-danger">CLARO</span>' : "Otro");
 
                 $data[] = array(
-                    "0" => '<button class="btn btn-warning" onclick="asignar(' . $row['col_id'] . ')"><span class="fa fa-plus"></span></button>',
+                    "0" => '<button class="btn btn-warning" onclick="asignar(' . $row['col_id'] . ', event)"><span class="fa fa-plus"></span></button>',
                     "1" => $row['col_nombre'],
                     "2" => $row['col_cedula'],
                     "3" => $empresa,

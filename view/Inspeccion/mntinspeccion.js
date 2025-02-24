@@ -114,9 +114,6 @@ function asignar(col_id) {
 }
 
 
-
-
-
 $(document).ready(function () {
     // Inicialización de DataTable
     tabla = $('#inspeccion_data').DataTable({

@@ -332,9 +332,9 @@ class Usuario extends Conectar
             throw new Exception("Error en la conexión a la base de datos");
         }
 
-        $sql = "SELECT tm_usuario ip, mac  WHERE usu_id = ?";
+        $sql = "SELECT ip, mac FROM  tm_usuario  WHERE usu_id = ?";
         $stmt = $conectar->prepare($sql);
-        $stmt->bindValue(1, $usu_id, PDO::PARAM_INT);
+        $stmt->bindValue(1, $usu_id);
         return $stmt->execute();
     }
 }

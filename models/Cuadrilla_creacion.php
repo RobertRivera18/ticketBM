@@ -89,10 +89,7 @@ class Cuadrilla_creacion extends Conectar
         $stmt->bindValue(1, $recargas, PDO::PARAM_BOOL);  // True o False
         $stmt->bindValue(2, $cua_id, PDO::PARAM_INT);     // ID de la cuadrilla
 
-        // Ejecutar la consulta
         $stmt->execute();
-
-        // Retornar si la actualización fue exitosa
         return $stmt->rowCount();
     }
 
@@ -121,13 +118,18 @@ class Cuadrilla_creacion extends Conectar
     CASE cua.cua_ciudad
         WHEN 1 THEN 'Guayaquil'
         WHEN 2 THEN 'Quito'
-        ELSE 'Desconocida'  -- Para manejar valores que no sean 1 o 2
+        ELSE 'Desconocida'
     END AS ciudad_nombre, 
     IF(cua.recargas, 'Recarga realizada', 'No realizada') AS recargas,
-    eq.serie
+    eq.serie,
+    GROUP_CONCAT(col.col_nombre SEPARATOR ', ') AS colaboradores 
 FROM tm_cuadrilla cua
 LEFT JOIN tm_cuadrilla_equipo cqe ON cua.cua_id = cqe.cua_id
-LEFT JOIN tm_equipos eq ON cqe.equipo_id = eq.equipo_id;
+LEFT JOIN tm_equipos eq ON cqe.equipo_id = eq.equipo_id
+LEFT JOIN tm_cuadrilla_colaborador cc ON cua.cua_id = cc.cua_id
+LEFT JOIN tm_colaborador col ON cc.col_id = col.col_id
+GROUP BY cua.cua_id, cua.cua_nombre, cua.cua_ciudad, cua.recargas, eq.serie;
+
  
 ";
         $stmt = $conectar->prepare($sql);

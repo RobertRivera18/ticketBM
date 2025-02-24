@@ -30,7 +30,9 @@ class Usuario_Equipo extends Conectar
     eq.modelo, 
     eq.serie, 
     u.usu_nom, 
-    u.usu_ape
+    u.usu_ape,
+    u.ip,
+    u.mac
 FROM tm_usuario_equipo
 INNER JOIN tm_equipos eq ON tm_usuario_equipo.equipo_id = eq.equipo_id
 INNER JOIN tm_usuario u ON tm_usuario_equipo.usu_id = u.usu_id
@@ -47,6 +49,24 @@ ORDER BY eq.equipo_id DESC;
             return [];
         }
     }
+
+    public function get_user_address($usu_id)
+    {
+        try {
+            $conectar = parent::conexion();
+            parent::set_names();
+            $sql = "SELECT ip, mac FROM tm_usuario WHERE usu_id = ?";
+            $stmt = $conectar->prepare($sql);
+            $stmt->bindValue(1, $usu_id, PDO::PARAM_INT);
+            $stmt->execute();
+            return $stmt->fetch(PDO::FETCH_ASSOC); 
+        } catch (PDOException $e) {
+            error_log("Error en get_user_address: " . $e->getMessage());
+            return []; 
+        }
+    }
+
+
 
     public function delete_usuario_equipo($usu_id, $equipo_id)
     {

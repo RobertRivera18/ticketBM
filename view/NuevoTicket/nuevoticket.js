@@ -63,7 +63,12 @@ function guardaryeditar(e){
 
                 $('#tick_titulo').val('');
                 $('#tick_descrip').summernote('reset');
-                swal("Correcto!", "Registrado Correctamente", "success");
+                swal({
+                    title: "HelpDesk!",
+                    text: "Completado.",
+                    type: "success",
+                    confirmButtonClass: "btn-success"
+                });
             }
         });
     }

@@ -98,6 +98,8 @@ function editar(usu_id){
         $('#usu_pass').val(data.usu_pass);
         $('#rol_id').val(data.rol_id).trigger('change');
         $('#empresa_id').val(data.empresa_id).trigger('change');
+        $('#ip').val(data.ip);
+        $('#mac').val(data.mac);
     }); 
 
     $('#modalmantenimiento').modal('show');

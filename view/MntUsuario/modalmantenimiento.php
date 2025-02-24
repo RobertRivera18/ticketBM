@@ -22,12 +22,12 @@
                     </div>
 
                     <div class="form-group">
-                        <label class="form-label" for="usu_correo">Correo Electrónico</label>
+                        <label class="form-label" for="usu_correo">Correo Electronico</label>
                         <input type="email" class="form-control" id="usu_correo" name="usu_correo" placeholder="test@test.com" required>
                     </div>
 
                     <div class="form-group">
-                        <label class="form-label" for="usu_cedula">Cédula de Identidad</label>
+                        <label class="form-label" for="usu_cedula">Cedula de Identidad</label>
                         <input type="text" class="form-control" id="usu_cedula" name="usu_cedula" required>
                     </div>
 
@@ -57,12 +57,12 @@
 
                     <!-- Campos agregados para IP y MAC -->
                     <div class="form-group">
-                        <label class="form-label" for="ip">Dirección IP (Opcional)</label>
+                        <label class="form-label" for="ip">Direccion IP (Opcional)</label>
                         <input type="text" class="form-control" id="ip" name="ip" placeholder="Ejemplo: 192.168.1.1">
                     </div>
 
                     <div class="form-group">
-                        <label class="form-label" for="mac">Dirección MAC (Opcional)</label>
+                        <label class="form-label" for="mac">Direccion MAC (Opcional)</label>
                         <input type="text" class="form-control" id="mac" name="mac" placeholder="Ejemplo: AA:BB:CC:DD:EE:FF">
                     </div>
 

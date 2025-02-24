@@ -43,14 +43,9 @@ switch ($_GET["op"]) {
 
         foreach ($datos as $row) {
             $sub_array = array();
-            $sub_array[] = $row["usu_nom"];
-            $sub_array[] = $row["usu_ape"];
+            $sub_array[] = $row["usu_nom"] . " " . $row["usu_ape"];
             $sub_array[] = $row["usu_cedula"];
             $sub_array[] = $row["usu_correo"];
-            $sub_array[] = $row["usu_pass"];
-
-
-
             $role_label = '';
             $empresa_label = '';
 
@@ -96,12 +91,12 @@ switch ($_GET["op"]) {
             // Agregamos las etiquetas al array final
             $sub_array[] = $role_label;
             $sub_array[] = $empresa_label;
-            // Verificación y asignación de valores para ip y mac
-            $sub_array[] = !empty($row["ip"]) ? $row["ip"] : '<span class="label label-pill label-danger">Sin asignación de red</span>';
-            $sub_array[] = !empty($row["mac"]) ? $row["mac"] : '<span class="label label-pill label-danger">Sin asignación de red</span>';
+            $ip_mac = (empty($row["ip"]) && empty($row["mac"])) ? '  <i class="fa fa-exclamation-circle" style="color: #ffc107; margin-right: 5px;" title="Sin asignacion"></i>' . 'Sin Asignacion' : (!empty($row["ip"]) ? '<span class="label label-danger">' . $row["ip"] . '</span>' : '') .
+                (!empty($row["ip"]) && !empty($row["mac"]) ? '<br/>' : '') .
+                (!empty($row["mac"]) ? '<span class="label label-info">' . $row["mac"] . '</span>' : '');
 
-            $sub_array[] = '<button type="button" onClick="editar(' . $row["usu_id"] . ');"  id="' . $row["usu_id"] . '" class="btn btn-inline btn-warning btn-sm ladda-button"><i class="fa fa-edit"></i></button>';
-            $sub_array[] = '<button type="button" onClick="eliminar(' . $row["usu_id"] . ');"  id="' . $row["usu_id"] . '" class="btn btn-inline btn-danger btn-sm ladda-button"><i class="fa fa-trash"></i></button>';
+            $sub_array[] = $ip_mac;
+            $sub_array[] = '<button type="button" onClick="editar(' . $row["usu_id"] . ');"  id="' . $row["usu_id"] . '" class="btn btn-inline btn-warning btn-sm ladda-button"><i class="fa fa-edit"></i></button> <button type="button" onClick="eliminar(' . $row["usu_id"] . ');"  id="' . $row["usu_id"] . '" class="btn btn-inline btn-danger btn-sm ladda-button"><i class="fa fa-trash"></i></button>';
 
             $data[] = $sub_array;
         }
