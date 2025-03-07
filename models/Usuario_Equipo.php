@@ -18,7 +18,7 @@ class Usuario_Equipo extends Conectar
     }
 
 
-    public function get_equipos_por_usuario($usu_id)
+   public function get_equipos_por_usuario($usu_id)
     {
         try {
             $conectar = parent::conexion();
@@ -30,9 +30,7 @@ class Usuario_Equipo extends Conectar
     eq.modelo, 
     eq.serie, 
     u.usu_nom, 
-    u.usu_ape,
-    u.ip,
-    u.mac
+    u.usu_ape
 FROM tm_usuario_equipo
 INNER JOIN tm_equipos eq ON tm_usuario_equipo.equipo_id = eq.equipo_id
 INNER JOIN tm_usuario u ON tm_usuario_equipo.usu_id = u.usu_id
@@ -50,7 +48,20 @@ ORDER BY eq.equipo_id DESC;
         }
     }
 
-    public function get_user_address($usu_id)
+
+    
+    public function delete_usuario_equipo($usu_id, $equipo_id)
+    {
+        $conectar = parent::conexion();
+        parent::set_names();
+        $sql = "DELETE FROM tm_usuario_equipo WHERE usu_id = ? AND equipo_id = ?";
+        $stmt = $conectar->prepare($sql);
+        $stmt->bindValue(1, $usu_id, PDO::PARAM_INT);
+        $stmt->bindValue(2, $equipo_id, PDO::PARAM_INT);
+        return $stmt->execute();
+    }
+    
+     public function get_user_address($usu_id)
     {
         try {
             $conectar = parent::conexion();
@@ -64,19 +75,6 @@ ORDER BY eq.equipo_id DESC;
             error_log("Error en get_user_address: " . $e->getMessage());
             return []; 
         }
-    }
-
-
-
-    public function delete_usuario_equipo($usu_id, $equipo_id)
-    {
-        $conectar = parent::conexion();
-        parent::set_names();
-        $sql = "DELETE FROM tm_usuario_equipo WHERE usu_id = ? AND equipo_id = ?";
-        $stmt = $conectar->prepare($sql);
-        $stmt->bindValue(1, $usu_id, PDO::PARAM_INT);
-        $stmt->bindValue(2, $equipo_id, PDO::PARAM_INT);
-        return $stmt->execute();
     }
 
 

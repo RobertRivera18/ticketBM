@@ -39,16 +39,11 @@ switch ($_GET["op"]) {
             }
 
 
-
             $ip_mac = (empty($row["ip"]) && empty($row["mac"])) ? '  <i class="fa fa-exclamation-circle" style="color: #ffc107; margin-right: 5px;" title="Sin asignacion"></i>' . 'Sin Asignacion' : (!empty($row["ip"]) ? '<span class="label label-danger">' . $row["ip"] . '</span>' : '') .
                 (!empty($row["ip"]) && !empty($row["mac"]) ? '<br/>' : '') .
                 (!empty($row["mac"]) ? '<span class="label label-info">' . $row["mac"] . '</span>' : '');
 
             $sub_array[] = $ip_mac;
-
-
-
-
 
             $sub_array[] = '<button type="button" onClick="generar(' . $row["usu_id"] . ');" 
             id="' . $row["usu_id"] . '"class="btn btn-inline btn-success btn-sm ladda-button">
@@ -320,7 +315,7 @@ switch ($_GET["op"]) {
             if (is_array($datos) && count($datos) > 0) {
                 $equipo_info = $datos[0];
 
-                $url_qr = "http://localhost/soporte/view/MntEquipos/equipo_info.php?usu_id=" . $usu_id;
+                $url_qr = "https://haggerstonec.com/view/MntEquipos/equipo_info.php?usu_id=" . $usu_id;
                 $generator = new barcode_generator();
                 $svg = $generator->render_svg("qr", $url_qr, "");
 

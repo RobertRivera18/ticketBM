@@ -63,6 +63,7 @@ function guardaryeditar(e){
 
                 $('#tick_titulo').val('');
                 $('#tick_descrip').summernote('reset');
+
                 swal({
                     title: "HelpDesk!",
                     text: "Completado.",

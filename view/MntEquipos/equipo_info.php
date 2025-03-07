@@ -12,10 +12,8 @@ $usuario_equipo = new Usuario_Equipo();
 $equipos = $usuario_equipo->get_equipos_por_usuario($usu_id);
 $address = $usuario_equipo->get_user_address($usu_id);
 
-
-
 if (!is_array($equipos) || count($equipos) == 0) {
-    die("No se encontró información de equipos asignados. Este usuario no tiene equipos asignados.");
+    die("No se encontro informacion de equipos asignados. Este usuario no tiene equipos asignados.");
 }
 
 $usuario_nombre = htmlspecialchars($equipos[0]["usu_nom"] . " " . $equipos[0]["usu_ape"]);
@@ -35,7 +33,7 @@ $mac_address = !empty($address["mac"]) ? $address["mac"] : "No disponible";
         <h2 class="text-center">Equipos Asignados al Usuario: <strong><?php echo $usuario_nombre ?></strong></h2>
         <p class="text-center">IP Asignada: <strong><?php echo $ip_usuario ?></strong></p>
         <p class="text-center">MAC del Equipo: <strong><?php echo $mac_address ?></strong></p>
-
+    
         <table class="table table-bordered">
             <thead>
                 <tr>

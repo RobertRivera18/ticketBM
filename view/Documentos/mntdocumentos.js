@@ -60,10 +60,6 @@ function asignar(col_id, event) {
 }
 
 
-
-
-
-
 function asignarEquipo(equipo_id, event) {
     if (event) {
         event.preventDefault();
@@ -145,8 +141,6 @@ function guardaryeditar(e) {
     });
 }
 
-
-
 function listarEquipos() {
     tabla = $('#tblequipos').dataTable(
         {
@@ -227,160 +221,7 @@ function listarColaboradores() {
 
 }
 
-
-
-/* function asignar(col_id) {
-    var tipo_acta = $("#tipo_acta").val();
-    $.ajax({
-        url: "../../controller/acta.php?op=asignar",
-        type: "POST",
-        data: {
-            tipo_acta: tipo_acta,
-            col_id: col_id
-        },
-        success: function (response) {
-            try {
-                var res = JSON.parse(response);
-
-                if (res.status === "success") {
-                    swal({
-                        title: "HelpDesk!",
-                        text: "Se ha asignado Correctamente.",
-                        type: "success"
-                    });
-
-                    $('#documento_data').DataTable().ajax.reload();
-                } else {
-                    swal({
-                        title: "Error",
-                        text: res.message || "Ocurrió un problema al asignar el colaborador.",
-                        type: "error",
-                        confirmButtonClass: "btn-danger"
-                    });
-                }
-            } catch (error) {
-                console.error("Error al procesar la respuesta:", error);
-                swal({
-                    title: "Error",
-                    text: "La respuesta del servidor no es válida.",
-                    type: "error",
-                    confirmButtonClass: "btn-danger"
-                });
-            }
-        }
-    });
-
-} */
-
-// Función para seleccionar el colaborador
-// function asignar(col_id, e) {
-//     e.preventDefault(); // Previene cualquier acción predeterminada (por si hay un evento de submit)
-//     $("#col_id").val(col_id); // Guarda el ID del colaborador seleccionado en el input
-
-// }
-
-// Función para seleccionar el equipo
-
-
-// Función para asignar colaborador y equipo
-// Función para seleccionar colaborador sin cerrar el modal
-
-
-
-
-
-
-
-
-// // Función para asignar el equipo al colaborador y registrar el acta
-// function guardarActa(e) {
-//     e.preventDefault();
-//     if ($(e.originalEvent.submitter).attr("id") === "guardarBtn") {
-//         var tipo_acta = $("#tipo_acta").val();
-//         var col_id = $("#col_id").val();
-//         var equipo_id = $("#equipo_id").val();
-//         console.log(col_id);
-//         console.log(equipo_id)
-
-//         if (!col_id) {
-//             swal({
-//                 title: "Error",
-//                 text: "Debe seleccionar un colaborador antes de continuar.",
-//                 type: "warning",
-//                 confirmButtonClass: "btn-warning"
-//             });
-//             return;
-//         }
-
-//         if (!equipo_id) {
-//             swal({
-//                 title: "Error",
-//                 text: "Debe seleccionar un equipo antes de continuar.",
-//                 type: "warning",
-//                 confirmButtonClass: "btn-warning"
-//             });
-//             return;
-//         }
-
-//         // Enviar los datos al backend
-//         $.ajax({
-//             url: "../../controller/acta.php?op=asignarEquipo",
-//             type: "POST",
-//             data: {
-//                 tipo_acta: tipo_acta,
-//                 col_id: col_id,
-//                 equipo_id: equipo_id
-//             },
-//             success: function (response) {
-//                 try {
-//                     var res = JSON.parse(response);
-
-//                     if (res.status === "success") {
-//                         swal({
-//                             title: "¡Éxito!",
-//                             text: "Acta registrada correctamente.",
-//                             type: "success",
-//                             confirmButtonClass: "btn-success"
-//                         });
-
-//                         // Recargar las tablas sin cerrar el modal
-//                         $('#documento_data').DataTable().ajax.reload();
-//                         $('#tblcuadrillas').DataTable().ajax.reload();
-//                         $('#tblequipos').DataTable().ajax.reload();
-
-//                         // Limpiar los campos para una nueva asignación
-//                         $("#col_id").val('');
-//                         $("#equipo_id").val('');
-//                     } else {
-//                         swal({
-//                             title: "Error",
-//                             text: res.message || "Ocurrió un problema al registrar el acta.",
-//                             type: "error",
-//                             confirmButtonClass: "btn-danger"
-//                         });
-//                     }
-//                 } catch (error) {
-//                     console.error("Error al procesar la respuesta:", error);
-//                 }
-//             },
-//             error: function (error) {
-//                 console.error("Error en la asignación:", error);
-//                 swal({
-//                     title: "Error",
-//                     text: "No se pudo completar la asignación.",
-//                     type: "error",
-//                     confirmButtonClass: "btn-danger"
-//                 });
-//             }
-//         });
-//     }
-// }
-
-
-
-
 //Funcion para eliminar un acta 
-
 function eliminarActa(id_acta) {
     var table = $('#documento_data').DataTable(); // Asegurarse de que la tabla esté inicializada$('#documento_data').DataTable().ajax.reload();// Asegurarse de que la tabla esté inicializada
     swal({
@@ -568,6 +409,16 @@ function descargarComprobante(id_acta) {
                 });
             }
         }
+    });
+}
+
+function descargarNota(id_acta){
+    window.location.href = '../../controller/acta.php?op=generar_acta_descargo&id_acta=' + id_acta;
+    swal({
+        title: "Acta de descarga generada!",
+        text: "Completado.",
+        type: "info",
+        confirmButtonClass: "btn-success"
     });
 }
 

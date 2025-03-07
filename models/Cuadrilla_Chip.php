@@ -129,10 +129,10 @@ class Cuadrilla_Chip extends Conectar
         $stmt = $conectar->prepare($sql);
         $stmt->bindValue(1, $cua_id, PDO::PARAM_INT);
         $stmt->execute();
-    
-        return $stmt->fetchAll(PDO::FETCH_ASSOC); 
+
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
-    
+
 
 
 
@@ -141,10 +141,10 @@ class Cuadrilla_Chip extends Conectar
     {
         $conectar = parent::conexion();
         parent::set_names();
-        $sql = "SELECT eq.nombre_equipo,eq.marca,eq.serie
-        FROM tm_cuadrilla_equipo
-        INNER JOIN tm_equipos eq ON tm_cuadrilla_equipo.equipo_id = eq.equipo_id
-        WHERE tm_cuadrilla_equipo.cua_id = ?";
+        $sql = "SELECT eq.equipo_id, eq.nombre_equipo, eq.marca, eq.serie
+    FROM tm_cuadrilla_equipo
+    INNER JOIN tm_equipos eq ON tm_cuadrilla_equipo.equipo_id = eq.equipo_id
+    WHERE tm_cuadrilla_equipo.cua_id = ?";
         $stmt = $conectar->prepare($sql);
         $stmt->bindValue(1, $cua_id);
         $stmt->execute();
@@ -176,6 +176,47 @@ class Cuadrilla_Chip extends Conectar
             return false;
         }
     }
+
+
+
+
+    public function delete_cuadrilla_equipo($cua_id, $equipo_id, $motivo)
+{
+    try {
+        $conectar = parent::conexion();
+        parent::set_names();
+
+        // Verificar si el equipo ya está asignado
+        $sql_check = "SELECT * FROM tm_cuadrilla_equipo WHERE cua_id = ? AND equipo_id = ?";
+        $stmt_check = $conectar->prepare($sql_check);
+        $stmt_check->bindValue(1, $cua_id, PDO::PARAM_INT);
+        $stmt_check->bindValue(2, $equipo_id, PDO::PARAM_INT);
+        $stmt_check->execute();
+
+        if ($stmt_check->rowCount() == 0) {
+            return false; // No existe la asignación
+        }
+
+        // Insertar en la tabla de eliminados
+        $sql_insert = "INSERT INTO tm_cuadrilla_equipo_eliminados (cua_id, equipo_id, motivo, fecha) VALUES (?, ?, ?, NOW())";
+        $stmt_insert = $conectar->prepare($sql_insert);
+        $stmt_insert->bindValue(1, $cua_id, PDO::PARAM_INT);
+        $stmt_insert->bindValue(2, $equipo_id, PDO::PARAM_INT);
+        $stmt_insert->bindValue(3, $motivo, PDO::PARAM_STR);
+        $stmt_insert->execute();
+
+        // Eliminar el equipo de la cuadrilla
+        $sql_delete = "DELETE FROM tm_cuadrilla_equipo WHERE cua_id = ? AND equipo_id = ?";
+        $stmt_delete = $conectar->prepare($sql_delete);
+        $stmt_delete->bindValue(1, $cua_id, PDO::PARAM_INT);
+        $stmt_delete->bindValue(2, $equipo_id, PDO::PARAM_INT);
+
+        return $stmt_delete->execute() && $stmt_delete->rowCount() > 0;
+    } catch (Exception $e) {
+        return false;
+    }
+}
+
 
     //Metodo usado para mostar los equipos otorgados a las cuadrillas
     public function get_empresa_cuadrilla($cua_id)

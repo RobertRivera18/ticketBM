@@ -231,6 +231,42 @@ function eliminarItem(cua_id, col_id) {
 }
 
 
+function eliminarItems(cua_id, equipo_id) {
+    $("#modalmantenimiento").modal('show');
+    $("#confirmarEliminar").off("click").on("click", function () {
+        let motivo = $("#motivo").val().trim();
+
+        if (motivo === "") {
+            swal({
+                title: "Error",
+                text: "Debe ingresar un motivo de eliminación.",
+                type: "warning",
+                confirmButtonClass: "btn-warning"
+            });
+            return;
+        }
+        $("#modalmantenimiento").modal('hide');
+        $.ajax({
+            url: "../../controller/cuadrilla_asig.php?op=eliminarEquipo",
+            type: "POST",
+            data: { cua_id: cua_id, equipo_id: equipo_id, motivo: motivo },
+            success: function (response) {
+                if (response) {
+                    swal({
+                        title: "HelpDesk!",
+                        text: "Equipo eliminado correctamente.",
+                        type: "success",
+                        confirmButtonClass: "btn-success"
+                    });
+                }
+
+                $('#cuadrilla_data').DataTable().ajax.reload();
+            }
+        });
+    });
+}
+
+
 function asignarEquipo(equipo_id) {
     console.log(equipo_id);
     $.ajax({

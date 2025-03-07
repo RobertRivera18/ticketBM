@@ -104,20 +104,33 @@ switch ($_GET["op"]) {
 
 
 
+
+
             // Manejo de equipos
             $equipos = $cuadrilla->get_equipos_por_cuadrilla($row["cua_id"]);
             $cantidad_equipos = is_array($equipos) ? count($equipos) : 0;
 
             if ($cantidad_equipos > 0) {
-                $equipos_array = array_map(function ($equipo) {
-                    return '<li>' . $equipo["nombre_equipo"] . ' - ' . $equipo["serie"] . '</li>';
+                $equipos_array = array_map(function ($equipo) use ($row) {
+                    return '<li class="fs-6 d-flex align-items-center">' .
+                        $equipo["nombre_equipo"] . ' - ' . $equipo["marca"] . ' - ' . $equipo["serie"] .
+                        '<i class="fa fa-times text-danger ms-2 mt-1" style="cursor: pointer;" onClick="eliminarItems(' . $row["cua_id"] . ', ' . $equipo["equipo_id"] . ')"></i>' .
+                        '</li>';
                 }, $equipos);
-
-                $sub_array[] = implode("<br>", $equipos_array) .
-                    '<br><a onClick="agregarEquipo(' . $row["cua_id"] . ')"><span class="label label-primary">Agregar más</span></a>';
+                $sub_array[] = '<ul class="mb-1">' . implode("", $equipos_array) . '</ul>' .
+                    '<a class="btn btn-sm btn-primary mt-1" onClick="agregarEquipo(' . $row["cua_id"] . ')">Agregar más</a>';
             } else {
-                $sub_array[] = '<a onClick="agregarEquipo(' . $row["cua_id"] . ');"><span class="label label-pill label-danger">Sin Chip</span></a>';
+                $sub_array[] = '
+  <div style="display: flex; align-items: center; cursor: pointer;" onclick="agregarEquipo(' . htmlspecialchars($row["cua_id"], ENT_QUOTES, 'UTF-8') . ');">
+      <i class="fa fa-exclamation-circle" style="color: #ffc107; margin-right: 5px;" title="Agregar equipo"></i>
+      <span>No tiene equipos asignados</span>
+  </div>';
             }
+
+
+
+
+
 
             // Validar si el campo 'recargas' es true o false
             $checked = $row["recargas"] ? 'checked' : ''; // Si recargas es true, marcar el checkbox
@@ -129,10 +142,20 @@ switch ($_GET["op"]) {
                         class="btn btn-inline btn-success btn-sm ladda-button">
                         <i class="fa fa-print"></i>
                     </button>
+                    <button type="button" onClick="generar(' . $row["cua_id"] . ');" 
+                        id="' . $row["cua_id"] . '" 
+                        class="btn btn-inline btn-primary btn-sm ladda-button">
+                         <i class="fa fa-file"></i>
+                    </button>
+
                     <input type="checkbox" id="checkbox_' . $row["cua_id"] . '" 
                         class="mr-2" 
                         style="width: 20px; height: 20px;" ' . $checked . '>
-                </div>';
+                </div>
+                
+                 
+                
+                ';
 
             // Agregar fila al resultado final
             $data[] = $sub_array;
@@ -154,6 +177,19 @@ switch ($_GET["op"]) {
         $cuadrilla->delete_cuadrilla_colaborador($_POST["cua_id"], $_POST["col_id"]);
         break;
 
+        case "eliminarEquipo":
+            if (isset($_POST["cua_id"], $_POST["equipo_id"], $_POST["motivo"])) {
+                $cua_id = $_POST["cua_id"];
+                $equipo_id = $_POST["equipo_id"];
+                $motivo = $_POST["motivo"];
+                
+                // Llamada a la función de eliminación con motivo
+                $resultado = $cuadrilla->delete_cuadrilla_equipo($cua_id, $equipo_id, $motivo);
+                
+                echo json_encode(["success" => $resultado]);
+            }
+            break;
+        
 
 
 
@@ -274,88 +310,86 @@ switch ($_GET["op"]) {
         break;
 
 
-        case 'exportarRecargas':
-            $cuadrillas = $cuadrilla_creacion->obtenerRecargasTrue();
-        
-            if (!empty($cuadrillas)) {
-                // Cargar la plantilla Excel
-                $inputFileName = '../public/templates/formatoListadoRecargas.xlsx';
-                $spreadsheet = IOFactory::load($inputFileName);
-                $sheet = $spreadsheet->getActiveSheet();
-                $fechaInicio = new DateTime('now');
-                $fechaInicio->setDate($fechaInicio->format('Y'), $fechaInicio->format('m'), 23); // Día 23 del mes actual
-                $fechaFin = clone $fechaInicio;
-                $fechaFin->modify('+1 month'); // Sumar un mes
-        
-                // Encabezado dinámico
-                $encabezado = "LISTADO DE LINEAS DE RECARGAS MENSUALES PERIODO " . $fechaInicio->format('d/m/Y') . " AL " . $fechaFin->format('d/m/Y');
-        
-                // Aplicar el encabezado a las filas 4, 5, 6 y 7 fusionando columnas C a I
-                $sheet->mergeCells('C4:I7');
-                $sheet->setCellValue('C4', $encabezado);
-                $sheet->getStyle('C4')->getFont()->setBold(true);
-                $sheet->getStyle('C4')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-                $sheet->getStyle('C4')->getAlignment()->setVertical(Alignment::VERTICAL_CENTER);
-        
-                $fila = 9;  // Comienza en la fila 9 porque las anteriores son encabezados
-                $contador = 1; // Inicializa el contador en 1
-                $cantidadCuadrillas = 0; // Para contar las cuadrillas
-        
-                foreach ($cuadrillas as $cuadrilla) {
-                    $colaboradores = !empty($cuadrilla['colaboradores']) ? explode(',', $cuadrilla['colaboradores']) : ['Sin colaboradores'];
-                    $primeraFila = true;
-        
-                    foreach ($colaboradores as $colaborador) {
-                        $sheet->setCellValue('C' . $fila, $contador); // Numeración secuencial
-                        $sheet->setCellValue('D' . $fila, $cuadrilla['ciudad_nombre']);
-                        $sheet->setCellValue('E' . $fila, $cuadrilla['serie']);
-                        $sheet->setCellValue('F' . $fila, $cuadrilla['cua_nombre']);
-                        $sheet->setCellValue('G' . $fila, $colaborador);
-                        $sheet->setCellValue('H' . $fila, 10.50); // El valor constante
-                        $sheet->setCellValue('I' . $fila, $cuadrilla['recargas']);
-        
-                        if ($primeraFila) {
-                            $inicioFila = $fila;
-                            $finFila = $fila + count($colaboradores) - 1;
-        
-                            if (count($colaboradores) > 1) {
-                                $sheet->mergeCells("C$inicioFila:C$finFila");
-                                $sheet->mergeCells("D$inicioFila:D$finFila");
-                                $sheet->mergeCells("E$inicioFila:E$finFila");
-                                $sheet->mergeCells("F$inicioFila:F$finFila");
-                                $sheet->mergeCells("H$inicioFila:H$finFila");
-                                $sheet->mergeCells("I$inicioFila:I$finFila");
-                            }
-                            $primeraFila = false;
+    case 'exportarRecargas':
+        $cuadrillas = $cuadrilla_creacion->obtenerRecargasTrue();
+
+        if (!empty($cuadrillas)) {
+            // Cargar la plantilla Excel
+            $inputFileName = '../public/templates/formatoListadoRecargas.xlsx';
+            $spreadsheet = IOFactory::load($inputFileName);
+            $sheet = $spreadsheet->getActiveSheet();
+            $fechaInicio = new DateTime('now');
+            $fechaInicio->setDate($fechaInicio->format('Y'), $fechaInicio->format('m'), 23); // Día 23 del mes actual
+            $fechaFin = clone $fechaInicio;
+            $fechaFin->modify('+1 month'); // Sumar un mes
+
+            // Encabezado dinámico
+            $encabezado = "LISTADO DE LINEAS DE RECARGAS MENSUALES PERIODO " . $fechaInicio->format('d/m/Y') . " AL " . $fechaFin->format('d/m/Y');
+
+            // Aplicar el encabezado a las filas 4, 5, 6 y 7 fusionando columnas C a I
+            $sheet->mergeCells('C4:I7');
+            $sheet->setCellValue('C4', $encabezado);
+            $sheet->getStyle('C4')->getFont()->setBold(true);
+            $sheet->getStyle('C4')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+            $sheet->getStyle('C4')->getAlignment()->setVertical(Alignment::VERTICAL_CENTER);
+
+            $fila = 9;  // Comienza en la fila 9 porque las anteriores son encabezados
+            $contador = 1; // Inicializa el contador en 1
+            $cantidadCuadrillas = 0; // Para contar las cuadrillas
+
+            foreach ($cuadrillas as $cuadrilla) {
+                $colaboradores = !empty($cuadrilla['colaboradores']) ? explode(',', $cuadrilla['colaboradores']) : ['Sin colaboradores'];
+                $primeraFila = true;
+
+                foreach ($colaboradores as $colaborador) {
+                    $sheet->setCellValue('C' . $fila, $contador); // Numeración secuencial
+                    $sheet->setCellValue('D' . $fila, $cuadrilla['ciudad_nombre']);
+                    $sheet->setCellValue('E' . $fila, $cuadrilla['serie']);
+                    $sheet->setCellValue('F' . $fila, $cuadrilla['cua_nombre']);
+                    $sheet->setCellValue('G' . $fila, $colaborador);
+                    $sheet->setCellValue('H' . $fila, 10.50); // El valor constante
+                    $sheet->setCellValue('I' . $fila, $cuadrilla['recargas']);
+
+                    if ($primeraFila) {
+                        $inicioFila = $fila;
+                        $finFila = $fila + count($colaboradores) - 1;
+
+                        if (count($colaboradores) > 1) {
+                            $sheet->mergeCells("C$inicioFila:C$finFila");
+                            $sheet->mergeCells("D$inicioFila:D$finFila");
+                            $sheet->mergeCells("E$inicioFila:E$finFila");
+                            $sheet->mergeCells("F$inicioFila:F$finFila");
+                            $sheet->mergeCells("H$inicioFila:H$finFila");
+                            $sheet->mergeCells("I$inicioFila:I$finFila");
                         }
-        
-                        $fila++;
+                        $primeraFila = false;
                     }
-        
-                    $contador++; // Incrementar el contador después de procesar una cuadrilla
-                    $cantidadCuadrillas++; // Incrementar el contador de cuadrillas
+
+                    $fila++;
                 }
-        
-                // Calcular la suma total de recargas (cantidad de cuadrillas * 10.50)
-                $totalRecargas = $cantidadCuadrillas * 10.50;
-                $sheet->setCellValue('H59', $totalRecargas); // Asignar el total a la celda H59
-        
-                // Guardar el archivo generado
-                $fActual = new DateTime();
-                $writer = new Xlsx($spreadsheet);
-                $fileName = 'reporteRecargas' . $fActual->format('Y-m-d') . '.xlsx';
-                $temp_file = tempnam(sys_get_temp_dir(), $fileName);
-                $writer->save($temp_file);
-        
-                // Descargar archivo
-                header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-                header('Content-Disposition: attachment; filename="' . $fileName . '"');
-                readfile($temp_file);
-                unlink($temp_file); // Eliminar archivo temporal
-            } else {
-                echo json_encode(['status' => 'error', 'message' => 'No hay cuadrillas con recargas en true']);
+
+                $contador++; // Incrementar el contador después de procesar una cuadrilla
+                $cantidadCuadrillas++; // Incrementar el contador de cuadrillas
             }
-            break;
-        
-        
+
+            // Calcular la suma total de recargas (cantidad de cuadrillas * 10.50)
+            $totalRecargas = $cantidadCuadrillas * 10.50;
+            $sheet->setCellValue('H59', $totalRecargas); // Asignar el total a la celda H59
+
+            // Guardar el archivo generado
+            $fActual = new DateTime();
+            $writer = new Xlsx($spreadsheet);
+            $fileName = 'reporteRecargas' . $fActual->format('Y-m-d') . '.xlsx';
+            $temp_file = tempnam(sys_get_temp_dir(), $fileName);
+            $writer->save($temp_file);
+
+            // Descargar archivo
+            header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+            header('Content-Disposition: attachment; filename="' . $fileName . '"');
+            readfile($temp_file);
+            unlink($temp_file); // Eliminar archivo temporal
+        } else {
+            echo json_encode(['status' => 'error', 'message' => 'No hay cuadrillas con recargas en true']);
+        }
+        break;
 }
