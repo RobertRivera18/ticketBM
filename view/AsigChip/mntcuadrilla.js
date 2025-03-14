@@ -367,6 +367,16 @@ $('#exportarRecargas').on('click', function() {
 });
 
 
+function descargarNota(cua_id){
+    window.location.href = '../../controller/cuadrilla_asig.php?op=generar_word_descargo&cua_id=' + cua_id;
+    swal({
+        title: "Acta de descarga generada!"+cua_id,
+        text: "Completado.",
+        type: "info",
+        confirmButtonClass: "btn-success"
+    });
+}
+
 
 
 

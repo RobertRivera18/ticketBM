@@ -15,10 +15,6 @@ use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
 
-
-
-
-
 $cuadrilla = new Cuadrilla_Chip();
 $cuadrilla_creacion = new Cuadrilla_creacion();
 
@@ -142,7 +138,7 @@ switch ($_GET["op"]) {
                         class="btn btn-inline btn-success btn-sm ladda-button">
                         <i class="fa fa-print"></i>
                     </button>
-                    <button type="button" onClick="generar(' . $row["cua_id"] . ');" 
+                    <button type="button" onClick="descargarNota(' . $row["cua_id"] . ');" 
                         id="' . $row["cua_id"] . '" 
                         class="btn btn-inline btn-primary btn-sm ladda-button">
                          <i class="fa fa-file"></i>
@@ -152,8 +148,7 @@ switch ($_GET["op"]) {
                         class="mr-2" 
                         style="width: 20px; height: 20px;" ' . $checked . '>
                 </div>
-                
-                 
+
                 
                 ';
 
@@ -177,19 +172,19 @@ switch ($_GET["op"]) {
         $cuadrilla->delete_cuadrilla_colaborador($_POST["cua_id"], $_POST["col_id"]);
         break;
 
-        case "eliminarEquipo":
-            if (isset($_POST["cua_id"], $_POST["equipo_id"], $_POST["motivo"])) {
-                $cua_id = $_POST["cua_id"];
-                $equipo_id = $_POST["equipo_id"];
-                $motivo = $_POST["motivo"];
-                
-                // Llamada a la función de eliminación con motivo
-                $resultado = $cuadrilla->delete_cuadrilla_equipo($cua_id, $equipo_id, $motivo);
-                
-                echo json_encode(["success" => $resultado]);
-            }
-            break;
-        
+    case "eliminarEquipo":
+        if (isset($_POST["cua_id"], $_POST["equipo_id"], $_POST["motivo"])) {
+            $cua_id = $_POST["cua_id"];
+            $equipo_id = $_POST["equipo_id"];
+            $motivo = $_POST["motivo"];
+
+            // Llamada a la función de eliminación con motivo
+            $resultado = $cuadrilla->delete_cuadrilla_equipo($cua_id, $equipo_id, $motivo);
+
+            echo json_encode(["success" => $resultado]);
+        }
+        break;
+
 
 
 
@@ -249,6 +244,7 @@ switch ($_GET["op"]) {
         }
 
         exit();
+        break;
 
 
 
@@ -392,4 +388,66 @@ switch ($_GET["op"]) {
             echo json_encode(['status' => 'error', 'message' => 'No hay cuadrillas con recargas en true']);
         }
         break;
+
+
+
+
+
+        case "generar_word_descargo":
+            $cua_id = $_GET['cua_id'] ?? null;
+    
+            if (!$cua_id) {
+                echo json_encode(["status" => "error", "message" => "ID de cuadrilla no proporcionado."]);
+                exit();
+            }
+    
+            $datos = $cuadrilla->create_word($cua_id);
+    
+            if (!$datos) {
+                echo json_encode(["status" => "error", "message" => "No se encontraron datos para la cuadrilla."]);
+                exit();
+            }
+    
+            $TBS = new clsTinyButStrong;
+            $TBS->Plugin(TBS_INSTALL, OPENTBS_PLUGIN);
+    
+            // Ruta de la plantilla
+            $template = '../public/templates/acta_descargo_cuadrillas.docx';
+            $TBS->LoadTemplate($template, OPENTBS_ALREADY_UTF8);
+    
+            $nombres = explode(",", $datos['nombres_colaboradores']);
+            // Fusionar datos
+            $TBS->MergeField('cuadrilla.colaborador1', $nombres[0]);  // Primer nombre
+            $TBS->MergeField('cuadrilla.colaborador2', $nombres[1]);  // Segundo nombre
+    
+            $cedulas = explode(",", $datos['cedulas_colaboradores']);
+            $TBS->MergeField('cuadrilla.cedula1', $cedulas[0]);  // Cedula del primer colaborador
+            $TBS->MergeField('cuadrilla.cedula2', $cedulas[1]);  // Cedula del segundo colaborador
+    
+            $TBS->MergeField('cuadrilla.nombre', $datos['nombre_cuadrilla']);
+            //$TBS->MergeField('cuadrilla.equipos', $datos['equipos_asignados']);
+    
+            $file_name = "acta_descargo_chip" . $cua_id . "_" . date('Y-m-d') . ".docx";
+            $save_path = "../public/actas/chipsCuadrillas/" . $file_name;
+    
+            // Guardar el archivo
+            $TBS->Show(OPENTBS_FILE, $save_path);
+    
+            // Descargar el archivo
+            if (file_exists($save_path)) {
+                header('Content-Description: File Transfer');
+                header('Content-Type: application/octet-stream');
+                header('Content-Disposition: attachment; filename="' . basename($file_name) . '"');
+                header('Expires: 0');
+                header('Cache-Control: must-revalidate');
+                header('Pragma: public');
+                header('Content-Length: ' . filesize($save_path));
+                readfile($save_path);
+                exit();
+            } else {
+                echo "El archivo no se pudo generar correctamente.";
+            }
+    
+            exit();
+            break;
 }

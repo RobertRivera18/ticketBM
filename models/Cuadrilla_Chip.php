@@ -235,6 +235,8 @@ class Cuadrilla_Chip extends Conectar
         return $stmt->fetchAll();
     }
 
+
+    //Crea word con detalle equipos asignados y colaboradores que pertenecen a la cuadrilla 
     public function create_word($cua_id)
     {
         try {
