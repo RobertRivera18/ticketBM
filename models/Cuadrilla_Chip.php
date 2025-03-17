@@ -181,41 +181,41 @@ class Cuadrilla_Chip extends Conectar
 
 
     public function delete_cuadrilla_equipo($cua_id, $equipo_id, $motivo)
-{
-    try {
-        $conectar = parent::conexion();
-        parent::set_names();
+    {
+        try {
+            $conectar = parent::conexion();
+            parent::set_names();
 
-        // Verificar si el equipo ya está asignado
-        $sql_check = "SELECT * FROM tm_cuadrilla_equipo WHERE cua_id = ? AND equipo_id = ?";
-        $stmt_check = $conectar->prepare($sql_check);
-        $stmt_check->bindValue(1, $cua_id, PDO::PARAM_INT);
-        $stmt_check->bindValue(2, $equipo_id, PDO::PARAM_INT);
-        $stmt_check->execute();
+            // Verificar si el equipo ya está asignado
+            $sql_check = "SELECT * FROM tm_cuadrilla_equipo WHERE cua_id = ? AND equipo_id = ?";
+            $stmt_check = $conectar->prepare($sql_check);
+            $stmt_check->bindValue(1, $cua_id, PDO::PARAM_INT);
+            $stmt_check->bindValue(2, $equipo_id, PDO::PARAM_INT);
+            $stmt_check->execute();
 
-        if ($stmt_check->rowCount() == 0) {
-            return false; // No existe la asignación
+            if ($stmt_check->rowCount() == 0) {
+                return false; // No existe la asignación
+            }
+
+            // Insertar en la tabla de eliminados
+            $sql_insert = "INSERT INTO tm_cuadrilla_equipo_eliminados (cua_id, equipo_id, motivo, fecha) VALUES (?, ?, ?, NOW())";
+            $stmt_insert = $conectar->prepare($sql_insert);
+            $stmt_insert->bindValue(1, $cua_id, PDO::PARAM_INT);
+            $stmt_insert->bindValue(2, $equipo_id, PDO::PARAM_INT);
+            $stmt_insert->bindValue(3, $motivo, PDO::PARAM_STR);
+            $stmt_insert->execute();
+
+            // Eliminar el equipo de la cuadrilla
+            $sql_delete = "DELETE FROM tm_cuadrilla_equipo WHERE cua_id = ? AND equipo_id = ?";
+            $stmt_delete = $conectar->prepare($sql_delete);
+            $stmt_delete->bindValue(1, $cua_id, PDO::PARAM_INT);
+            $stmt_delete->bindValue(2, $equipo_id, PDO::PARAM_INT);
+
+            return $stmt_delete->execute() && $stmt_delete->rowCount() > 0;
+        } catch (Exception $e) {
+            return false;
         }
-
-        // Insertar en la tabla de eliminados
-        $sql_insert = "INSERT INTO tm_cuadrilla_equipo_eliminados (cua_id, equipo_id, motivo, fecha) VALUES (?, ?, ?, NOW())";
-        $stmt_insert = $conectar->prepare($sql_insert);
-        $stmt_insert->bindValue(1, $cua_id, PDO::PARAM_INT);
-        $stmt_insert->bindValue(2, $equipo_id, PDO::PARAM_INT);
-        $stmt_insert->bindValue(3, $motivo, PDO::PARAM_STR);
-        $stmt_insert->execute();
-
-        // Eliminar el equipo de la cuadrilla
-        $sql_delete = "DELETE FROM tm_cuadrilla_equipo WHERE cua_id = ? AND equipo_id = ?";
-        $stmt_delete = $conectar->prepare($sql_delete);
-        $stmt_delete->bindValue(1, $cua_id, PDO::PARAM_INT);
-        $stmt_delete->bindValue(2, $equipo_id, PDO::PARAM_INT);
-
-        return $stmt_delete->execute() && $stmt_delete->rowCount() > 0;
-    } catch (Exception $e) {
-        return false;
     }
-}
 
 
     //Metodo usado para mostar los equipos otorgados a las cuadrillas
@@ -276,4 +276,46 @@ WHERE
             return false;
         }
     }
+
+    public function create_word_descargo($cua_id)
+    {
+        try {
+            $conectar = parent::conexion();
+            parent::set_names();
+            
+            $sql = "SELECT 
+                GROUP_CONCAT(DISTINCT c.col_nombre SEPARATOR ',') AS nombres_colaboradores,
+                GROUP_CONCAT(DISTINCT c.col_cedula SEPARATOR ',') AS cedulas_colaboradores,
+                GROUP_CONCAT(DISTINCT e.serie SEPARATOR ',') AS equipos_asignados,
+                cu.cua_nombre AS nombre_cuadrilla
+            FROM
+                tm_cuadrilla_colaborador cc
+            INNER JOIN
+                tm_colaborador c ON cc.col_id = c.col_id
+            LEFT JOIN
+                tm_cuadrilla_equipo ce ON ce.cua_id = cc.cua_id
+            LEFT JOIN
+                tm_equipos e ON ce.equipo_id = e.equipo_id
+            INNER JOIN
+                tm_cuadrilla cu ON cu.cua_id = cc.cua_id
+            WHERE
+                cc.cua_id = ?";
+    
+            $stmt = $conectar->prepare($sql);
+            $stmt->bindValue(1, $cua_id, PDO::PARAM_INT);
+            $stmt->execute();
+            $result = $stmt->fetch(PDO::FETCH_ASSOC);
+    
+            if (!$result) {
+                return false;
+            }
+    
+        
+            return $result;
+        } catch (PDOException $e) {
+            echo "Error en la consulta: " . $e->getMessage();
+            return false;
+        }
+    }
+    
 }

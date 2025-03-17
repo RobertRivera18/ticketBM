@@ -391,49 +391,63 @@ switch ($_GET["op"]) {
 
 
 
-
-
         case "generar_word_descargo":
             $cua_id = $_GET['cua_id'] ?? null;
-    
+        
             if (!$cua_id) {
                 echo json_encode(["status" => "error", "message" => "ID de cuadrilla no proporcionado."]);
                 exit();
             }
-    
-            $datos = $cuadrilla->create_word($cua_id);
-    
+        
+            $datos = $cuadrilla->create_word_descargo($cua_id);
+        
             if (!$datos) {
                 echo json_encode(["status" => "error", "message" => "No se encontraron datos para la cuadrilla."]);
                 exit();
             }
-    
+        
+            // Cargar la librería TinyButStrong y OpenTBS
             $TBS = new clsTinyButStrong;
             $TBS->Plugin(TBS_INSTALL, OPENTBS_PLUGIN);
-    
-            // Ruta de la plantilla
-            $template = '../public/templates/acta_descargo_cuadrillas.docx';
+        
+            // Verificar que la plantilla Word existe
+            $template = '../public/templates/acta_entregachipcuadrilla.docx';
+            
+            if (!file_exists($template)) {
+                echo "Error: La plantilla no existe en la ruta especificada.";
+                exit();
+            }
+        
             $TBS->LoadTemplate($template, OPENTBS_ALREADY_UTF8);
-    
-            $nombres = explode(",", $datos['nombres_colaboradores']);
-            // Fusionar datos
-            $TBS->MergeField('cuadrilla.colaborador1', $nombres[0]);  // Primer nombre
-            $TBS->MergeField('cuadrilla.colaborador2', $nombres[1]);  // Segundo nombre
-    
-            $cedulas = explode(",", $datos['cedulas_colaboradores']);
-            $TBS->MergeField('cuadrilla.cedula1', $cedulas[0]);  // Cedula del primer colaborador
-            $TBS->MergeField('cuadrilla.cedula2', $cedulas[1]);  // Cedula del segundo colaborador
-    
-            $TBS->MergeField('cuadrilla.nombre', $datos['nombre_cuadrilla']);
-            //$TBS->MergeField('cuadrilla.equipos', $datos['equipos_asignados']);
-    
-            $file_name = "acta_descargo_chip" . $cua_id . "_" . date('Y-m-d') . ".docx";
+        
+            // Separar los nombres y cédulas asegurando que no haya espacios extra
+            $nombres = array_map('trim', explode(",", $datos['nombres_colaboradores']));
+            $cedulas = array_map('trim', explode(",", $datos['cedulas_colaboradores']));
+        
+            // Evitar errores si hay menos de dos colaboradores
+            $colaborador1 = $nombres[0] ?? 'N/A';
+            $colaborador2 = $nombres[1] ?? 'N/A';
+            $cedula1 = $cedulas[0] ?? 'N/A';
+            $cedula2 = $cedulas[1] ?? 'N/A';
+            $nombre_cuadrilla = $datos['nombre_cuadrilla'] ?? 'N/A';
+        
+          
+        
+            // Fusionar datos en la plantilla Word
+            $TBS->MergeField('cuadrilla.colaborador1', $colaborador1);
+            $TBS->MergeField('cuadrilla.colaborador2', $colaborador2);
+            $TBS->MergeField('cuadrilla.cedula1', $cedula1);
+            $TBS->MergeField('cuadrilla.cedula2', $cedula2);
+            $TBS->MergeField('cuadrilla.nombre', $nombre_cuadrilla);
+        
+            // Definir el nombre del archivo y la ruta donde se guardará
+            $file_name = "acta_descargo_chip_" . $cua_id . "_" . date('Y-m-d') . ".docx";
             $save_path = "../public/actas/chipsCuadrillas/" . $file_name;
-    
-            // Guardar el archivo
+        
+            // Guardar el archivo Word
             $TBS->Show(OPENTBS_FILE, $save_path);
-    
-            // Descargar el archivo
+        
+            // Verificar si el archivo se generó correctamente
             if (file_exists($save_path)) {
                 header('Content-Description: File Transfer');
                 header('Content-Type: application/octet-stream');
@@ -445,9 +459,12 @@ switch ($_GET["op"]) {
                 readfile($save_path);
                 exit();
             } else {
-                echo "El archivo no se pudo generar correctamente.";
+                echo "Error: No se pudo generar el archivo Word.";
             }
-    
             exit();
-            break;
+        
+
+
+
+    
 }
