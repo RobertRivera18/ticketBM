@@ -411,7 +411,7 @@ switch ($_GET["op"]) {
             $TBS->Plugin(TBS_INSTALL, OPENTBS_PLUGIN);
         
             // Verificar que la plantilla Word existe
-            $template = '../public/templates/acta_entregachipcuadrilla.docx';
+            $template = '../public/templates/descargo_cuadrilla.docx';
             
             if (!file_exists($template)) {
                 echo "Error: La plantilla no existe en la ruta especificada.";
