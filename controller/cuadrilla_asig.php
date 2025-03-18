@@ -458,8 +458,8 @@ switch ($_GET["op"]) {
             $TBS->MergeField('equipo.modelo', $modelo1);
         
             // Definir el nombre del archivo y la ruta donde se guardará
-            $file_name = "acta_descargo_chip_" . $cua_id . "_" . date('Y-m-d') . ".docx";
-            $save_path = "../public/actas/chipsCuadrillas/" . $file_name;
+            $file_name = "acta_descargo_chip_" . $cua_id . "_" .$nombre_cuadrilla . ".docx";
+            $save_path = "../public/actas/descargo_cuadrillas/" . $file_name;
         
             // Guardar el archivo Word
             $TBS->Show(OPENTBS_FILE, $save_path);
