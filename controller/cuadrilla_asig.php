@@ -412,7 +412,7 @@ switch ($_GET["op"]) {
         
             // Verificar que la plantilla Word existe
             $template = '../public/templates/descargo_cuadrilla.docx';
-            
+        
             if (!file_exists($template)) {
                 echo "Error: La plantilla no existe en la ruta especificada.";
                 exit();
@@ -424,6 +424,12 @@ switch ($_GET["op"]) {
             $nombres = array_map('trim', explode(",", $datos['nombres_colaboradores']));
             $cedulas = array_map('trim', explode(",", $datos['cedulas_colaboradores']));
         
+            // Separar los datos de los equipos
+            $series_equipos = array_map('trim', explode(",", $datos['equipos_asignados']));
+            $nombres_equipos = array_map('trim', explode(",", $datos['nombres_equipos']));
+            $marcas_equipos = array_map('trim', explode(",", $datos['marcas_equipos']));
+            $modelos_equipos = array_map('trim', explode(",", $datos['modelos_equipos']));
+        
             // Evitar errores si hay menos de dos colaboradores
             $colaborador1 = $nombres[0] ?? 'N/A';
             $colaborador2 = $nombres[1] ?? 'N/A';
@@ -431,7 +437,11 @@ switch ($_GET["op"]) {
             $cedula2 = $cedulas[1] ?? 'N/A';
             $nombre_cuadrilla = $datos['nombre_cuadrilla'] ?? 'N/A';
         
-          
+            // Evitar errores si no hay equipos asignados
+            $serie1 = $series_equipos[0] ?? 'N/A';
+            $equipo1 = $nombres_equipos[0] ?? 'N/A';
+            $marca1 = $marcas_equipos[0] ?? 'N/A';
+            $modelo1 = $modelos_equipos[0] ?? 'N/A';
         
             // Fusionar datos en la plantilla Word
             $TBS->MergeField('cuadrilla.colaborador1', $colaborador1);
@@ -439,6 +449,13 @@ switch ($_GET["op"]) {
             $TBS->MergeField('cuadrilla.cedula1', $cedula1);
             $TBS->MergeField('cuadrilla.cedula2', $cedula2);
             $TBS->MergeField('cuadrilla.nombre', $nombre_cuadrilla);
+            $TBS->MergeField('fecha', date('d/m/Y'));
+            
+            // Datos de equipos
+            $TBS->MergeField('equipo.serie', $serie1);
+            $TBS->MergeField('equipo.nombre', $equipo1);
+            $TBS->MergeField('equipo.marca', $marca1);
+            $TBS->MergeField('equipo.modelo', $modelo1);
         
             // Definir el nombre del archivo y la ruta donde se guardará
             $file_name = "acta_descargo_chip_" . $cua_id . "_" . date('Y-m-d') . ".docx";
@@ -463,8 +480,7 @@ switch ($_GET["op"]) {
             }
             exit();
         
-
-
+        
 
     
 }
