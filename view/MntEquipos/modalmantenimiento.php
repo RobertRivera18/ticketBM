@@ -39,6 +39,7 @@
                         <select class="select2" id="datos" name="datos">
                             <option value="1">IMEI</option>
                             <option value="2">Equipo Informatico</option>
+                            <option value="3">Equipos Tecnicos Claro</option>
                         </select>
                     </div>
 

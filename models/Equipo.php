@@ -66,6 +66,11 @@ class Equipo extends Conectar
     CASE 
         WHEN e.datos = 1 THEN cua.cua_nombre
         ELSE NULL 
+    END AS cuadrilla_asignada,
+
+     CASE 
+        WHEN e.datos = 3 THEN cua.cua_nombre
+        ELSE NULL 
     END AS cuadrilla_asignada
 FROM 
     tm_equipos e
@@ -80,7 +85,7 @@ LEFT JOIN
 LEFT JOIN 
     tm_cuadrilla cua ON cue.cua_id = cua.cua_id
 WHERE 
-    e.datos IN (1, 2) 
+    e.datos IN (1, 2,3) 
 ORDER BY 
     e.equipo_id DESC;
 ;
@@ -157,5 +162,6 @@ ORDER BY
         return $resultado = $sql->fetchAll();
     }
 
-   
-}
+
+    
+    }

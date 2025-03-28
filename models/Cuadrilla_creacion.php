@@ -128,8 +128,15 @@ LEFT JOIN tm_cuadrilla_equipo cqe ON cua.cua_id = cqe.cua_id
 LEFT JOIN tm_equipos eq ON cqe.equipo_id = eq.equipo_id
 LEFT JOIN tm_cuadrilla_colaborador cc ON cua.cua_id = cc.cua_id
 LEFT JOIN tm_colaborador col ON cc.col_id = col.col_id
-GROUP BY cua.cua_id, cua.cua_nombre, cua.cua_ciudad, cua.recargas, eq.serie;
-
+WHERE eq.datos = 1
+GROUP BY cua.cua_id, cua.cua_nombre, cua.cua_ciudad, cua.recargas, eq.serie
+ORDER BY 
+    (CASE cua.cua_ciudad 
+        WHEN 1 THEN 1 
+        WHEN 2 THEN 2 
+        ELSE 3 
+    END),
+    cua.cua_id; 
  
 ";
         $stmt = $conectar->prepare($sql);

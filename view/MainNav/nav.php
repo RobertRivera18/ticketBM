@@ -113,20 +113,35 @@ if ($_SESSION["rol_id"] == 2) {
 
                 </ul>
             </li>
+            <li class="blue-dirty dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                    <span class="glyphicon glyphicon-wrench"></span>
+                    <span class="lbl">Asignacion de Equipos a Cuadrillas</span>
+                    <span class="caret"></span>
+                </a>
+                <ul class="dropdown-menu">
+                    <li class="blue-dirty">
+                        <a href="..\AsigChip\">
+
+                            <span class="lbl">Entrega de Chips</span>
+                        </a>
+                    </li>
+                   
+
+                    <li class="blue-dirty">
+                        <a href="..\AsigEquipoTecnicos\">
+                            <span class="lbl">Entrega de Equipos(Tablets/Medidores)</span>
+                        </a>
+                    </li>
+
+                </ul>
+            </li>
             <li class="blue-dirty">
                 <a href="..\Documentos\">
                     <span class="glyphicon glyphicon-credit-card"></span>
                     <span class="lbl">Generar Actas Entregas Credenciales</span>
                 </a>
             </li>
-
-            <li class="blue-dirty">
-                <a href="..\AsigChip\">
-                    <span class="glyphicon glyphicon-credit-card"></span>
-                    <span class="lbl">Generar Actas Cuadrillas-Chip</span>
-                </a>
-            </li>
-
 
 
             <li class="blue-dirty">
@@ -135,6 +150,10 @@ if ($_SESSION["rol_id"] == 2) {
                     <span class="lbl">Generar Permiso Trabajos Especiales</span>
                 </a>
             </li>
+
+
+
+            
 
         </ul>
     </nav>

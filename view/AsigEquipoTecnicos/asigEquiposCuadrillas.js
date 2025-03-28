@@ -28,7 +28,7 @@ $(document).ready(function () {
             'pdfHtml5'
         ],
         "ajax": {
-            url: '../../controller/cuadrilla_asig.php?op=listar',
+            url: '../../controller/cuadrilla_asignacionEquipo.php?op=listar',
             type: "post",
             dataType: "json",
             error: function (e) {
@@ -72,7 +72,7 @@ function eliminar(cua_id) {
     },
         function (isConfirm) {
             if (isConfirm) {
-                $.post("../../controller/cuadrilla_asig.php?op=eliminar", { cua_id: cua_id }, function (data) {
+                $.post("../../controller/cuadrilla_asignacionEquipo?op=eliminar", { cua_id: cua_id }, function (data) {
                 });
 
                 $('#cuadrilla_data').DataTable().ajax.reload();
@@ -138,7 +138,7 @@ function listarEquipos() {
             ],
             "ajax":
             {
-                url: '../../controller/cuadrilla_asig.php?op=combo',
+                url: '../../controller/cuadrilla_asignacionEquipo.php?op=combo',
                 type: "get",
                 dataType: "json",
                 error: function (e) {
@@ -169,23 +169,26 @@ function listarEquipos() {
 }
 
 
-let currentCuaId;
+let currentCuaId; // Declarada global para usar en colaboradores y equipos
 
 function agregar(cua_id) {
-    currentCuaId = cua_id;
-    listarColaboradores();
-    $("#modalasignar").modal('show');
+    currentCuaId = cua_id; // Asignar cua_id a la variable global
+    listarColaboradores(); // Listar colaboradores para asignar
+    $("#modalasignar").modal('show'); // Mostrar modal de colaboradores
 }
 
 function agregarEquipo(cua_id) {
-    currentCuaId = cua_id;
-    listarEquipos();
-    $("#modalequipos").modal('show');
+    currentCuaId = cua_id; // Asignar cua_id a la variable global
+    listarEquipos(); // Listar equipos para asignar
+    $("#modalequipos").modal('show'); // Mostrar modal de equipos
 }
+
+
+
 
 function asignar(col_id) {
     $.ajax({
-        url: "../../controller/cuadrilla_asig.php?op=asignar",
+        url: "../../controller/cuadrilla_asignacionEquipo.php?op=asignar",
         type: "POST",
         data: { cua_id: currentCuaId, col_id: col_id },
         success: function (response) {
@@ -209,7 +212,7 @@ function asignar(col_id) {
 function eliminarItem(cua_id, col_id) {
     // Llamada AJAX para eliminar el colaborador de la cuadrilla
     $.ajax({
-        url: "../../controller/cuadrilla_asig.php?op=eliminarColaborador",
+        url: "../../controller/cuadrilla_asignacionEquipo?op=eliminarColaborador",
         type: "POST",
         data: { cua_id: cua_id, col_id: col_id },
         success: function (response) {
@@ -220,12 +223,13 @@ function eliminarItem(cua_id, col_id) {
                     type: "success",
                     confirmButtonClass: "btn-success"
                 });
-
+                
             }
             $('#cuadrilla_data').DataTable().ajax.reload();
         }
     });
 }
+
 
 function eliminarItems(cua_id, equipo_id) {
     // Cerrar cualquier modal abierto antes de mostrar el nuevo modal
@@ -249,7 +253,7 @@ function eliminarItems(cua_id, equipo_id) {
 
         $("#modalEliminacion").modal('hide');
         $.ajax({
-            url: "../../controller/cuadrilla_asig.php?op=eliminarEquipo",
+            url: "../../controller/cuadrilla_asignacionEquipo.php?op=eliminarEquipo",
             type: "POST",
             data: { cua_id: cua_id, equipo_id: equipo_id, motivo: motivo },
             success: function (response) {
@@ -290,7 +294,7 @@ function procesarArchivo(cua_id) {
         formData.append('cua_id', cua_id);
 
         $.ajax({
-            url: '../../controller/cuadrilla_asig.php?op=subirComprobanteCuadrilla',
+            url: '../../controller/cuadrilla_asignacionEquipo.php?op=subirComprobanteCuadrillaEquipo',
             type: 'POST',
             data: formData,
             cache: false,
@@ -329,20 +333,12 @@ function procesarArchivo(cua_id) {
 }
 
 
-
-
-
-
-
-
-
-//Funcion Asigancion de Equipos a cuadrilla
 function asignarEquipo(equipo_id) {
     console.log(equipo_id);
     $.ajax({
-        url: "../../controller/cuadrilla_asig.php?op=asignarEquipo",
+        url: "../../controller/cuadrilla_asignacionEquipo.php?op=asignarEquipo",
         type: "POST",
-        data: { cua_id: currentCuaId, equipo_id: equipo_id },
+        data: { cua_id: currentCuaId, equipo_id: equipo_id }, // Usar currentCuaId
         success: function (response) {
             console.log("Equipo asignado:", response);
 
@@ -365,127 +361,30 @@ function asignarEquipo(equipo_id) {
     });
 }
 
-
-//Funcion para generar Acta de entrega Chip Cuadrilla
 function generar(cua_id) {
-    fetch('../../controller/cuadrilla_asig.php?op=generar_word&cua_id=' + cua_id)
-        .then(response => response.json())
-        .then(data => {
-            if (data.status === "error") {
-                swal({
-                    title: "Error",
-                    text: data.message,
-                    icon: "error",
-                    button: "Aceptar"
-                });
-            } else {
-                swal({
-                    title: "HelpDesk!",
-                    text: "El documento se ha generado correctamente.",
-                    icon: "success",
-                    button: "Descargar"
-                }).then(() => {
-                    window.location.href = '../../public/actas/chipsCuadrillas/' + data.file_name;
-                });
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            swal({
-                title: "Error",
-                text: "Ocurrió un problema al generar el documento.",
-                icon: "error",
-                button: "Aceptar"
-            });
-        });
+    window.location.href = '../../controller/cuadrilla_asignacionEquipo.php?op=generar_word&cua_id=' + cua_id;
+    swal({
+        title: "HelpDesk!",
+        text: "Completado.",
+        type: "success",
+        confirmButtonClass: "btn-success"
+    });
 }
 
 
-
-//Funcion para marcar las recargas realizadas
-$(document).on('change', 'input[type="checkbox"]', function () {
-    var cua_id = $(this).attr('id').split('_')[1]; // Obtener el ID de la cuadrilla desde el checkbox
-    var recargas = $(this).prop('checked') ? 'true' : 'false'; // Determinar si el checkbox está marcado o desmarcado
-
-    $.ajax({
-        url: '../../controller/cuadrilla_asig.php?op=marcarRecarga',
-        type: 'POST',
-        data: {
-            cua_id: cua_id,
-            recargas: recargas
-        },
-        success: function (response) {
-            var res = JSON.parse(response);
-            if (res.status === 'success') {
-                console.log('Recarga actualizada');
-            } else {
-                console.log('Error al actualizar recarga');
-            }
-        }
-    });
-});
-
-// Función para desmarcar todos los checkboxes
-function refresh() {
+function descargarNota(cua_id){
+    window.location.href = '../../controller/cuadrilla_asignacionEquipo.php?op=generar_word_descargo&cua_id=' + cua_id;
     swal({
-        title: "Procesando...",
-        text: "Por favor, espere mientras se resetean las recargas.",
-        content: {
-            element: "div",
-            attributes: {
-                innerHTML: '<div class="loader" style="margin: auto;"></div>',
-            },
-        },
-        buttons: false,
-        closeOnClickOutside: false,
-        closeOnEsc: false,
-    });
-
-    // Simular un retraso antes de iniciar la solicitud
-    setTimeout(function () {
-        $.ajax({
-            url: '../../controller/cuadrilla_asig.php?op=desmarcarTodas',
-            type: 'POST',
-            dataType: 'json',
-            success: function (response) {
-                if (response.status === 'success') {
-                    console.log('Recargas reseteadas');
-                    // Desmarcar todas las casillas
-                    $('input[type="checkbox"]').prop('checked', false);
-                }
-            }, complete: function () {
-                swal.close();
-            }
-        });
-    }, 1000);
-}
-
-
-
-//Genera excel de cuadrillas y recargas
-$('#exportarRecargas').on('click', function () {
-    window.location.href = '../../controller/cuadrilla_asig.php?op=exportarRecargas';
-});
-
-
-
-
-
-//Funcion acta de descargo de equipos por cuadrillas
-function descargarNota(cua_id) {
-    window.location.href = '../../controller/cuadrilla_asig.php?op=generar_word_descargo&cua_id=' + cua_id;
-    swal({
-        title: "Acta de descarga generada!" + cua_id,
+        title: "Acta de descarga generada!"+cua_id,
         text: "Completado.",
         type: "info",
         confirmButtonClass: "btn-success"
     });
 }
 
-//Descargar comprobante firmado por colaborador entrega chip
 function descargarComprobante(cua_id) {
     $.ajax({
-        url: '../../controller/cuadrilla_asig.php?op=obtenerRutaArchivo',
+        url: '../../controller/cuadrilla_asignacionEquipo.php?op=obtenerRutaArchivo',
         type: 'POST',
         data: { cua_id: cua_id },
         success: function (response) {
@@ -493,7 +392,7 @@ function descargarComprobante(cua_id) {
                 var data = JSON.parse(response);
                 if (data.success && data.ruta) {
                     var xhr = new XMLHttpRequest();
-                    xhr.open('GET', '../../controller/cuadrilla_asig.php?op=descargarArchivo&ruta=' + encodeURIComponent(data.ruta));
+                    xhr.open('GET', '../../controller/cuadrilla_asignacionEquipo.php?op=descargarArchivo&ruta=' + encodeURIComponent(data.ruta));
                     xhr.onload = function () {
                         if (xhr.status === 404) {
                             swal({
@@ -503,7 +402,7 @@ function descargarComprobante(cua_id) {
                                 button: "Aceptar"
                             });
                         } else {
-                            window.location.href = '../../controller/cuadrilla_asig.php?op=descargarArchivo&ruta=' + encodeURIComponent(data.ruta);
+                            window.location.href = '../../controller/cuadrilla_asignacionEquipo.php?op=descargarArchivo&ruta=' + encodeURIComponent(data.ruta);
                         }
                     };
                     xhr.send();
@@ -526,6 +425,13 @@ function descargarComprobante(cua_id) {
         }
     });
 }
+
+
+
+
+
+
+
 
 
 

@@ -39,14 +39,17 @@ switch ($_GET["op"]) {
                 $sub_array[] = '<span class="label label-success">Equipo Libre</span>';
             }
 
-            // Verifica si es un equipo informático (datos = 2)
-            if (isset($row["datos"]) && $row["datos"] == 2) {
-                $sub_array[] = '<span class="badge badge-success">Informático</span>';
+            // Verifica el tipo de equipo según el valor de "datos"
+            if (isset($row["datos"])) {
+                if ($row["datos"] == 2) {
+                    $sub_array[] = '<span class="badge badge-success">Informático</span>';
+                } elseif ($row["datos"] == 1) {
+                    $sub_array[] = '<span class="badge badge-info">No Informático</span>';
+                } elseif ($row["datos"] == 3) {
+                    $sub_array[] = '<span class="badge badge-danger">Equipo Técnicos Claro</span>';
+                }
             }
-            // Si es un equipo no informático (datos = 1)
-            elseif (isset($row["datos"]) && $row["datos"] == 1) {
-                $sub_array[] = '<span class="badge badge-danger">No Informático</span>';
-            }
+
 
             // Agrega botones para editar y eliminar
             $sub_array[] = '<td class="text-center" colspan="2">
@@ -126,7 +129,7 @@ switch ($_GET["op"]) {
         echo json_encode($results);
         break;
 
-        //Combo para equipos disponibles para usuarios(Administrativos)
+    //Combo para equipos disponibles para usuarios(Administrativos)
 
     case "comboEquipos":
         $datos = $equipo->get_equipos_disponibles_usuarios();

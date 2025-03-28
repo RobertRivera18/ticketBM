@@ -115,6 +115,22 @@ class Cuadrilla_Chip extends Conectar
 
 
 
+    //Obtener equipos para tecnicos disponibles
+    public function get_equiposTecnicos_disponibles()
+    {
+        $conectar = parent::conexion();
+        parent::set_names();
+        $sql = "SELECT e.*
+                FROM tm_equipos e
+                LEFT JOIN tm_cuadrilla_equipo cc ON e.equipo_id = cc.equipo_id
+                WHERE cc.equipo_id IS NULL AND e.datos=3";
+        $sql = $conectar->prepare($sql);
+        $sql->execute();
+        return $resultado = $sql->fetchAll();
+    }
+
+
+
 
     //Metodo usado para mostar los colaboradores por cuadrilla en el DataTable
     public function get_colaboradores_por_cuadrilla($cua_id)
@@ -144,7 +160,24 @@ class Cuadrilla_Chip extends Conectar
         $sql = "SELECT eq.equipo_id, eq.nombre_equipo, eq.marca, eq.serie
     FROM tm_cuadrilla_equipo
     INNER JOIN tm_equipos eq ON tm_cuadrilla_equipo.equipo_id = eq.equipo_id
-    WHERE tm_cuadrilla_equipo.cua_id = ?";
+    WHERE eq.datos = 1 AND  tm_cuadrilla_equipo.cua_id = ?";
+        $stmt = $conectar->prepare($sql);
+        $stmt->bindValue(1, $cua_id);
+        $stmt->execute();
+
+        return $stmt->fetchAll();
+    }
+
+
+    //Metodo usado para mostar los equipos otorgados a las cuadrillas
+    public function get_equipos_por_cuadrilla1($cua_id)
+    {
+        $conectar = parent::conexion();
+        parent::set_names();
+        $sql = "SELECT eq.equipo_id, eq.nombre_equipo, eq.marca, eq.serie
+FROM tm_cuadrilla_equipo
+INNER JOIN tm_equipos eq ON tm_cuadrilla_equipo.equipo_id = eq.equipo_id
+WHERE eq.datos = 3 AND tm_cuadrilla_equipo.cua_id = ?";
         $stmt = $conectar->prepare($sql);
         $stmt->bindValue(1, $cua_id);
         $stmt->execute();
@@ -258,7 +291,7 @@ LEFT JOIN
 INNER JOIN
     tm_cuadrilla cu ON cu.cua_id = cc.cua_id
 WHERE
-    cc.cua_id = ?
+   e.datos =1 AND  cc.cua_id = ?
 ";
             $stmt = $conectar->prepare($sql);
             $stmt->bindValue(1, $cua_id, PDO::PARAM_INT);
@@ -276,6 +309,48 @@ WHERE
             return false;
         }
     }
+
+
+    //Genera word de asigancion de un equipo a tecnicos(Medidor de campo)
+    public function create_word_equipo_cuadrilla($cua_id)
+    {
+        try {
+            $conectar = parent::conexion();
+            parent::set_names();
+
+            $sql = "SELECT 
+            GROUP_CONCAT(DISTINCT c.col_nombre SEPARATOR ',') AS nombres_colaboradores,
+            GROUP_CONCAT(DISTINCT c.col_cedula SEPARATOR ',') AS cedulas_colaboradores,
+            e.equipo_id, 
+            e.nombre_equipo AS descripcion, 
+            e.marca, 
+            e.modelo, 
+            e.serie AS serie,
+            cu.cua_nombre AS nombre_cuadrilla
+        FROM tm_cuadrilla_colaborador cc
+        INNER JOIN tm_colaborador c ON cc.col_id = c.col_id
+        LEFT JOIN tm_cuadrilla_equipo ce ON ce.cua_id = cc.cua_id
+        LEFT JOIN tm_equipos e ON ce.equipo_id = e.equipo_id
+        INNER JOIN tm_cuadrilla cu ON cu.cua_id = cc.cua_id
+        WHERE e.datos =3 AND cc.cua_id = ?
+        GROUP BY e.equipo_id, cu.cua_nombre;";
+
+            $stmt = $conectar->prepare($sql);
+            $stmt->bindValue(1, $cua_id, PDO::PARAM_INT);
+            $stmt->execute();
+            $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            if (!$result) {
+                return false;
+            }
+
+            return $result;
+        } catch (PDOException $e) {
+            echo "Error en la consulta: " . $e->getMessage();
+            return false;
+        }
+    }
+
 
     public function create_word_descargo($cua_id)
     {
@@ -304,7 +379,7 @@ LEFT JOIN
 INNER JOIN
     tm_cuadrilla cu ON cu.cua_id = cc.cua_id
 WHERE
-    cc.cua_id = ?";
+   e.datos=1 AND  cc.cua_id = ?";
 
             $stmt = $conectar->prepare($sql);
             $stmt->bindValue(1, $cua_id, PDO::PARAM_INT);
@@ -322,4 +397,89 @@ WHERE
             return false;
         }
     }
+
+
+    //Metodo para subir un comprobante en la tabla cuadrilla
+    public function guardarRutaComprobanteCuadrilla($cua_id, $ruta)
+    {
+        try {
+            $conectar = parent::conexion();
+            if (!$conectar) {
+                throw new Exception("No se pudo establecer la conexión a la base de datos");
+            }
+            parent::set_names();
+            $sql = "UPDATE tm_cuadrilla SET ruta_comprobante = ? WHERE cua_id = ?";
+            $stmt = $conectar->prepare($sql);
+            $stmt->bindValue(1, $ruta, PDO::PARAM_STR);
+            $stmt->bindValue(2, $cua_id, PDO::PARAM_INT);
+            if (!$stmt->execute()) {
+                error_log("Error al ejecutar la consulta: " . implode(", ", $stmt->errorInfo()));
+                return false;
+            }
+            return true;
+        } catch (PDOException $e) {
+            error_log("Error en guardarRutaComprobanteCuadrilla: " . $e->getMessage());
+            return false;
+        }
+    }
+
+      //Para descargar el comprobante de recepcion de chip
+      public function obtenerRutaArchivo($cua_id)
+      {
+          try {
+              $conectar = parent::conexion();
+              parent::set_names();
+              $sql = "SELECT ruta_comprobante FROM tm_cuadrilla WHERE cua_id = ?";
+              $stmt = $conectar->prepare($sql);
+              $stmt->bindValue(1, $cua_id, PDO::PARAM_INT);
+              $stmt->execute();
+              $resultado = $stmt->fetch(PDO::FETCH_ASSOC);
+              return $resultado ? $resultado['ruta_comprobante'] : '';
+          } catch (Exception $e) {
+              return '';
+          }
+      }
+
+
+
+      //Metodos para subir comprobante entrega de equipos a tecnicos claro
+    public function guardarRutaComprobanteCuadrillaEquipos($cua_id, $ruta)
+    {
+        try {
+            $conectar = parent::conexion();
+            if (!$conectar) {
+                throw new Exception("No se pudo establecer la conexión a la base de datos");
+            }
+            parent::set_names();
+            $sql = "UPDATE tm_cuadrilla SET comprobante_equipoTecnicos = ? WHERE cua_id = ?";
+            $stmt = $conectar->prepare($sql);
+            $stmt->bindValue(1, $ruta, PDO::PARAM_STR);
+            $stmt->bindValue(2, $cua_id, PDO::PARAM_INT);
+            if (!$stmt->execute()) {
+                error_log("Error al ejecutar la consulta: " . implode(", ", $stmt->errorInfo()));
+                return false;
+            }
+            return true;
+        } catch (PDOException $e) {
+            error_log("Error en guardarRutaComprobanteCuadrilla: " . $e->getMessage());
+            return false;
+        }
+    }
+    //Para descargar el comprobante de recepcion de chip
+    public function obtenerRutaArchivoEquipo($cua_id)
+    {
+        try {
+            $conectar = parent::conexion();
+            parent::set_names();
+            $sql = "SELECT comprobante_equipoTecnicos FROM tm_cuadrilla WHERE cua_id = ?";
+            $stmt = $conectar->prepare($sql);
+            $stmt->bindValue(1, $cua_id, PDO::PARAM_INT);
+            $stmt->execute();
+            $resultado = $stmt->fetch(PDO::FETCH_ASSOC);
+            return $resultado ? $resultado['comprobante_equipoTecnicos'] : '';
+        } catch (Exception $e) {
+            return '';
+        }
+    }
+
 }
