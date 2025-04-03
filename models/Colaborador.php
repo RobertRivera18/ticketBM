@@ -94,6 +94,18 @@ class Colaborador extends Conectar
         return $resultado = $sql->fetchAll();
     }
 
+    public function get_all_colaboradores()
+    {
+        $conectar = parent::conexion();
+        parent::set_names();
+        $sql = "SELECT c.*
+             FROM tm_colaborador c
+             LEFT JOIN tm_cuadrilla_colaborador cc ON c.col_id = cc.col_id";
+        $sql = $conectar->prepare($sql);
+        $sql->execute();
+        return $resultado = $sql->fetchAll();
+    }
+
 
       //Muestra los colaboradores que pertenecen a claro
       public function get_colaboradoresClaro(){

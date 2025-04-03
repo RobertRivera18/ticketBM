@@ -73,7 +73,7 @@ switch ($_GET["op"]) {
         break;
 
     case "combo":
-        $datos = $colaborador->get_colaboradores();
+        $datos = $colaborador->get_all_colaboradores();
         $data = array();
         if (is_array($datos) && count($datos) > 0) {
             foreach ($datos as $row) {

@@ -50,45 +50,37 @@ class Equipo extends Conectar
             $conectar = parent::conexion();
             parent::set_names();
             $sql = "
-              SELECT 
+             SELECT 
     e.equipo_id,
     e.nombre_equipo,
     e.marca,
     e.modelo,
     e.serie,
     e.datos,
-  
-    CASE 
-        WHEN e.datos = 2 THEN CONCAT(u.usu_nom, ' ', u.usu_ape)
-        ELSE NULL 
-    END AS nombre_usuario,
-   
-    CASE 
-        WHEN e.datos = 1 THEN cua.cua_nombre
-        ELSE NULL 
-    END AS cuadrilla_asignada,
 
-     CASE 
-        WHEN e.datos = 3 THEN cua.cua_nombre
-        ELSE NULL 
-    END AS cuadrilla_asignada
+    -- Obtener el asignado, priorizando usuario si datos = 2, sino cuadrilla
+    CASE 
+        WHEN e.datos = 2 THEN 
+            (SELECT CONCAT(u.usu_nom, ' ', u.usu_ape)
+             FROM tm_usuario_equipo ue
+             JOIN tm_usuario u ON ue.usu_id = u.usu_id
+             WHERE ue.equipo_id = e.equipo_id
+             LIMIT 1)
+        WHEN e.datos IN (1,3) THEN 
+            (SELECT cua.cua_nombre
+             FROM tm_cuadrilla_equipo cue
+             JOIN tm_cuadrilla cua ON cue.cua_id = cua.cua_id
+             WHERE cue.equipo_id = e.equipo_id
+             LIMIT 1)
+        ELSE NULL
+    END AS asignado
+
 FROM 
     tm_equipos e
-
-LEFT JOIN 
-    tm_usuario_equipo ue ON e.equipo_id = ue.equipo_id
-LEFT JOIN 
-    tm_usuario u ON ue.usu_id = u.usu_id
-
-LEFT JOIN 
-    tm_cuadrilla_equipo cue ON e.equipo_id = cue.equipo_id
-LEFT JOIN 
-    tm_cuadrilla cua ON cue.cua_id = cua.cua_id
 WHERE 
-    e.datos IN (1, 2,3) 
+    e.datos IN (1, 2, 3)
 ORDER BY 
     e.equipo_id DESC;
-;
 
             ";
 
@@ -161,7 +153,4 @@ ORDER BY
         $sql->execute();
         return $resultado = $sql->fetchAll();
     }
-
-
-    
-    }
+}

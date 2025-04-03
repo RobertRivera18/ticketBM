@@ -39,7 +39,7 @@
                             <tfoot>
                                 <tr>
                                     <th>Opciones</th>
-                                    <th>Nombre de Cuadrilla</th>
+                                    <th>Nombre</th>
                                     <th>Ciudad</th>
                                     <th>Empresa</th>
                                 </tr>
@@ -55,6 +55,7 @@
                                     <th>Opciones</th>
                                     <th>Nombre Equipo</th>
                                     <th>Marca</th>
+                                    <th>Modelo</th>
                                     <th>Serie</th>
                                 </tr>
                             </thead>
@@ -66,6 +67,7 @@
                                     <th>Opciones</th>
                                     <th>Nombre Equipo</th>
                                     <th>Marca</th>
+                                    <th>Modelo</th>
                                     <th>Serie</th>
                                 </tr>
                             </tfoot>

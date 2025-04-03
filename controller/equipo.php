@@ -13,72 +13,68 @@ switch ($_GET["op"]) {
         }
         break;
 
-    case "listar":
-        $datos = $equipo->get_equipo_con_asignacion();
-        $data = array();
-
-        foreach ($datos as $row) {
-            $sub_array = array();
-            $sub_array[] = $row["nombre_equipo"];
-            $sub_array[] = $row["marca"];
-            $sub_array[] = $row["modelo"];
-            $sub_array[] = $row["serie"];
-
-            // Verifica si el equipo está asignado a un usuario
-            if (!empty($row["nombre_usuario"])) {
-                $sub_array[] = '<span class="label label-danger">Equipo Asignado</span>' .
-                    '<span class="label label-warning">' . $row["nombre_usuario"] . '</span>';
-            }
-            // Verifica si el equipo está asignado a una cuadrilla
-            elseif (!empty($row["cuadrilla_asignada"])) {
-                $sub_array[] = '<span class="label label-danger">Equipo Asignado</span>' .
-                    '<span class="label label-info">' . $row["cuadrilla_asignada"] . '</span>';
-            }
-            // Si no está asignado a nadie
-            else {
-                $sub_array[] = '<span class="label label-success">Equipo Libre</span>';
-            }
-
-            // Verifica el tipo de equipo según el valor de "datos"
-            if (isset($row["datos"])) {
-                if ($row["datos"] == 2) {
-                    $sub_array[] = '<span class="badge badge-success">Informático</span>';
-                } elseif ($row["datos"] == 1) {
-                    $sub_array[] = '<span class="badge badge-info">No Informático</span>';
-                } elseif ($row["datos"] == 3) {
-                    $sub_array[] = '<span class="badge badge-danger">Equipo Técnicos Claro</span>';
+        case "listar":
+            $datos = $equipo->get_equipo_con_asignacion();
+            $data = array();
+        
+            foreach ($datos as $row) {
+                $sub_array = array();
+                $sub_array[] = $row["nombre_equipo"];
+                $sub_array[] = $row["marca"];
+                $sub_array[] = $row["modelo"];
+                $sub_array[] = $row["serie"];
+            
+                // Verifica si el equipo está asignado
+                if (!empty($row["asignado"])) {
+                    $sub_array[] = '<span class="label label-danger">Equipo Asignado</span>' .
+                        '<span class="label label-warning">' . htmlspecialchars($row["asignado"]) . '</span>';
+                } else {
+                    $sub_array[] = '<span class="label label-success">Equipo Libre</span>';
                 }
+            
+                // Determina el tipo de equipo
+                $tipo_equipo = "";
+                if (isset($row["datos"])) {
+                    switch ($row["datos"]) {
+                        case 2:
+                            $tipo_equipo = '<span class="badge badge-success">Informático</span>';
+                            break;
+                        case 1:
+                            $tipo_equipo = '<span class="badge badge-info">No Informático</span>';
+                            break;
+                        case 3:
+                            $tipo_equipo = '<span class="badge badge-danger">Equipo Técnicos Claro</span>';
+                            break;
+                    }
+                }
+                $sub_array[] = $tipo_equipo;
+            
+                // Botones de acción
+                $sub_array[] = '<td class="text-center" colspan="2">
+                            <div style="display: flex; justify-content: center; gap: 5px;">
+                                <button type="button" onClick="editar(' . $row["equipo_id"] . ');" id="' . $row["equipo_id"] . '" class="btn btn-inline btn-warning btn-sm ladda-button">
+                                    <i class="fa fa-edit"></i>
+                                </button>
+                                <button type="button" onClick="eliminar(' . $row["equipo_id"] . ');" id="' . $row["equipo_id"] . '" class="btn btn-inline btn-danger btn-sm ladda-button">
+                                    <i class="fa fa-trash"></i>
+                                </button>
+                            </div>
+                        </td>';
+            
+                $data[] = $sub_array;
             }
-
-
-            // Agrega botones para editar y eliminar
-            $sub_array[] = '<td class="text-center" colspan="2">
-                        <div style="display: flex; justify-content: center; gap: 5px;">
-                            <button type="button" onClick="editar(' . $row["equipo_id"] . ');" id="' . $row["equipo_id"] . '" class="btn btn-inline btn-warning btn-sm ladda-button">
-                                <i class="fa fa-edit"></i>
-                            </button>
-                            <button type="button" onClick="eliminar(' . $row["equipo_id"] . ');" id="' . $row["equipo_id"] . '" class="btn btn-inline btn-danger btn-sm ladda-button">
-                                <i class="fa fa-trash"></i>
-                            </button>
-                        </div>
-                    </td>';
-
-            // Agrega el arreglo de resultados
-            $data[] = $sub_array;
-        }
-
-        // Respuesta en formato JSON
-        $results = array(
-            "sEcho" => 1,
-            "iTotalRecords" => count($data),
-            "iTotalDisplayRecords" => count($data),
-            "aaData" => $data
-        );
-
-        // Enviar respuesta al cliente
-        echo json_encode($results);
-        break;
-
+            
+            // Respuesta en formato JSON
+            $results = array(
+                "sEcho" => 1,
+                "iTotalRecords" => count($data),
+                "iTotalDisplayRecords" => count($data),
+                "aaData" => $data
+            );
+        
+            echo json_encode($results);
+            break;
+        
 
 
     case "eliminar":
